@@ -1,0 +1,13 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { demoScenes, type DemoScene } from '../../../spoor/demo/fixtures';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV
+    ? demoScenes.map((scene) => ({ params: { scene }, props: { scene } }))
+    : [];
+}
+const { scene } = Astro.props as { scene: DemoScene };
+---
+
+<Layout locale="fr" page="home" previewScene={scene} />

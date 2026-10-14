@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import sharp from 'sharp';
 
 const git = (args) =>
@@ -7,7 +7,13 @@ const git = (args) =>
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   }).trim();
-const files = git(['ls-files', '-z']).split('\0').filter(Boolean);
+const files = [
+  ...new Set(
+    git(['ls-files', '--cached', '--others', '--exclude-standard', '-z'])
+      .split('\0')
+      .filter(Boolean),
+  ),
+].filter(existsSync);
 const failures = [];
 const expectedEmail = '245930475+Voldigoade@users.noreply.github.com';
 const username = process.env.USERNAME;

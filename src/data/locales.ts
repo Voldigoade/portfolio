@@ -40,10 +40,10 @@ export function route(
 
 export const copy = {
   fr: {
-    title: 'Voldigoade — logiciels, systèmes, sécurité, vie privée',
+    title: 'Voldigoade',
     description:
-      'Logiciels, systèmes, réseaux et vie privée. Les travaux et les recherches de Voldigoade, une couche après l’autre.',
-    nav: ['Travaux', 'Couches', 'Approche'],
+      'Le portfolio de Voldigoade. Logiciels, systèmes, réseaux, sécurité, vie privée et recherche technique.',
+    nav: ['À propos', 'Spoor', 'GitHub'],
     navLabel: 'Navigation principale',
     languageLabel: 'Langue',
     skip: 'Aller au contenu',
@@ -55,9 +55,13 @@ export const copy = {
     top: 'Retour en haut',
     back: 'Retour aux travaux',
     visit: 'Lire la recherche',
-    privacyTitle: 'Une surface volontairement sobre.',
+    privacyTitle: 'Confidentialité',
     privacyDescription: 'Ce que ce site fait — et ce qu’il n’enregistre pas.',
     privacySections: [
+      {
+        title: 'Spoor',
+        text: 'Quand vous lancez une recherche, le nom de profil ou de dépôt est envoyé à l’API publique de Spoor. Le mode rapide consulte des données publiques GitHub, sans appel à GitLeak. Les résultats restent en mémoire dans votre navigateur ; les fichiers exportés sont fournis par Spoor. Le service et son hébergeur reçoivent les informations techniques nécessaires à ces requêtes.',
+      },
       {
         title: 'Dans le navigateur',
         text: 'Ce site ne dépose aucun cookie et n’utilise ni stockage local, ni traceur, ni outil d’analyse d’audience. Aucun compteur de visites n’est activé. Les polices et les images sont servies avec le site.',
@@ -78,10 +82,10 @@ export const copy = {
     home: 'Revenir à l’accueil',
   },
   en: {
-    title: 'Voldigoade — software, systems, security, privacy',
+    title: 'Voldigoade',
     description:
-      'Software, systems, networks and privacy. Work and research by Voldigoade, one layer at a time.',
-    nav: ['Work', 'Layers', 'Approach'],
+      'Voldigoade’s portfolio. Software, systems, networking, security, privacy and technical research.',
+    nav: ['About', 'Spoor', 'GitHub'],
     navLabel: 'Main navigation',
     languageLabel: 'Language',
     skip: 'Skip to content',
@@ -93,9 +97,13 @@ export const copy = {
     top: 'Back to top',
     back: 'Back to work',
     visit: 'Read the research',
-    privacyTitle: 'A deliberately small footprint.',
+    privacyTitle: 'Privacy',
     privacyDescription: 'What this site does, and what it does not record.',
     privacySections: [
+      {
+        title: 'Spoor',
+        text: 'When you start a lookup, the profile or repository name is sent to Spoor’s public API. Fast mode checks public GitHub data without calling GitLeak. Results stay in browser memory; exported files come from Spoor. The service and its hosting provider receive the technical information needed for these requests.',
+      },
       {
         title: 'In your browser',
         text: 'This site uses no cookies, local storage, trackers or audience analytics. No view counter is enabled. Fonts and images are served with the site.',
@@ -116,10 +124,10 @@ export const copy = {
     home: 'Return home',
   },
   es: {
-    title: 'Voldigoade — software, sistemas, seguridad, privacidad',
+    title: 'Voldigoade',
     description:
-      'Software, sistemas, redes y privacidad. Los proyectos y la investigación de Voldigoade, capa a capa.',
-    nav: ['Proyectos', 'Capas', 'Enfoque'],
+      'El portfolio de Voldigoade. Software, sistemas, redes, seguridad, privacidad e investigación técnica.',
+    nav: ['Acerca de', 'Spoor', 'GitHub'],
     navLabel: 'Navegación principal',
     languageLabel: 'Idioma',
     skip: 'Ir al contenido',
@@ -131,9 +139,13 @@ export const copy = {
     top: 'Volver arriba',
     back: 'Volver a los proyectos',
     visit: 'Leer la investigación',
-    privacyTitle: 'Una huella deliberadamente pequeña.',
+    privacyTitle: 'Privacidad',
     privacyDescription: 'Qué hace este sitio y qué datos no registra.',
     privacySections: [
+      {
+        title: 'Spoor',
+        text: 'Al iniciar una consulta, el nombre del perfil o repositorio se envía a la API pública de Spoor. El modo rápido consulta datos públicos de GitHub sin llamar a GitLeak. Los resultados permanecen en la memoria del navegador; Spoor proporciona los archivos exportados. El servicio y su proveedor de alojamiento reciben la información técnica necesaria para estas solicitudes.',
+      },
       {
         title: 'En el navegador',
         text: 'Este sitio no utiliza cookies, almacenamiento local, rastreadores ni análisis de audiencia. No hay contador de visitas. Las fuentes y las imágenes se sirven desde el propio sitio.',

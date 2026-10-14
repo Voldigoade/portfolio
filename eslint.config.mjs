@@ -7,9 +7,17 @@ export default defineConfig(
   { ignores: ['dist/**', '.astro/**', '.vercel/**'] },
   js.configs.recommended,
   ...ts.configs.recommended,
+  {
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
+    },
+  },
   ...astro.configs.recommended,
   {
-    files: ['tests/browser.mjs'],
+    files: ['tests/browser.mjs', 'tests/spoor-e2e.mjs'],
     languageOptions: {
       globals: {
         fetch: 'readonly',
@@ -18,6 +26,9 @@ export default defineConfig(
         requestAnimationFrame: 'readonly',
         getComputedStyle: 'readonly',
         performance: 'readonly',
+        navigator: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
       },
     },
   },
@@ -28,6 +39,9 @@ export default defineConfig(
         Buffer: 'readonly',
         URL: 'readonly',
         console: 'readonly',
+        Response: 'readonly',
+        AbortController: 'readonly',
+        AbortSignal: 'readonly',
       },
     },
   },

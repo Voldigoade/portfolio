@@ -9,22 +9,23 @@ const colors = Object.fromEntries(
   ]),
 );
 const labels = {
-  fr: 'D’une couche à l’autre.',
-  en: 'From one layer to the next.',
-  es: 'De una capa a la siguiente.',
+  fr: 'Logiciels, systèmes, sécurité.',
+  en: 'Software, systems, security.',
+  es: 'Software, sistemas, seguridad.',
 };
 const dots = [];
-for (let x = 24; x < 1200; x += 24) {
-  for (let y = 24; y < 630; y += 24) {
-    const opacity = (Math.abs(x - 600) / 600) * 0.38;
+for (let x = 130; x < 1070; x += 8) {
+  for (let y = 4; y < 360; y += 8) {
+    const distance = Math.sqrt(((x - 600) / 480) ** 2 + (y / 360) ** 2);
+    const opacity = Math.max(0, 1 - distance) * 0.65;
     dots.push(
-      `<circle cx="${x}" cy="${y}" r="0.8" fill="${colors.primary}" opacity="${opacity}"/>`,
+      `<circle cx="${x}" cy="${y}" r="0.8" fill="${colors.muted}" opacity="${opacity}"/>`,
     );
   }
 }
 await mkdir('public', { recursive: true });
 for (const [locale, label] of Object.entries(labels)) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="${colors.background}"/>${dots.join('')}<g fill="none" stroke="${colors.primary}" stroke-opacity="0.45"><path d="M0 180H120V120H240V330H150V450H300V580M1200 410H1030V270H1110V180H990V90H870V0"/></g><g fill="${colors.primary}"><rect x="237" y="117" width="6" height="6"/><rect x="1027" y="407" width="6" height="6"/></g><text x="600" y="320" text-anchor="middle" font-family="Arial,sans-serif" font-size="110" letter-spacing="-6" fill="${colors.text}">Voldigoade</text><text x="600" y="390" text-anchor="middle" font-family="Arial,sans-serif" font-size="32" fill="${colors.muted}">${label}</text><path d="M558 500H606V524H642" fill="none" stroke="${colors.primary}"/></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="${colors.background}"/>${dots.join('')}<text x="600" y="320" text-anchor="middle" font-family="Arial,sans-serif" font-size="100" font-weight="600" letter-spacing="-5" fill="${colors.text}">Voldigoade</text><text x="600" y="390" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" fill="${colors.muted}">${label}</text></svg>`;
   await sharp(Buffer.from(svg))
     .png({ compressionLevel: 9 })
     .toFile(`public/og-${locale}.png`);

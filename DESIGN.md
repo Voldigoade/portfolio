@@ -1,96 +1,64 @@
 ---
 version: alpha
 name: Voldigoade
-description: Interactive technical portfolio with a routed matrix field and visual project studies.
+description: A personal technical portfolio with an optional Spoor component.
 colors:
-  background: '#0C1013'
-  surface: '#141B20'
-  text: '#EDF3F6'
-  muted: '#A5B2BD'
-  border: '#2B3942'
-  primary: '#94D3E3'
-  on-primary: '#0C1013'
+  background: '#0a0a0a'
+  surface: '#101010'
+  text: '#fafafa'
+  muted: '#a3a3a3'
+  border: '#2b2b2b'
+  primary: '#b8c4ff'
+  on-primary: '#0a0a0a'
 typography:
   sans:
-    fontFamily: 'IBM Plex Sans, Segoe UI, sans-serif'
+    fontFamily: 'Geist, sans-serif'
   mono:
-    fontFamily: 'SFMono-Regular, Consolas, Liberation Mono, monospace'
+    fontFamily: 'Geist Mono, monospace'
 rounded:
-  control: '12px'
-  surface: '18px'
+  control: '20px'
+  surface: '14px'
 spacing:
-  page-max: '70rem'
-  section-gap: '7rem'
-components:
-  navigation:
-    textColor: '{colors.muted}'
-    backgroundColor: '{colors.surface}'
-  button:
-    textColor: '{colors.on-primary}'
-    backgroundColor: '{colors.primary}'
-  project:
-    textColor: '{colors.text}'
-  separator:
-    backgroundColor: '{colors.border}'
-  layers:
-    textColor: '{colors.primary}'
+  page-max: '900px'
+  mobile-gutter: '20px'
 ---
 
-# Voldigoade Design System
+# Voldigoade
 
-## Overview
+The approved foundation is Concept A: a centered name, one factual supporting line, small floating navigation, a dark neutral palette and a geometric dot field. The Once UI demo is the concrete reference for proportions, typography, controls and restraint. Use actual Once UI Core primitives. No portfolio template is used.
 
-A personal portfolio built around changing the scale of a problem. The visual signature is an ordered matrix with routed signals: a field around the identity, a research model to inspect, and a five-layer path that responds to selection. Work is visual and immediately accessible. Long methodology belongs on project pages.
+## Composition
 
-This is a content site with isolated interactive visualizations. French is the default, English and Spanish are complete equivalents. Language is not evidence of location. No automatic locale detection. The public identity remains Voldigoade only.
+The homepage contains the hero, a two-sentence About section, three open stack columns, a compact collapsible Spoor component and the footer. The personal portfolio must remain complete if Spoor is removed. The hero action leads to About. Navigation puts the identity and About before Spoor. Existing localized research detail URLs remain available, but the homepage is not a project gallery.
 
-The visual reference is the restraint and motion quality of the Once UI demo: centered hierarchy, fine background texture, negative space, small controls and controlled depth. The implementation is original native Canvas, SVG, CSS and TypeScript. No Once UI template or component code is copied. IBM Plex Sans is retained because its technical shapes work at the newly prominent display scale.
+The desktop hero is 365px high with an 80px heading, 24px supporting line and 40px actions. Homepage sections have a 900px maximum width. At 390px, the hero is 325px high with 20px content gutters. Mobile keeps a small identity mark, two section links and language links at the top. Stack content becomes three compact rows. The Spoor input and action remain on one line; the report uses one column.
 
-## Colors
+The hero stays in the same position across terminal states. Results expand the page below it. Do not move the hero to accommodate a report. Do not add filler sections, slogans, diagrams, telemetry or decorative paths.
 
-The canonical tokens are the CSS custom properties in `src/styles/global.css`. This document mirrors the exact base values. `colors.{name}` maps directly to `--color-{name}`. Components consume those properties; Canvas reads the primary and text values once from computed CSS. The social preview generator reads the same stylesheet. Alpha variants, neutral border highlights and a lighter primary hover are derived surface treatments.
+## Components and tokens
 
-Dark graphite, near-white text, readable muted labels and one pale cyan primary. Local light falloff gives the research surface depth. No saturated purple gradient, giant glow or colorful sector coding. Forced colors preserve selected outlines and semantic content.
+`src/styles/global.css` owns the site tokens mirrored above. Once UI Core supplies headings, buttons, inputs, the matrix effect, dropdown surfaces, theme and responsive layout context. The theme is dark, neutral gray, with contrast buttons and a restrained pale indigo status/focus accent. Fonts are self-hosted Geist and Geist Mono. Translucency, backdrop blur and a thin inner highlight are confined to the Spoor shell. About and stack remain open content without cards, pills or icons.
 
-## Typography
+Shared export-menu behavior lives in `src/components/site/Menu.tsx`. Menus support outside dismissal, Escape, Arrow keys, Home and End, and return focus to their trigger. The report uses semantic headings and definition lists; status uses text and shapes in addition to color.
 
-Self-hosted IBM Plex Sans 400 and 500, with Latin coverage for all three locales. The name is the hero heading, up to 128px desktop and approximately 55px at 390px. The identity line is 24–36px. Small metadata uses native monospace. Body text remains 16px on detail pages. Control typography is explicit. The hero contains one identity line and a compact list of real areas, not a biography.
+`src/components/spoor/` owns presentation. `src/spoor/` owns the small client boundary, target parsing and localized interface copy. Fixture data is isolated in `src/spoor/demo/`. UI components never interpret GitHub data or implement analysis.
 
-## Layout
+## Spoor states
 
-Maximum width 70rem. Desktop gutters 3rem; below 1100px 2.5rem; below 740px 1.25rem. The hero fills most of the viewport and exposes the next project transition. The name is centered in the field, with clear primary and secondary actions.
+The ordinary page starts with Spoor collapsed. Its disclosure animates height, opacity and a small vertical offset; collapsed content is inert and excluded from the accessibility tree. Input and results survive minimizing. There are no public fixture controls, demo badges, provider-debugging panels or terminal jokes.
 
-Desktop navigation is a small fixed center surface; the mark and language control sit at the outer edges. Mobile keeps mark and languages at the top and moves the same section links to a bottom navigation surface with safe-area clearance. Interactive targets are at least 44px. Anchor margins account for the fixed header.
+The public client uses the deployed Spoor v0.1.2 service in fast mode with schema 1.1. Progress and results come from real API responses, with SSE, polling recovery and bounded timeouts. No fixture fallback is allowed. Development-only `/preview/spoor/:scene` routes exercise idle, populated input, starting, provider events, complete, error, rate limited and partial results. These routes are omitted from production, and their fixture notice sits outside the portfolio composition. Fixtures are never presented as real public results.
 
-The research preview is one substantial surface, followed by a short caption and real project actions. Layer navigation is spatial, not a list. On mobile it becomes a two-row winding path with the same five choices. Detailed project and privacy routes keep the same shell and type system but allow longer reading.
+Summary fields are optional. Missing fields disappear; partial status stays visible. Copy copies the visible summary with localized feedback. Export offers PDF, Markdown, JSON, TXT and SVG; preview exports stay disabled. There is no full-report action until a useful report experience exists. No fake downloads are generated.
 
-## Elevation & Depth
+## Motion and accessibility
 
-Depth is confined to small navigation surfaces, the research preview and selected nodes. A low-opacity local gradient and thin borders separate surfaces. There is no full-site glass treatment or card grid. A schematic stack in the layer context represents the selected abstraction; it is native vector geometry rather than a decorative 3D object.
+The real Once UI MatrixFx renders simple dots at 24fps, masked from the top center. A CSS dot field is available before hydration. Motion stops when reduced motion is requested, the document is hidden or the field leaves the viewport. There is no visible motion toggle and no persisted preference.
 
-## Shapes
+Use a short hero entrance, quiet navigation and button responses, a height-based disclosure and short result/menu reveals. There is no typing animation or intentional lookup delay. Reduced motion removes animations and smooth scrolling. Keep visible focus, accessible names, keyboard submission, live status announcements and native links. The static portfolio remains readable without JavaScript; Spoor needs JavaScript to interact.
 
-Controls use 12px corners; visual surfaces 18px; navigation and hero actions use a compact rounded geometry. Coordinate nodes remain square. Icons use a consistent 1.4–1.7px stroke, 18–24px size, currentColor, and are hidden from assistive technology. The restrained V mark is replaceable. No shield, lock, skull, technology logo or invented metric.
+## Content and privacy
 
-## Components
+French, English and Spanish are complete equivalents with explicit language links. Language is not evidence of location. The public identity is Voldigoade only. Keep copy short and factual. No biography, personality adjectives or technical manifesto.
 
-The source for concise homepage content is `src/data/experience.ts`. Project facts remain in `src/data/projects.ts`. Shared localized routes and metadata remain in `src/data/locales.ts` and `Layout.astro`.
-
-`SignalField.astro` owns the hero visual. Its Canvas renderer runs at up to 60fps desktop and 30fps mobile, caps DPR at 1.75/1.5, uses deterministic fixed dots, and suspends offscreen or when the document is hidden. Pointer coordinates are read from input events with cached bounds; there are no per-frame layout reads. Static CSS/SVG fallbacks preserve the field without JavaScript.
-
-`ResearchPreview.astro` is a structural model, not a result matrix. Four selections reveal the research question for identity, metadata, network and trust. The scope names are backed by the public research. No fabricated score, finding or unfinished-data skeleton. The component can be replaced by actual project media without changing project routing or the caption.
-
-`Layers.astro` has one shared tab behavior with the research preview. Native links work without JavaScript. Enhancement adds tab semantics, roving focus, Arrow/Home/End/Space handling, linked panels and a selected path. Layer selection updates the hash, and language switching retains that state. All five contextual sections remain readable without enhancement. Selected state is shown by shape, text and ARIA as well as color.
-
-Motion tokens: fast 180ms, state 360ms, entrance 700ms; easing `cubic-bezier(0.22, 1, 0.36, 1)`. One coordinated identity entrance, moving signal heads and selected path traversal establish life. Avoid repeated generic fade-up reveals. Motion state is shared by Canvas and CSS. A fixed accessible pause/resume button stops ambient motion; the system reduced-motion preference always wins. No motion preference, visitor identity or analytics is stored. Reduced motion renders a complete static design. Offscreen animation regions are paused through IntersectionObserver.
-
-Navigation and language links use native anchors. Active navigation follows visible sections. Hover raises contrast and gives arrows a small directional shift. Focus uses a 2px primary outline with 6px offset. The motion button exposes its pressed state and localized action name. There are no async data calls, account states, forms or destructive visitor actions.
-
-## Do's and Don'ts
-
-- Make the work and interaction carry the identity before explanatory copy.
-- Keep unknowns and research limitations visible on the project page.
-- Share motion state, tab behavior, tokens and locale routing across surfaces.
-- Keep the full composition understandable with motion reduced or JavaScript unavailable.
-- Do not add fake telemetry, results, badges, stock imagery, terminal decoration or template sections.
-- Do not introduce tracking, external fonts, unnecessary client APIs or identifying metadata.
+The document title is simply Voldigoade. Localized metadata descriptions describe the portfolio. The site remains statically rendered by Astro with a React island. No analytics, visitor database, external fonts, cookies or stored inputs. Only an explicit submission transmits a target to the public Spoor API. All provider credentials stay in the external backend.
