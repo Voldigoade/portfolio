@@ -1,0 +1,6 @@
+.layers-section .layer-context .layer-panel {
+  display: block;
+}
+.layers-section .layer-panel + .layer-panel {
+  margin-top: 32px;
+}

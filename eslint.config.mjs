@@ -9,6 +9,19 @@ export default defineConfig(
   ...ts.configs.recommended,
   ...astro.configs.recommended,
   {
+    files: ['tests/browser.mjs'],
+    languageOptions: {
+      globals: {
+        fetch: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+        requestAnimationFrame: 'readonly',
+        getComputedStyle: 'readonly',
+        performance: 'readonly',
+      },
+    },
+  },
+  {
     languageOptions: {
       globals: {
         process: 'readonly',

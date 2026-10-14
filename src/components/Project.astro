@@ -36,11 +36,10 @@ const p = project.translations[locale];
     <p class="lead">{p.context}</p>
   </section>
   <dl class="dimension-list">
-    {p.dimensions.map((dimension) => (
-      <div>
+    {p.dimensions.map((dimension, i) => (
+      <div id={`dimension-${i}`}>
         <dt>{dimension.title}</dt>
         <dd>{dimension.text}</dd>
-        <span class="row-trace" aria-hidden="true"></span>
       </div>
     ))}
   </dl>

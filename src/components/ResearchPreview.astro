@@ -1,0 +1,87 @@
+---
+import { experience, dimensionIds } from '../data/experience';
+import type { Locale } from '../data/locales';
+import Glyph from './Glyph.astro';
+interface Props {
+  locale: Locale;
+  slug: string;
+  href: string;
+}
+const { locale, slug, href } = Astro.props;
+const t = experience[locale];
+const paths = [
+  'M480 180H365Q350 180 350 165V90Q350 75 335 75H250',
+  'M620 180H735Q750 180 750 165V90Q750 75 765 75H850',
+  'M480 200H365Q350 200 350 215V290Q350 305 335 305H250',
+  'M620 200H735Q750 200 750 215V290Q750 305 765 305H850',
+];
+---
+
+<div
+  class="research-preview"
+  data-research-preview
+  data-active="1"
+  data-motion-region
+>
+  <div class="preview-heading">
+    <span>{t.researchFrame}</span>
+    <span>{t.threatModel}</span>
+  </div>
+  <div class="research-map">
+    <svg
+      class="research-paths"
+      viewBox="0 0 1100 380"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      {paths.map((path, i) => (
+        <g data-research-path={i} class:list={{ 'is-active': i === 1 }}>
+          <path class="route-base" d={path} />
+          <path class="route-pulse" d={path} />
+        </g>
+      ))}
+    </svg>
+    <span class="research-hub" aria-hidden="true">
+      {t.messengers}
+    </span>
+    <div
+      class="dimension-controls"
+      aria-label={t.previewLabel}
+      data-research-controls
+    >
+      {t.dimensions.map((label, i) => (
+        <a
+          class:list={[
+            'dimension-node',
+            `node-${dimensionIds[i]}`,
+            { 'is-active': i === 1 },
+          ]}
+          href={`${href}#dimension-${i}`}
+          id={`${slug}-dimension-${i}`}
+          data-dimension={i}
+        >
+          <Glyph kind={i} />
+          <span>{label}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+  <div class="research-questions" aria-live="polite">
+    {t.questions.map((question, i) => (
+      <p
+        id={`${slug}-question-${i}`}
+        data-research-question={i}
+        hidden={i !== 1}
+      >
+        {question}
+      </p>
+    ))}
+  </div>
+  <p class="messenger-scope" translate="no">
+    Signal · SimpleX · Session · Olvid · Threema · Briar · Cwtch
+  </p>
+</div>
+<script>
+  import { initResearchPreviews } from '../scripts/interactions';
+  initResearchPreviews();
+</script>

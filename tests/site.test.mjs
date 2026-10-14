@@ -73,7 +73,7 @@ test('internal links, section targets and local assets exist', () => {
   }
 });
 
-test('privacy and security surface stays static and same-origin', () => {
+test('public output preserves privacy, security and same-origin assets', () => {
   const files = readdirSync('dist', { recursive: true });
   assert.equal(files.filter((file) => file.endsWith('.map')).length, 0);
   for (const file of files.filter((file) => /\.(html|js|css)$/.test(file))) {

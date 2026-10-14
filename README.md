@@ -1,6 +1,6 @@
 # Voldigoade portfolio
 
-A static personal portfolio in French, English and Spanish. Built with Astro, TypeScript and plain CSS. Fonts are self-hosted IBM Plex Sans; browser JavaScript only preserves section anchors during language changes.
+A personal portfolio in French, English and Spanish, statically rendered with Astro and enhanced with native TypeScript, Canvas and SVG. The interactive field, research preview and layer explorer share motion preferences and accessible navigation. Fonts are self-hosted IBM Plex Sans.
 
 ## Development
 
@@ -17,18 +17,31 @@ npm run lint
 npm run check
 npm run build
 npm test
+npm run test:browser
 npm run preview
 ```
 
 Tests inspect the production output, so build before running them.
 
+Browser checks use an installed Microsoft Edge by default, start a local production preview, and save their report and screenshots in a temporary directory. Set `PORTFOLIO_BROWSER` to another Playwright browser channel or `PORTFOLIO_BASE_URL` to check an existing deployment.
+
 ## Content
 
 `src/data/locales.ts` contains interface copy and route mappings. `/` is French, `/en` English and `/es` Spanish. Project, privacy and error pages have corresponding localized routes. Language switching retains the current page and section.
 
+`src/data/experience.ts` contains the compact homepage copy, research questions and five layer contexts. The shared tab behavior supports pointer, touch, Arrow keys, Home, End and Space. Layer and research selections use hash links that survive language changes.
+
+`src/components/ResearchPreview.astro` renders the current project's structural preview. It can be replaced with actual project media without changing the project caption or routing.
+
 `src/data/projects.ts` is the project source of truth. Keep every translation complete, use public sources, and distinguish published evidence from planned work. Adding a project with a unique slug automatically adds its homepage entry, localized detail pages and sitemap entries. Extend the route and content assertions in the tests alongside new public projects.
 
 `src/styles/global.css` owns the runtime tokens. `DESIGN.md` records their intent and mapping. The tests check that the documented color tokens match the CSS.
+
+## Motion
+
+The Canvas field caps rendering at 60fps on desktop and 30fps on mobile, with bounded device pixel ratios. Canvas and SVG ambient motion suspend offscreen and in hidden tabs. The pause control stops ambient motion; reduced-motion preferences render a complete static composition. No preference is persisted. Native links and static visual fallbacks keep navigation usable without JavaScript.
+
+Run `npm run social` after changing visual tokens to regenerate the localized social previews.
 
 ## Deployment
 
