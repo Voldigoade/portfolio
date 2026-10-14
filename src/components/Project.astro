@@ -1,13 +1,13 @@
 ---
 import { copy, route, type Locale } from '../data/locales';
-import { projects } from '../data/projects';
+import type { Project } from '../data/projects';
 import Arrow from './Arrow.astro';
 interface Props {
   locale: Locale;
+  project: Project;
 }
-const { locale } = Astro.props;
+const { locale, project } = Astro.props;
 const t = copy[locale];
-const project = projects[0];
 const p = project.translations[locale];
 ---
 

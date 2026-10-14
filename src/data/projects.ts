@@ -19,7 +19,7 @@ interface ProjectTranslation {
   artifacts: string[];
 }
 
-interface Project {
+export interface Project {
   slug: string;
   repository: string;
   website: Record<Locale, string>;

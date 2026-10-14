@@ -16,17 +16,19 @@ import Arrow from '../components/Arrow.astro';
 interface Props {
   locale: Locale;
   page: Page;
+  projectSlug?: string;
   title?: string;
   description?: string;
 }
 const {
   locale,
   page,
+  projectSlug,
   title = copy[locale].title,
   description = copy[locale].description,
 } = Astro.props;
 const t = copy[locale];
-const canonical = new URL(route(locale, page), Astro.site);
+const canonical = new URL(route(locale, page, projectSlug), Astro.site);
 const ogLocales = { fr: 'fr_FR', en: 'en_US', es: 'es_ES' };
 const sections = ['work', 'areas', 'approach'];
 const schema = {
@@ -56,13 +58,13 @@ const schema = {
           <link
             rel="alternate"
             hreflang={lang}
-            href={new URL(route(lang, page), Astro.site)}
+            href={new URL(route(lang, page, projectSlug), Astro.site)}
           />
         ))}
         <link
           rel="alternate"
           hreflang="x-default"
-          href={new URL(route('fr', page), Astro.site)}
+          href={new URL(route('fr', page, projectSlug), Astro.site)}
         />
       </>
     )}
@@ -137,7 +139,7 @@ const schema = {
       <nav class="languages" aria-label={t.languageLabel}>
         {locales.map((lang) => (
           <a
-            href={route(lang, page)}
+            href={route(lang, page, projectSlug)}
             hreflang={lang}
             lang={lang}
             aria-label={languageNames[lang]}

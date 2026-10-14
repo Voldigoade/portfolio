@@ -26,7 +26,7 @@ Tests inspect the production output, so build before running them.
 
 `src/data/locales.ts` contains interface copy and route mappings. `/` is French, `/en` English and `/es` Spanish. Project, privacy and error pages have corresponding localized routes. Language switching retains the current page and section.
 
-`src/data/projects.ts` is the project source of truth. Keep every translation complete, use public sources, and distinguish published evidence from planned work. Add a page key and route mapping when introducing another project, then render its data through the shared project component and include it in the sitemap and tests.
+`src/data/projects.ts` is the project source of truth. Keep every translation complete, use public sources, and distinguish published evidence from planned work. Adding a project with a unique slug automatically adds its homepage entry, localized detail pages and sitemap entries. Extend the route and content assertions in the tests alongside new public projects.
 
 `src/styles/global.css` owns the runtime tokens. `DESIGN.md` records their intent and mapping. The tests check that the documented color tokens match the CSS.
 
@@ -39,3 +39,5 @@ The site has no backend, visitor database, cookies or analytics. A view counter 
 Public project statements reference [the profile README](https://github.com/Voldigoade/voldigoade) and [Secure Messaging Research](https://github.com/Voldigoade/recherche-messageries). They are checked during maintenance, never fetched by visitors.
 
 No license for this repository has been selected. IBM Plex Sans retains its separate OFL license in `public/licenses/`.
+
+Before publishing, run `npm run audit:public` against the staged files and current Git history. Public commits use the Voldigoade identity, its GitHub noreply address, and UTC for both author and committer timestamps. Set commit timestamps explicitly to UTC; the audit rejects local timezone offsets.

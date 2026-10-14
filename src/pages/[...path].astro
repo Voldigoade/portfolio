@@ -5,45 +5,61 @@ import Project from '../components/Project.astro';
 import Privacy from '../components/Privacy.astro';
 import NotFound from '../components/NotFound.astro';
 import { copy, locales, route, type Locale, type Page } from '../data/locales';
-import { projects } from '../data/projects';
+import { projects, type Project as ProjectData } from '../data/projects';
 
 export function getStaticPaths() {
   const pages: Page[] = ['home', 'project', 'privacy', '404'];
   return locales.flatMap((locale) =>
     pages
       .filter((page) => locale !== 'fr' || page !== '404')
-      .map((page) => ({
-        params: { path: route(locale, page).slice(1) || undefined },
-        props: { locale, page },
-      })),
+      .flatMap<{ params: { path: string | undefined }; props: Props }>(
+        (page) => {
+          if (page === 'project')
+            return projects.map((project) => ({
+              params: { path: route(locale, page, project.slug).slice(1) },
+              props: { locale, page, project },
+            }));
+          return [
+            {
+              params: { path: route(locale, page).slice(1) || undefined },
+              props: { locale, page, project: undefined },
+            },
+          ];
+        },
+      ),
   );
 }
 interface Props {
   locale: Locale;
   page: Page;
+  project?: ProjectData;
 }
-const { locale, page } = Astro.props;
+const { locale, page, project } = Astro.props;
 const t = copy[locale];
-const p = projects[0].translations[locale];
-const title =
-  page === 'project'
-    ? `${p.title} — Voldigoade`
-    : page === 'privacy'
-      ? `${t.privacy} — Voldigoade`
-      : page === '404'
-        ? `404 — Voldigoade`
-        : t.title;
-const description =
-  page === 'project'
-    ? p.description
-    : page === 'privacy'
-      ? t.privacyDescription
-      : t.description;
+const p = project?.translations[locale];
+const title = p
+  ? `${p.title} — Voldigoade`
+  : page === 'privacy'
+    ? `${t.privacy} — Voldigoade`
+    : page === '404'
+      ? `404 — Voldigoade`
+      : t.title;
+const description = p
+  ? p.description
+  : page === 'privacy'
+    ? t.privacyDescription
+    : t.description;
 ---
 
-<Layout locale={locale} page={page} title={title} description={description}>
+<Layout
+  locale={locale}
+  page={page}
+  title={title}
+  description={description}
+  projectSlug={project?.slug}
+>
   {page === 'home' && <Home locale={locale} />}
-  {page === 'project' && <Project locale={locale} />}
+  {project && <Project locale={locale} project={project} />}
   {page === 'privacy' && <Privacy locale={locale} />}
   {page === '404' && <NotFound locale={locale} />}
 </Layout>

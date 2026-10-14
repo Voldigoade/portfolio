@@ -76,11 +76,17 @@ if (hasHead) {
   for (const identity of git([
     'log',
     '--all',
-    '--format=%an|%ae|%cn|%ce',
+    '--format=%an|%ae|%cn|%ce|%ai|%ci',
   ]).split('\n')) {
     commits++;
-    const [author, authorEmail, committer, committerEmail] =
-      identity.split('|');
+    const [
+      author,
+      authorEmail,
+      committer,
+      committerEmail,
+      authorDate,
+      committerDate,
+    ] = identity.split('|');
     if (
       author !== 'Voldigoade' ||
       committer !== 'Voldigoade' ||
@@ -88,6 +94,8 @@ if (hasHead) {
       committerEmail !== expectedEmail
     )
       failures.push('Commit identity mismatch');
+    if (!authorDate.endsWith('+0000') || !committerDate.endsWith('+0000'))
+      failures.push('Commit timestamp offset is not UTC');
   }
 }
 console.log(

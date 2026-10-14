@@ -11,26 +11,31 @@ export const languageNames: Record<Locale, string> = {
 const segments: Record<Locale, Record<Page, string>> = {
   fr: {
     home: '',
-    project: 'projets/secure-messaging',
+    project: 'projets',
     privacy: 'confidentialite',
     '404': '404',
   },
   en: {
     home: 'en',
-    project: 'en/projects/secure-messaging',
+    project: 'en/projects',
     privacy: 'en/privacy',
     '404': 'en/404',
   },
   es: {
     home: 'es',
-    project: 'es/proyectos/secure-messaging',
+    project: 'es/proyectos',
     privacy: 'es/privacidad',
     '404': 'es/404',
   },
 };
 
-export function route(locale: Locale, page: Page = 'home'): string {
-  return `/${segments[locale][page]}`;
+export function route(
+  locale: Locale,
+  page: Page = 'home',
+  projectSlug = 'secure-messaging',
+): string {
+  const path = segments[locale][page];
+  return page === 'project' ? `/${path}/${projectSlug}` : `/${path}`;
 }
 
 export const copy = {

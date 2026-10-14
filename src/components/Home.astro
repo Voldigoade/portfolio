@@ -42,12 +42,15 @@ const t = copy[locale];
           <div class="project-copy">
             <p class="status">{p.status}</p>
             <h3>
-              <a href={route(locale, 'project')}>{p.title}</a>
+              <a href={route(locale, 'project', project.slug)}>{p.title}</a>
             </h3>
             <p class="project-summary">{p.summary}</p>
             <p class="project-description">{p.description}</p>
             <div class="actions">
-              <a class="underlined-link" href={route(locale, 'project')}>
+              <a
+                class="underlined-link"
+                href={route(locale, 'project', project.slug)}
+              >
                 {t.read}
                 <Arrow />
               </a>
