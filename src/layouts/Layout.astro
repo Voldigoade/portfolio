@@ -1,0 +1,180 @@
+---
+import '@fontsource/ibm-plex-sans/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-500.css';
+import headingFont from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-500-normal.woff2?url';
+import '../styles/global.css';
+import {
+  copy,
+  languageNames,
+  locales,
+  route,
+  type Locale,
+  type Page,
+} from '../data/locales';
+import Arrow from '../components/Arrow.astro';
+
+interface Props {
+  locale: Locale;
+  page: Page;
+  title?: string;
+  description?: string;
+}
+const {
+  locale,
+  page,
+  title = copy[locale].title,
+  description = copy[locale].description,
+} = Astro.props;
+const t = copy[locale];
+const canonical = new URL(route(locale, page), Astro.site);
+const ogLocales = { fr: 'fr_FR', en: 'en_US', es: 'es_ES' };
+const sections = ['work', 'areas', 'approach'];
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Voldigoade',
+  url: Astro.site?.href,
+  inLanguage: locales,
+  sameAs: ['https://github.com/Voldigoade'],
+};
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111417" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {page === '404' ? (
+      <meta name="robots" content="noindex,follow" />
+    ) : (
+      <>
+        {locales.map((lang) => (
+          <link
+            rel="alternate"
+            hreflang={lang}
+            href={new URL(route(lang, page), Astro.site)}
+          />
+        ))}
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={new URL(route('fr', page), Astro.site)}
+        />
+      </>
+    )}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Voldigoade" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={ogLocales[locale]} />
+    {locales
+      .filter((lang) => lang !== locale)
+      .map((lang) => (
+        <meta property="og:locale:alternate" content={ogLocales[lang]} />
+      ))}
+    <meta
+      property="og:image"
+      content={new URL(`/og-${locale}.png`, Astro.site)}
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t.title} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta
+      name="twitter:image"
+      content={new URL(`/og-${locale}.png`, Astro.site)}
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="preload"
+      href={headingFont}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+  <body id="top">
+    <a class="skip-link" href="#main">
+      {t.skip}
+    </a>
+    <header class="site-header wrap">
+      <a
+        class="wordmark"
+        href={route(locale)}
+        aria-label="Voldigoade"
+        translate="no"
+      >
+        <svg width="22" height="23" viewBox="0 0 22 23" aria-hidden="true">
+          <path
+            d="M2 3 10 20H12L20 3M2 12H7M15 12H20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+        </svg>
+        Voldigoade
+      </a>
+      <nav class="main-nav" aria-label={t.navLabel}>
+        {t.nav.map((label, i) => (
+          <a
+            href={`${route(locale)}#${sections[i]}`}
+            aria-current={
+              page === 'project' && i === 0 ? 'location' : undefined
+            }
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+      <nav class="languages" aria-label={t.languageLabel}>
+        {locales.map((lang) => (
+          <a
+            href={route(lang, page)}
+            hreflang={lang}
+            lang={lang}
+            aria-label={languageNames[lang]}
+            aria-current={lang === locale ? 'page' : undefined}
+            data-locale-link
+          >
+            {lang.toUpperCase()}
+          </a>
+        ))}
+      </nav>
+    </header>
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <footer class="site-footer wrap">
+      <div>
+        <a class="footer-name" href={route(locale)} translate="no">
+          Voldigoade
+        </a>
+        <p>{t.footer}</p>
+      </div>
+      <div class="footer-links">
+        <a href={route(locale, 'privacy')}>{t.privacy}</a>
+        <a href="#top">
+          {t.top}
+          <Arrow direction="up" />
+        </a>
+      </div>
+    </footer>
+    <script>
+      document
+        .querySelectorAll<HTMLAnchorElement>('[data-locale-link]')
+        .forEach((link) => {
+          link.addEventListener('click', () => {
+            link.hash = window.location.hash;
+          });
+        });
+    </script>
+  </body>
+</html>

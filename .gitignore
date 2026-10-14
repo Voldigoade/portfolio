@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+test-results/
+playwright-report/
+coverage/
