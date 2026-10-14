@@ -367,8 +367,10 @@ try {
   await page.goto(base + '#about');
   await settled(page);
   await page.getByRole('link', { name: 'English', exact: true }).click();
+  await settled(page);
   assert.equal(page.url(), base + '/en#about');
   await page.getByRole('link', { name: 'Español', exact: true }).click();
+  await settled(page);
   assert.equal(page.url(), base + '/es#about');
   for (const path of ['/missing-page', '/en/404', '/es/404']) {
     const response = await page.goto(base + path);
