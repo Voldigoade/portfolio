@@ -538,12 +538,110 @@ try {
     );
     await audit(page, path);
   }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(base);
+  await settled(page);
+  const desktopSpoorLink = page.locator('.floating-nav a[href="/#spoor"]');
+  await desktopSpoorLink.click();
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector('.floating-nav a[href="/#spoor"]')
+        ?.getAttribute('aria-current') === 'location',
+  );
+  assert.equal(
+    await page.locator('#spoor-content').getAttribute('aria-hidden'),
+    'false',
+  );
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector('.floating-nav a[href="/#about"]')
+        ?.getAttribute('aria-current') === 'location',
+  );
+  const desktopSpoorBox = await desktopSpoorLink.boundingBox();
+  await page.mouse.move(
+    desktopSpoorBox.x + desktopSpoorBox.width / 2,
+    desktopSpoorBox.y + desktopSpoorBox.height / 2,
+  );
+  const desktopNavState = await page.evaluate(() => {
+    const spoor = document.querySelector('.floating-nav a[href="/#spoor"]');
+    return {
+      current: [
+        ...document.querySelectorAll(
+          '.floating-nav a[aria-current="location"]',
+        ),
+      ].map((link) => link.textContent.trim()),
+      hovered: spoor.matches(':hover'),
+      focusVisible: spoor.matches(':focus-visible'),
+      background: getComputedStyle(spoor).backgroundColor,
+    };
+  });
+  assert.deepEqual(desktopNavState.current, ['À propos']);
+  assert.equal(desktopNavState.hovered, true);
+  assert.equal(desktopNavState.focusVisible, false);
+  assert.equal(desktopNavState.background, 'rgba(0, 0, 0, 0)');
+  await page.goBack();
+  await page.waitForFunction(() => window.location.hash === '');
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector('.floating-nav a[href="/#about"]')
+        ?.getAttribute('aria-current') === 'location',
+  );
+  await page.goForward();
+  await page.waitForFunction(
+    () =>
+      window.location.hash === '#spoor' &&
+      document
+        .querySelector('.floating-nav a[href="/#spoor"]')
+        ?.getAttribute('aria-current') === 'location',
+  );
+  report.interactions.push('desktop nav active state and browser history');
+
+  await page.goto(base);
+  await settled(page);
+  await page.mouse.move(10, 890);
+  const keyboardSpoorLink = page.locator('.floating-nav a[href="/#spoor"]');
+  let keyboardFocusedSpoor = false;
+  for (let i = 0; i < 12 && !keyboardFocusedSpoor; i++) {
+    await page.keyboard.press('Tab');
+    keyboardFocusedSpoor = await keyboardSpoorLink.evaluate(
+      (link) => link === document.activeElement,
+    );
+  }
+  assert.equal(keyboardFocusedSpoor, true);
+  assert.equal(
+    await keyboardSpoorLink.evaluate((link) => link.matches(':focus-visible')),
+    true,
+  );
+  assert.equal(
+    await keyboardSpoorLink.evaluate(
+      (link) => getComputedStyle(link).outlineStyle,
+    ),
+    'solid',
+  );
+
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(base);
   await settled(page);
   assert.equal(
     await page.locator('html').getAttribute('data-motion'),
     'paused',
+  );
+  assert.equal(
+    await page
+      .locator('html')
+      .evaluate((node) => getComputedStyle(node).scrollBehavior),
+    'auto',
+  );
+  await page.locator('.floating-nav a[href="/#spoor"]').click();
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector('.floating-nav a[href="/#spoor"]')
+        ?.getAttribute('aria-current') === 'location',
   );
   report.motion.reduced = true;
   await page.emulateMedia({ forcedColors: 'active' });
@@ -570,6 +668,64 @@ try {
     await touchPage.locator('#spoor-content').getAttribute('aria-hidden'),
     'false',
   );
+  await touchPage.getByRole('button', { name: 'Réduire', exact: true }).tap();
+  assert.equal(
+    await touchPage.locator('#spoor-content').getAttribute('aria-hidden'),
+    'true',
+  );
+  await touchPage.locator('.floating-nav a[href="/#spoor"]').tap();
+  await touchPage.waitForFunction(
+    () =>
+      document
+        .querySelector('.floating-nav a[href="/#spoor"]')
+        ?.getAttribute('aria-current') === 'location',
+  );
+  assert.equal(
+    await touchPage.locator('#spoor-content').getAttribute('aria-hidden'),
+    'false',
+  );
+  await touchPage.evaluate(() =>
+    window.scrollTo({ top: 0, behavior: 'instant' }),
+  );
+  await touchPage.waitForFunction(
+    () =>
+      document
+        .querySelector('.floating-nav a[href="/#about"]')
+        ?.getAttribute('aria-current') === 'location',
+  );
+  const touchNavState = await touchPage.evaluate(() => {
+    const spoor = document.querySelector('.floating-nav a[href="/#spoor"]');
+    return {
+      current: [
+        ...document.querySelectorAll(
+          '.floating-nav a[aria-current="location"]',
+        ),
+      ].map((link) => link.textContent.trim()),
+      background: getComputedStyle(spoor).backgroundColor,
+    };
+  });
+  assert.deepEqual(touchNavState.current, ['À propos']);
+  assert.ok(
+    touchNavState.background === 'transparent' ||
+      touchNavState.background.endsWith(', 0)'),
+  );
+  await touchPage.goBack();
+  await touchPage.waitForFunction(() => window.location.hash === '');
+  await touchPage.waitForFunction(
+    () =>
+      document
+        .querySelector('.floating-nav a[href="/#about"]')
+        ?.getAttribute('aria-current') === 'location',
+  );
+  await touchPage.goForward();
+  await touchPage.waitForFunction(
+    () =>
+      window.location.hash === '#spoor' &&
+      document
+        .querySelector('.floating-nav a[href="/#spoor"]')
+        ?.getAttribute('aria-current') === 'location',
+  );
+  report.interactions.push('mobile touch nav active state and browser history');
   await touch.close();
   const noJs = await browser.newContext({ javaScriptEnabled: false });
   const staticPage = await noJs.newPage();

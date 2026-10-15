@@ -5,6 +5,7 @@ import type { DemoScene } from '../../spoor/demo/fixtures';
 import { experience } from '../../data/experience';
 import { MatrixField } from './MatrixField';
 import { SpoorTerminal } from '../spoor/SpoorTerminal';
+import { ExternalLinkIcon } from './InlineIcons';
 
 export function HomePage({
   locale,
@@ -83,7 +84,7 @@ export function HomePage({
             <article className="work-entry" key={project.name}>
               <h3>
                 <a href={project.url}>
-                  {project.name} <span aria-hidden="true">↗</span>
+                  {project.name} <ExternalLinkIcon />
                 </a>
               </h3>
               <p>{project.description}</p>

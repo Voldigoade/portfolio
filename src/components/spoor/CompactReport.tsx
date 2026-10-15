@@ -7,6 +7,7 @@ import { ExportMenu } from './ExportMenu';
 import { displayValue, summaryText, visibleFields } from '../../spoor/summary';
 import { reportCopy } from '../../spoor/report-copy';
 import { ReportEvidence } from './ReportEvidence';
+import { ExternalLinkIcon } from '../site/InlineIcons';
 
 export function CompactReport({
   client,
@@ -58,7 +59,7 @@ export function CompactReport({
             </p>
             {report.profile?.url && (
               <a className="profile-link" href={report.profile.url}>
-                {reportCopy[locale].profile} <span aria-hidden="true">↗</span>
+                {reportCopy[locale].profile} <ExternalLinkIcon />
               </a>
             )}
           </div>
@@ -72,7 +73,7 @@ export function CompactReport({
       </header>
       {report.repository?.url && (
         <a className="profile-link" href={report.repository.url}>
-          {t.repository} <span aria-hidden="true">↗</span>
+          {t.repository} <ExternalLinkIcon />
         </a>
       )}
       {report.repository?.description && (

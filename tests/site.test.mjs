@@ -10,6 +10,31 @@ const routes = {
   en: ['/en', '/en/projects/secure-messaging', '/en/privacy'],
   es: ['/es', '/es/proyectos/secure-messaging', '/es/privacidad'],
 };
+
+test('portfolio navigation cues use hidden inline SVGs without emoji arrows', () => {
+  for (const paths of Object.values(routes)) {
+    for (const path of paths) {
+      const html = htmlAt(path);
+      assert.doesNotMatch(html, /[\u2190-\u21ff]/u);
+      assert.doesNotMatch(html, /\p{Extended_Pictographic}/u);
+      assert.match(
+        html,
+        /<svg(?=[^>]*class="external-link-icon")(?=[^>]*aria-hidden="true")[^>]*>/,
+      );
+    }
+  }
+  const header = readFileSync('src/components/site/Header.tsx', 'utf8');
+  const css = readFileSync('src/styles/global.css', 'utf8');
+  assert.match(header, /rootMargin: '-10% 0px -10%'/);
+  assert.match(
+    header,
+    /querySelectorAll\('main > section#about, main > section#spoor'\)/,
+  );
+  assert.match(css, /\.floating-nav \.button\[aria-current\]/);
+  assert.match(css, /\.floating-nav \.button:hover:not\(\[aria-current\]\)/);
+  assert.match(css, /a:focus-visible/);
+});
+
 test('inline executable scripts have exact CSP hashes on every static page', () => {
   for (const file of readdirSync('dist', { recursive: true }).filter((file) =>
     file.endsWith('.html'),

@@ -22,6 +22,7 @@ export function Header({
   const t = copy[locale];
   const [section, setSection] = useState('');
   useEffect(() => {
+    if (page !== 'home') return;
     const visible = new Map<string, number>();
     const observer = new IntersectionObserver(
       (entries) => {
@@ -31,15 +32,24 @@ export function Header({
             entry.isIntersecting ? entry.intersectionRatio : 0,
           );
         const current = [...visible.entries()].sort((a, b) => b[1] - a[1])[0];
-        setSection(current && current[1] > 0 ? current[0] : '');
+        const spoorTop =
+          document.getElementById('spoor')?.getBoundingClientRect().top ??
+          Number.POSITIVE_INFINITY;
+        setSection(
+          current && current[1] > 0
+            ? current[0]
+            : spoorTop <= window.innerHeight * 0.5
+              ? 'spoor'
+              : 'about',
+        );
       },
-      { rootMargin: '-10% 0px -35%', threshold: [0, 0.1, 0.4] },
+      { rootMargin: '-10% 0px -10%', threshold: [0, 0.1, 0.4] },
     );
     document
-      .querySelectorAll('main > section[id]')
+      .querySelectorAll('main > section#about, main > section#spoor')
       .forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, []);
+  }, [page]);
   return (
     <header className="site-header">
       <a className="identity-mark" href={route(locale)} aria-label="Voldigoade">

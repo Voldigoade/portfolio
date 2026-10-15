@@ -43,6 +43,11 @@ a {
   color: inherit;
   text-decoration: none;
 }
+.external-link-icon,
+.back-link-icon {
+  display: inline-block;
+  vertical-align: -0.12em;
+}
 button,
 input {
   font-size: inherit;
@@ -176,10 +181,16 @@ a.identity-mark:hover {
     color var(--motion-fast),
     background var(--motion-fast);
 }
-.floating-nav .button[aria-current],
-.floating-nav .button:hover {
+.floating-nav .button[aria-current] {
   color: white;
   background: #ffffff08;
+}
+.floating-nav .button:hover:not([aria-current]),
+.floating-nav .button:focus:not(:focus-visible):not([aria-current]) {
+  color: #a3a3a3;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
 }
 .nav-separator {
   height: 14px;

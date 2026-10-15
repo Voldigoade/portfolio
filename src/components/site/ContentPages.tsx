@@ -1,13 +1,14 @@
 import { Button } from '@once-ui-system/core/components/Button';
 import { copy, route, type Locale } from '../../data/locales';
 import type { Project } from '../../data/projects';
+import { BackArrowIcon, ExternalLinkIcon } from './InlineIcons';
 
 export function PrivacyPage({ locale }: { locale: Locale }) {
   const t = copy[locale];
   return (
     <article className="prose-page page-wrap">
       <a className="back-link" href={route(locale)}>
-        ← {t.home}
+        <BackArrowIcon /> {t.home}
       </a>
       <h1>{t.privacyTitle}</h1>
       <p className="lead">{t.privacyDescription}</p>
@@ -18,7 +19,7 @@ export function PrivacyPage({ locale }: { locale: Locale }) {
         </section>
       ))}
       <a className="text-link" href="https://vercel.com/legal/privacy-policy">
-        {t.hostPrivacy} ↗
+        {t.hostPrivacy} <ExternalLinkIcon />
       </a>
     </article>
   );
@@ -36,7 +37,7 @@ export function ProjectPage({
   return (
     <article className="project-page page-wrap">
       <a className="back-link" href={route(locale)}>
-        ← {t.home}
+        <BackArrowIcon /> {t.home}
       </a>
       <header className="project-header">
         <p className="status">{p.status}</p>
@@ -82,7 +83,7 @@ export function ProjectPage({
             ))}
           </ul>
           <a className="text-link" href={project.repository}>
-            {t.repository} ↗
+            {t.repository} <ExternalLinkIcon />
           </a>
         </aside>
       </div>
@@ -90,7 +91,7 @@ export function ProjectPage({
         <h2>{p.statusTitle}</h2>
         <p>{p.statusText}</p>
         <a className="text-link" href={project.website[locale]}>
-          {t.visit} ↗
+          {t.visit} <ExternalLinkIcon />
         </a>
       </section>
     </article>
