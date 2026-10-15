@@ -413,6 +413,10 @@ try {
       true,
     );
     report.interactions.push(`HTTP ${failure} recoverable`);
+    if (failure === '429') {
+      await capture(page, 'rate-limit');
+      await audit(page, 'rate-limit');
+    }
   }
   scenario = 'loading';
   await submit();
@@ -452,6 +456,8 @@ try {
     await submit();
     await page.locator('.compact-report').waitFor();
     await audit(page, state);
+    if (['partial', 'enrichmentUnavailable'].includes(state))
+      await capture(page, state);
     if (state === 'partial')
       assert.equal(
         await page

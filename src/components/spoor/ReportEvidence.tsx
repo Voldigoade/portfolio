@@ -76,8 +76,10 @@ export function ReportEvidence({
         <div className="activity-summary">
           <h4>{t.activity}</h4>
           <p>
-            {report.activity.events} {t.events} · {report.activity.repositories}{' '}
-            {t.activeRepos}
+            {report.activity.events}{' '}
+            {report.activity.events === 1 ? t.event : t.events} ·{' '}
+            {report.activity.repositories}{' '}
+            {report.activity.repositories === 1 ? t.activeRepo : t.activeRepos}
             {report.activity.latest && (
               <>
                 {' '}
@@ -97,7 +99,8 @@ export function ReportEvidence({
             <p className="evidence-note">
               {report.scan.commits !== undefined && (
                 <>
-                  {report.scan.commits} {t.commits}
+                  {report.scan.commits}{' '}
+                  {report.scan.commits === 1 ? t.commit : t.commits}
                 </>
               )}
               {report.scan.repositories !== undefined && (
@@ -107,7 +110,7 @@ export function ReportEvidence({
                   {report.scan.total !== undefined
                     ? `/${report.scan.total}`
                     : ''}{' '}
-                  {t.repos}
+                  {report.scan.repositories === 1 ? t.repo : t.repos}
                 </>
               )}
             </p>
