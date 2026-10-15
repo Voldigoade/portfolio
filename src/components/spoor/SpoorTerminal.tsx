@@ -73,12 +73,61 @@ export function SpoorTerminal({
   useEffect(() => {
     if (!expanded || !navigationRequest) return;
     input.current?.focus({ preventScroll: true });
-    document.getElementById('spoor')?.scrollIntoView({
-      block: 'start',
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ? 'instant'
-        : 'smooth',
+    const section = document.getElementById('spoor');
+    if (!section) return;
+
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    const scrollToSection = () => {
+      const viewportStyle = getComputedStyle(document.documentElement);
+      const sectionStyle = getComputedStyle(section);
+      const viewportCenter =
+        ((Number.parseFloat(viewportStyle.scrollPaddingTop) || 0) +
+          window.innerHeight -
+          (Number.parseFloat(viewportStyle.scrollPaddingBottom) || 0)) /
+        2;
+      const targetCenter =
+        viewportCenter +
+        ((Number.parseFloat(sectionStyle.scrollMarginTop) || 0) -
+          (Number.parseFloat(sectionStyle.scrollMarginBottom) || 0)) /
+          2;
+      const bounds = section.getBoundingClientRect();
+      window.scrollTo({
+        top: window.scrollY + bounds.top + bounds.height / 2 - targetCenter,
+        behavior: reducedMotion ? 'instant' : 'smooth',
+      });
+    };
+    let cancelled = false;
+    let secondFrame = 0;
+    const frame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        if (reducedMotion) {
+          scrollToSection();
+          return;
+        }
+        const animations =
+          section
+            .querySelector('.spoor-disclosure')
+            ?.getAnimations()
+            .filter((animation) => animation.playState === 'running') ?? [];
+        if (animations.length === 0) {
+          scrollToSection();
+          return;
+        }
+        void Promise.all(
+          animations.map((animation) => animation.finished.catch(() => {})),
+        ).then(() => {
+          if (!cancelled) scrollToSection();
+        });
+      });
     });
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(secondFrame);
+    };
   }, [expanded, navigationRequest]);
   const submit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();

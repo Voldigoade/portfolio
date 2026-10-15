@@ -30,8 +30,11 @@ test('portfolio navigation cues use hidden inline SVGs without emoji arrows', ()
     header,
     /querySelectorAll\('main > section#about, main > section#spoor'\)/,
   );
-  assert.match(css, /\.floating-nav \.button\[aria-current\]/);
-  assert.match(css, /\.floating-nav \.button:hover:not\(\[aria-current\]\)/);
+  assert.match(css, /\.floating-nav \.button\[aria-current='location'\]/);
+  assert.match(
+    css,
+    /\.floating-nav \.button:hover:not\(\[aria-current='location'\]\)/,
+  );
   assert.match(css, /a:focus-visible/);
 });
 
