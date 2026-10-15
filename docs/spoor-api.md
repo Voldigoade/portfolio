@@ -1,12 +1,12 @@
 # Spoor integration
 
-The public portfolio uses Spoor **v0.1.3**, report schema **1.1**, inspected at commit `6b9833b56ce6035a19df47370f4d5cd758aafaf9`:
+The public portfolio uses Spoor **v0.1.4**, report schema **1.1**, inspected at commit `63f9bc166322387ed4b99e6366b93010f2dcc8c6`:
 
-- [README](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/README.md)
-- [Embed guide](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/docs/EMBED.md)
-- [TypeScript reference client](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/packages/spoor-client/src/index.ts)
-- [Server handlers](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/crates/spoor-server/src/routes.rs)
-- [Canonical report](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/crates/spoor-core/src/report.rs)
+- [README](https://github.com/Voldigoade/spoor/blob/63f9bc166322387ed4b99e6366b93010f2dcc8c6/README.md)
+- [Embed guide](https://github.com/Voldigoade/spoor/blob/63f9bc166322387ed4b99e6366b93010f2dcc8c6/docs/EMBED.md)
+- [TypeScript reference client](https://github.com/Voldigoade/spoor/blob/63f9bc166322387ed4b99e6366b93010f2dcc8c6/packages/spoor-client/src/index.ts)
+- [Server handlers](https://github.com/Voldigoade/spoor/blob/63f9bc166322387ed4b99e6366b93010f2dcc8c6/crates/spoor-server/src/routes.rs)
+- [Canonical report](https://github.com/Voldigoade/spoor/blob/63f9bc166322387ed4b99e6366b93010f2dcc8c6/crates/spoor-core/src/report.rs)
 
 The adapter follows the canonical Rust schema 1.1. The reference client wraps requests; this portfolio also owns polling recovery and result lifecycle handling.
 
