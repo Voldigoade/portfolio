@@ -40,6 +40,17 @@ const schema = {
   inLanguage: locales,
   sameAs: ['https://github.com/Voldigoade'],
 };
+const languageNavigation = `document.addEventListener('click', (event) => {
+  const link = event.target instanceof Element ? event.target.closest('.languages a') : null;
+  if (link instanceof HTMLAnchorElement) link.hash = window.location.hash;
+}, true);`;
+const languageHash = await crypto.subtle.digest(
+  'SHA-256',
+  new TextEncoder().encode(languageNavigation),
+);
+Astro.csp?.insertScriptHash(
+  `sha256-${btoa(String.fromCharCode(...new Uint8Array(languageHash)))}`,
+);
 ---
 
 <!doctype html>
@@ -117,6 +128,7 @@ const schema = {
     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   </head>
   <body id="top" data-page={page}>
+    <script is:inline set:html={languageNavigation} />
     <Portfolio
       locale={locale}
       page={page}

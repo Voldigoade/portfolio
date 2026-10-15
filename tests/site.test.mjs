@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
@@ -9,6 +10,28 @@ const routes = {
   en: ['/en', '/en/projects/secure-messaging', '/en/privacy'],
   es: ['/es', '/es/proyectos/secure-messaging', '/es/privacidad'],
 };
+test('inline executable scripts have exact CSP hashes on every static page', () => {
+  for (const file of readdirSync('dist', { recursive: true }).filter((file) =>
+    file.endsWith('.html'),
+  )) {
+    const html = readFileSync(join('dist', file), 'utf8');
+    const policy =
+      html.match(
+        /http-equiv="content-security-policy" content="([^"]+)"/i,
+      )?.[1] || '';
+    for (const [, attributes, script] of html.matchAll(
+      /<script([^>]*)>([\s\S]*?)<\/script>/gi,
+    )) {
+      if (/\bsrc=|type="application\/ld\+json"/.test(attributes)) continue;
+      const hash =
+        'sha256-' + createHash('sha256').update(script).digest('base64');
+      assert.ok(
+        policy.includes(hash),
+        `${file}: executable inline script is not authorized by CSP`,
+      );
+    }
+  }
+});
 
 function htmlAt(path) {
   return readFileSync(resolve('dist', `.${path}`, 'index.html'), 'utf8');

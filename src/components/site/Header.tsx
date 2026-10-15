@@ -94,9 +94,6 @@ export function Header({
             lang={lang}
             aria-label={languageNames[lang]}
             aria-current={lang === locale ? 'page' : undefined}
-            onClick={(event) => {
-              event.currentTarget.hash = window.location.hash;
-            }}
           >
             {lang.toUpperCase()}
           </a>

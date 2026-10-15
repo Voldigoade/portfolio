@@ -136,7 +136,21 @@ async function capture(page, name, fullPage = false) {
         .map((animation) => animation.finished.catch(() => {})),
     ),
   );
-  await page.screenshot({ path: join(output, `${name}.png`), fullPage });
+  const cardStates = [
+    'rate-limit',
+    'loading',
+    'sse-recovery',
+    'partial',
+    'enrichmentUnavailable',
+    'export-busy',
+    'export-error',
+    'focused-field',
+  ];
+  if (cardStates.includes(name))
+    await page
+      .locator('#spoor')
+      .screenshot({ path: join(output, `${name}.png`) });
+  else await page.screenshot({ path: join(output, `${name}.png`), fullPage });
   report.screenshots.push(name);
 }
 async function assertLayout(page) {
@@ -609,6 +623,18 @@ try {
   assert.equal(await staticPage.locator('#about').isVisible(), true);
   assert.equal(await staticPage.locator('.areas-grid .area').count(), 6);
   await noJs.close();
+  const earlyContext = await browser.newContext();
+  await earlyContext.route('**/_astro/*.js', (route) =>
+    route.fulfill({ contentType: 'application/javascript', body: '' }),
+  );
+  const earlyPage = await earlyContext.newPage();
+  await earlyPage.goto(base + '#about');
+  await earlyPage.getByRole('link', { name: 'English', exact: true }).click();
+  assert.equal(earlyPage.url(), base + '/en#about');
+  await earlyPage.getByRole('link', { name: 'Español', exact: true }).click();
+  assert.equal(earlyPage.url(), base + '/es#about');
+  await earlyContext.close();
+  report.interactions.push('language anchor retained before React loads');
   assert.deepEqual(
     report.errors.filter(
       (message) =>
