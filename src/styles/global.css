@@ -181,12 +181,12 @@ a.identity-mark:hover {
     color var(--motion-fast),
     background var(--motion-fast);
 }
-.floating-nav .button[aria-current] {
+.floating-nav .button[aria-current='location'] {
   color: white;
   background: #ffffff08;
 }
-.floating-nav .button:hover:not([aria-current]),
-.floating-nav .button:focus:not(:focus-visible):not([aria-current]) {
+.floating-nav .button:hover:not([aria-current='location']),
+.floating-nav .button:focus:not(:focus-visible):not([aria-current='location']) {
   color: #a3a3a3;
   background: transparent;
   box-shadow: none;
@@ -1489,4 +1489,8 @@ a.identity-mark:hover {
   [data-site-menu] {
     animation: none;
   }
+}
+
+body[data-page='home'] #main {
+  padding-bottom: clamp(20rem, 38vh, 24rem);
 }

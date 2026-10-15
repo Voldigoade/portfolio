@@ -67,6 +67,84 @@ async function settled(page) {
       ),
     );
 }
+async function assertSpoorCentered(page) {
+  try {
+    await page.waitForFunction(
+      () => {
+        const section = document.querySelector('#spoor');
+        if (!section) return false;
+        const bounds = section.getBoundingClientRect();
+        const viewportStyle = getComputedStyle(document.documentElement);
+        const sectionStyle = getComputedStyle(section);
+        const viewportCenter =
+          ((parseFloat(viewportStyle.scrollPaddingTop) || 0) +
+            window.innerHeight -
+            (parseFloat(viewportStyle.scrollPaddingBottom) || 0)) /
+          2;
+        const targetCenter =
+          viewportCenter +
+          ((parseFloat(sectionStyle.scrollMarginTop) || 0) -
+            (parseFloat(sectionStyle.scrollMarginBottom) || 0)) /
+            2;
+        return (
+          bounds.top >= 120 &&
+          bounds.bottom <= window.innerHeight - 80 &&
+          Math.abs(bounds.top + bounds.height / 2 - targetCenter) < 24
+        );
+      },
+      null,
+      { timeout: 8000 },
+    );
+  } catch (error) {
+    const geometry = await page.evaluate(() => {
+      const section = document.querySelector('#spoor');
+      if (!section) return null;
+      const bounds = section.getBoundingClientRect();
+      const viewportStyle = getComputedStyle(document.documentElement);
+      const sectionStyle = getComputedStyle(section);
+      const viewportCenter =
+        ((parseFloat(viewportStyle.scrollPaddingTop) || 0) +
+          window.innerHeight -
+          (parseFloat(viewportStyle.scrollPaddingBottom) || 0)) /
+        2;
+      const targetCenter =
+        viewportCenter +
+        ((parseFloat(sectionStyle.scrollMarginTop) || 0) -
+          (parseFloat(sectionStyle.scrollMarginBottom) || 0)) /
+          2;
+      return {
+        scrollY: window.scrollY,
+        scrollMax: document.documentElement.scrollHeight - window.innerHeight,
+        top: bounds.top,
+        bottom: bounds.bottom,
+        height: bounds.height,
+        actualCenter: bounds.top + bounds.height / 2,
+        targetCenter,
+        disclosureAnimations: document
+          .querySelector('.spoor-disclosure')
+          ?.getAnimations()
+          .map((animation) => ({
+            state: animation.playState,
+            time: animation.currentTime,
+          })),
+      };
+    });
+    error.message += `; final Spoor geometry: ${JSON.stringify(geometry)}`;
+    throw error;
+  }
+}
+async function waitForTransparentSpoorNav(page) {
+  await page.waitForFunction(
+    () => {
+      const spoor = document.querySelector('.floating-nav a[href="/#spoor"]');
+      if (!spoor) return false;
+      const background = getComputedStyle(spoor).backgroundColor;
+      return background === 'transparent' || background.endsWith(', 0)');
+    },
+    null,
+    { timeout: 2000 },
+  );
+}
 async function audit(page, state) {
   const result = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
@@ -553,6 +631,7 @@ try {
     await page.locator('#spoor-content').getAttribute('aria-hidden'),
     'false',
   );
+  await assertSpoorCentered(page);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await page.waitForFunction(
     () =>
@@ -565,6 +644,7 @@ try {
     desktopSpoorBox.x + desktopSpoorBox.width / 2,
     desktopSpoorBox.y + desktopSpoorBox.height / 2,
   );
+  await waitForTransparentSpoorNav(page);
   const desktopNavState = await page.evaluate(() => {
     const spoor = document.querySelector('.floating-nav a[href="/#spoor"]');
     return {
@@ -581,7 +661,10 @@ try {
   assert.deepEqual(desktopNavState.current, ['À propos']);
   assert.equal(desktopNavState.hovered, true);
   assert.equal(desktopNavState.focusVisible, false);
-  assert.equal(desktopNavState.background, 'rgba(0, 0, 0, 0)');
+  assert.ok(
+    desktopNavState.background === 'transparent' ||
+      desktopNavState.background.endsWith(', 0)'),
+  );
   await page.goBack();
   await page.waitForFunction(() => window.location.hash === '');
   await page.waitForFunction(
@@ -598,7 +681,10 @@ try {
         .querySelector('.floating-nav a[href="/#spoor"]')
         ?.getAttribute('aria-current') === 'location',
   );
-  report.interactions.push('desktop nav active state and browser history');
+  await assertSpoorCentered(page);
+  report.interactions.push(
+    'desktop nav active state, centered landing, and browser history',
+  );
 
   await page.goto(base);
   await settled(page);
@@ -643,6 +729,7 @@ try {
         .querySelector('.floating-nav a[href="/#spoor"]')
         ?.getAttribute('aria-current') === 'location',
   );
+  await assertSpoorCentered(page);
   report.motion.reduced = true;
   await page.emulateMedia({ forcedColors: 'active' });
   assert.equal(await page.locator('h1').isVisible(), true);
@@ -684,6 +771,7 @@ try {
     await touchPage.locator('#spoor-content').getAttribute('aria-hidden'),
     'false',
   );
+  await assertSpoorCentered(touchPage);
   await touchPage.evaluate(() =>
     window.scrollTo({ top: 0, behavior: 'instant' }),
   );
@@ -693,6 +781,7 @@ try {
         .querySelector('.floating-nav a[href="/#about"]')
         ?.getAttribute('aria-current') === 'location',
   );
+  await waitForTransparentSpoorNav(touchPage);
   const touchNavState = await touchPage.evaluate(() => {
     const spoor = document.querySelector('.floating-nav a[href="/#spoor"]');
     return {
@@ -725,7 +814,10 @@ try {
         .querySelector('.floating-nav a[href="/#spoor"]')
         ?.getAttribute('aria-current') === 'location',
   );
-  report.interactions.push('mobile touch nav active state and browser history');
+  await assertSpoorCentered(touchPage);
+  report.interactions.push(
+    'mobile touch nav centered landing, active state, and browser history',
+  );
   await touch.close();
   const noJs = await browser.newContext({ javaScriptEnabled: false });
   const staticPage = await noJs.newPage();
