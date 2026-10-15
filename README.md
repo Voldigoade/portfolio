@@ -36,7 +36,7 @@ Language links retain the current page and section. No portfolio template is use
 
 ## Spoor
 
-The browser calls the external Spoor v0.1.3 service using `fast` with `enrich: true` and report schema 1.1. SSE supplies progress; polling recovers missed completion or a dropped stream. Completion reopens the card and reveals an offscreen result heading. Copy uses the displayed summary; exports download backend files.
+The browser calls the external Spoor v0.1.4 service using `fast` with `enrich: true` and report schema 1.1. SSE supplies progress; polling recovers missed completion or a dropped stream. Completion reopens the card and reveals an offscreen result heading. Copy uses the displayed summary; exports download backend files.
 
 The small client boundary lives in `src/spoor/`; presentation lives in `src/components/spoor/`. [Integration notes](docs/spoor-api.md) cover the contract, retries and privacy. Provider credentials and analysis code belong in the backend.
 
