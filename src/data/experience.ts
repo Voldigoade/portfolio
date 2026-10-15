@@ -14,7 +14,7 @@ export const experience = {
       { name: 'Systèmes & réseaux', lines: ['Linux / Unix · protocoles'] },
       { name: 'Sécurité & vie privée', lines: ['Technologies d’anonymat'] },
       {
-        name: 'Logiciels locaux & desktop',
+        name: 'Desktop / local-first',
         lines: ['Tauri · SQLite · local-first'],
       },
       { name: 'Automatisation & outils', lines: ['Agents · LLM · Node.js'] },
