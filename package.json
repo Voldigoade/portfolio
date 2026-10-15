@@ -31,7 +31,7 @@
     "astro": "7.3.8",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "sass": "1.98.0"
+    "sass": "1.105.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
