@@ -17,7 +17,11 @@ export default defineConfig(
   },
   ...astro.configs.recommended,
   {
-    files: ['tests/browser.mjs', 'tests/spoor-e2e.mjs'],
+    files: [
+      'tests/browser.mjs',
+      'tests/spoor-e2e.mjs',
+      'tests/spoor-visibility.mjs',
+    ],
     languageOptions: {
       globals: {
         fetch: 'readonly',

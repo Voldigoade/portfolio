@@ -45,7 +45,7 @@ Shared export-menu behavior lives in `src/components/site/Menu.tsx`. Menus suppo
 
 ## Spoor states
 
-The ordinary page starts with Spoor collapsed. Its disclosure animates height, opacity and a small vertical offset; collapsed content is inert and excluded from the accessibility tree. Input and results survive minimizing. There are no public fixture controls, demo badges, provider-debugging panels or terminal jokes.
+The ordinary page starts with Spoor collapsed. Its disclosure animates height, opacity and a small vertical offset; collapsed content is inert and excluded from the accessibility tree. Input and results survive minimizing. A completed lookup reopens the card. If the result heading is outside the viewport, it scrolls into view without taking keyboard focus. There are no public fixture controls, demo badges, provider-debugging panels or terminal jokes.
 
 The public client uses the deployed Spoor v0.1.3 service in fast mode with schema 1.1. Progress and results come from real API responses, with SSE, polling recovery and bounded timeouts. No fixture fallback is allowed. Development-only `/preview/spoor/:scene` routes exercise idle, populated input, starting, provider events, complete, error, rate limited and partial results. These routes are omitted from production, and their fixture notice sits outside the portfolio composition. Fixtures are never presented as real public results.
 

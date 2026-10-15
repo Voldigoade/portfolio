@@ -1,19 +1,18 @@
 # Voldigoade portfolio
 
-A personal technical portfolio in French, English and Spanish: identity, About, technical areas, Selected Work and an optional Spoor component. Astro renders static pages; React and Once UI Core provide interaction and shared controls. Fonts are self-hosted Geist and Geist Mono.
+Personal portfolio in French, English and Spanish. Astro builds static pages; React and Once UI Core handle interactive controls. Geist fonts are self-hosted.
 
 ## Development
 
-Use Node.js 22.12 or later and npm.
+Use Node.js 22.12 or later.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Release checks:
-
 ```sh
+npm run check:prose
 npm run format:check
 npm run lint
 npm run check
@@ -23,38 +22,34 @@ npm run test:browser
 npm run audit:public
 ```
 
-Tests inspect the production output, so build first. Browser checks use installed Microsoft Edge and save evidence in a temporary directory. Set `PORTFOLIO_BROWSER` for another Playwright browser channel or `PORTFOLIO_BASE_URL` for an existing deployment.
+Build before running tests. Browser checks use installed Microsoft Edge and write screenshots outside the repository. Set `PORTFOLIO_BROWSER` for another Playwright channel or `PORTFOLIO_BASE_URL` for an existing server.
 
-## Content and design
+## Editing
 
-`src/data/locales.ts` contains route mappings and shared copy. `/` is French, `/en` English and `/es` Spanish. Project, privacy and error pages have localized routes. Language switching retains the current page and section.
+- `src/data/locales.ts`: routes, metadata and shared translations. French lives at `/`, English at `/en`, Spanish at `/es`.
+- `src/data/experience.ts`: homepage copy and selected work.
+- `src/data/projects.ts`: research detail content and source links.
+- `src/styles/global.css`: visual tokens and layout.
+- [DESIGN.md](DESIGN.md): approved composition and interaction behavior.
 
-`src/data/experience.ts` holds the short homepage copy. `src/data/projects.ts` preserves the research detail content and public source links. Projects are not automatically added to the homepage.
-
-`src/styles/global.css` owns the site tokens. `DESIGN.md` describes the approved composition and component behavior. Once UI Core supplies the primitives; no Magic Portfolio template is used. Astro is retained for static routes and metadata, with a React island for interaction.
+Language links retain the current page and section. No portfolio template is used.
 
 ## Spoor
 
-Spoor starts collapsed and uses the deployed v0.1.3 HTTP service with schema 1.1. Public lookups use bounded fast mode with public enrichment requested. The adapter consumes real SSE progress, recovers completion through status polling, handles cancellation/errors/timeouts and downloads actual backend exports. No GitHub or GitLeak calls, analysis engine or provider credentials belong in this repository.
+The browser calls the external Spoor v0.1.3 service using `fast` with `enrich: true` and report schema 1.1. SSE supplies progress; polling recovers missed completion or a dropped stream. Completion reopens the card and reveals an offscreen result heading. Copy uses the displayed summary; exports download backend files.
 
-Development-only `/preview/spoor/:scene` routes use isolated fixtures for UI testing. They have no production static paths, and their fixture branch is excluded from the production bundle. Production never falls back to mock results. No state selector appears in the portfolio.
+The small client boundary lives in `src/spoor/`; presentation lives in `src/components/spoor/`. [Integration notes](docs/spoor-api.md) cover the contract, retries and privacy. Provider credentials and analysis code belong in the backend.
 
-`src/spoor/types.ts` defines the small client interface. `HttpSpoorClient` maps the current backend into a compact display model; presentation components consume that interface. See [the integration notes](docs/spoor-api.md) for verified source references and operational behavior.
+Development-only `/preview/spoor/:scene` routes use isolated fixtures and are omitted from production. Production errors never fall back to mock data.
 
-Real browser tests deliberately trigger backend work: set `SPOOR_REAL_E2E=1`, `PORTFOLIO_BASE_URL` and `PORTFOLIO_QA_OUTPUT` outside the repository, then run `npm run test:e2e`. The standard browser suite uses isolated network interception for failure-state tests.
+Real E2E tests trigger backend work. Set `SPOOR_REAL_E2E=1`, `PORTFOLIO_BASE_URL` and an external `PORTFOLIO_QA_OUTPUT`, then run `npm run test:e2e`. Repeated failure-state tests use intercepted requests instead.
 
-## Motion and privacy
+## Privacy and deployment
 
-The dot field, hero entrance, disclosure and result/menu transitions respect reduced motion. The field suspends when hidden or offscreen. There is no visible motion control. No preferences or inputs are stored. Without JavaScript, the static content and navigation remain readable.
+No analytics, cookies, visitor database or stored inputs. Motion respects reduced motion. Static content stays readable without JavaScript. Hosting providers may keep request logs.
 
-There are no analytics, visitor database, cookies or external fonts. A view counter is omitted. Hosting providers may maintain their own technical request logs.
+`npm run build` writes `dist/`. The canonical origin defaults to `https://voldigoade.xyz`; changing `SITE_URL` requires a rebuild. Astro generates script hashes for CSP; `vercel.json` adds security headers. The browser uses exact-origin CORS to reach Spoor directly.
 
-## Deployment
+Run `npm run social` after changing identity copy or visual tokens. Font licenses remain in `public/licenses/`; Once UI Core is MIT-licensed. This repository has no selected license.
 
-`npm run build` writes a static site to `dist/`. The default canonical origin is `https://voldigoade.xyz`; set build-time `SITE_URL` to another HTTPS origin and rebuild to update canonical URLs, alternates, social previews, robots and sitemap.
-
-Astro emits the content security policy with generated script hashes. Style attributes are allowed for Once UI layout and positioning; style elements and scripts stay restricted. Vercel adds frame restrictions and the remaining security headers from `vercel.json`. The browser connects directly to the public Spoor API with exact-origin CORS; no proxy or server runtime is required.
-
-Run `npm run social` after changing the identity line or visual tokens. Geist and Geist Mono retain their OFL notices in `public/licenses/`; Once UI Core and the official starter are MIT-licensed. No license for this repository has been selected.
-
-Before publishing, run `npm run audit:public` against staged files and Git history. Public commits use the Voldigoade identity, its GitHub noreply address and explicit UTC author and committer timestamps.
+Run `npm run audit:public` before publishing. Commits use the Voldigoade identity, its GitHub noreply address and UTC author/committer timestamps.

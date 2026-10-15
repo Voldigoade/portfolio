@@ -56,7 +56,7 @@ export const copy = {
     back: 'Retour aux travaux',
     visit: 'Lire la recherche',
     privacyTitle: 'Confidentialité',
-    privacyDescription: 'Ce que ce site fait — et ce qu’il n’enregistre pas.',
+    privacyDescription: 'Ce que ce site fait et ce qu’il n’enregistre pas.',
     privacySections: [
       {
         title: 'Spoor',

@@ -46,54 +46,8 @@ const viewports = [
   { width: 1920, height: 1080 },
 ];
 const api = 'https://api--spoor--xsw6djgrvwtl.code.run';
-const fixture = {
-  schema_version: '1.1',
-  target: { type: 'user' },
-  summary: {
-    display_name: 'Browser test',
-    total_public_repositories: 8,
-    distinct_emails_observed: 1,
-    public_keys_found: 2,
-    account_created: '2025-01-01T00:00:00Z',
-    primary_languages: [
-      ['Rust', 50],
-      ['TypeScript', 25],
-      ['Python', 25],
-    ],
-  },
-  coverage: {
-    is_partial: false,
-    commits_scanned: 30,
-    repositories_scanned: 3,
-    repositories_total: 8,
-  },
-  profile: {
-    login: 'example',
-    name: 'Browser test',
-    bio: 'Public profile biography.',
-    followers: 12,
-    html_url: 'https://github.com/example',
-    avatar_url: 'https://avatars.githubusercontent.com/u/1',
-  },
-  identities: [
-    {
-      email: 'observed@example.invalid',
-      email_type: 'domain_email',
-      name: 'Observed name',
-      sources: ['Public Git Commit Metadata'],
-      repositories: ['example/repository-with-a-long-name'],
-      first_seen: '2025-01-01T00:00:00Z',
-      last_seen: '2026-10-01T00:00:00Z',
-    },
-  ],
-  activity: {
-    total_events_observed: 24,
-    active_repositories: ['example/repo'],
-    recent_actions: [{ created_at: '2026-10-01T00:00:00Z' }],
-  },
-  provider_status: { github: { status: 'cached' }, GitLeak: { status: 'ok' } },
-  repositories: [{ languages: null, hygiene: null }],
-};
+import { fixture } from './fixtures/spoor-report.mjs';
+
 const json = (value, status = 200) => ({
   status,
   contentType: 'application/json',

@@ -34,11 +34,11 @@ const { locale, page, project } = Astro.props;
 const t = copy[locale];
 const p = project?.translations[locale];
 const title = p
-  ? `${p.title} — Voldigoade`
+  ? `${p.title} | Voldigoade`
   : page === 'privacy'
-    ? `${t.privacy} — Voldigoade`
+    ? `${t.privacy} | Voldigoade`
     : page === '404'
-      ? `404 — Voldigoade`
+      ? `404 | Voldigoade`
       : t.title;
 const description = p
   ? p.description

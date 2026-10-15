@@ -125,7 +125,7 @@ export function ReportEvidence({
           {report.enrichment &&
             ['unavailable', 'partial'].includes(report.enrichment) && (
               <p className="enrichment-note">
-                {t.enrichment} —{' '}
+                {t.enrichment} :{' '}
                 {report.enrichment === 'unavailable'
                   ? t.unavailable
                   : t.limited}

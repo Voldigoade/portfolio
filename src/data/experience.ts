@@ -6,7 +6,7 @@ export const experience = {
     explore: 'À propos',
     about: 'À propos',
     introduction: [
-      'Je passe assez facilement d’une couche à l’autre. Une appli web devient un service systemd, puis une capture réseau — et il y a souvent un outil Rust quelque part à la fin.',
+      'Je passe assez facilement d’une couche à l’autre. Une appli web devient un service systemd, puis une capture réseau, et il y a souvent un outil Rust quelque part à la fin.',
       'J’écris surtout en Rust, Python et TypeScript. Le reste dépend de ce qu’il faut faire fonctionner. Je ne publie pas tout ; ce qui est ici, j’ai choisi de le sortir.',
     ],
     stack: 'Autour du code',
@@ -47,7 +47,7 @@ export const experience = {
     explore: 'About me',
     about: 'About',
     introduction: [
-      'I tend to move between layers. A web app becomes a systemd service, then a packet capture — and a Rust tool usually turns up somewhere along the way.',
+      'I tend to move between layers. A web app becomes a systemd service, then a packet capture. A Rust tool usually turns up somewhere along the way.',
       'I mostly write Rust, Python and TypeScript. Everything else depends on what needs to work. I don’t publish everything; what’s here is work I chose to ship.',
     ],
     stack: 'Usually somewhere around',
@@ -88,7 +88,7 @@ export const experience = {
     explore: 'Acerca de mí',
     about: 'Acerca de',
     introduction: [
-      'Suelo pasar de una capa a otra. Una aplicación web acaba siendo un servicio de systemd, luego una captura de red — y, en algún momento, aparece una herramienta en Rust.',
+      'Suelo pasar de una capa a otra. Una aplicación web acaba siendo un servicio de systemd, luego una captura de red. En algún momento aparece una herramienta en Rust.',
       'Escribo sobre todo en Rust, Python y TypeScript. Lo demás depende de lo que haya que hacer funcionar. No lo publico todo; lo que hay aquí es trabajo que decidí sacar a la luz.',
     ],
     stack: 'En lo que suelo trabajar',

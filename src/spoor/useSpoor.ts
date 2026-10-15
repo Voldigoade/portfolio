@@ -53,8 +53,11 @@ export function useSpoor(client: SpoorClient) {
       };
       active.current = session;
       const signal = session.controller.signal;
+      let finishing = false;
+      let settled = false;
       const fail = (error: unknown) => {
-        if (signal.aborted || active.current !== session) return;
+        if (settled || signal.aborted || active.current !== session) return;
+        settled = true;
         session.unsubscribe?.();
         const problem =
           error instanceof SpoorError ? error : new SpoorError('provider');
@@ -71,15 +74,27 @@ export function useSpoor(client: SpoorClient) {
         const lookup = await client.startLookup(target, 'fast', signal);
         if (signal.aborted || active.current !== session) return;
         const finish = async () => {
+          if (
+            finishing ||
+            settled ||
+            signal.aborted ||
+            active.current !== session
+          )
+            return;
+          finishing = true;
           session.unsubscribe?.();
           try {
             const report = await client.getReport(lookup.id, signal);
-            if (!signal.aborted && active.current === session)
+            if (!signal.aborted && active.current === session && !settled) {
+              settled = true;
               setState((previous) => ({
                 ...previous,
                 phase: report.status,
                 report,
+                error: undefined,
+                recovering: false,
               }));
+            }
           } catch (error) {
             fail(error);
           }
@@ -90,7 +105,13 @@ export function useSpoor(client: SpoorClient) {
         }
         if (lookup.status === 'failed') throw new SpoorError('provider');
         const receive = (event: LookupEvent) => {
-          if (signal.aborted || active.current !== session) return;
+          if (
+            finishing ||
+            settled ||
+            signal.aborted ||
+            active.current !== session
+          )
+            return;
           if (event.type === 'connection')
             setState((previous) => ({
               ...previous,
@@ -111,8 +132,11 @@ export function useSpoor(client: SpoorClient) {
         session.unsubscribe = client.subscribeToLookup(
           lookup.id,
           receive,
-          (error) => fail(error || new SpoorError('network')),
+          (error) => {
+            if (!finishing) fail(error || new SpoorError('network'));
+          },
         );
+        if (finishing || settled) session.unsubscribe?.();
       } catch (error) {
         fail(error);
       }

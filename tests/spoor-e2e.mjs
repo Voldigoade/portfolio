@@ -92,6 +92,22 @@ try {
       continue;
     }
     assert.equal(await page.locator('.compact-report').count(), 1);
+    await page.waitForFunction(() => {
+      const heading = document.querySelector('.report-heading h3');
+      const bounds = heading?.getBoundingClientRect();
+      return (
+        document.querySelector('.spoor-shell').dataset.expanded === 'true' &&
+        !document.querySelector('#spoor-content').inert &&
+        bounds?.top >= 0 &&
+        bounds.bottom < window.innerHeight
+      );
+    });
+    await page.screenshot({
+      path: join(
+        output,
+        path === '/' ? 'desktop-auto-reveal.png' : 'repository-auto-reveal.png',
+      ),
+    });
     const response = await reportResponse;
     assert.ok(response);
     const raw = await response.json();
@@ -154,38 +170,56 @@ try {
       assert.match(copied, /Voldigoade\r?\nCompte GitHub/);
       assert.doesNotMatch(copied, /schema_version|provider_status/);
       result.copy = true;
-      for (const [label, format] of [
-        ['PDF', 'pdf'],
-        ['Markdown', 'md'],
-        ['JSON', 'json'],
-        ['TXT', 'txt'],
-        ['SVG', 'svg'],
-      ]) {
+      for (const width of [1440, 390]) {
+        await page.setViewportSize({
+          width,
+          height: width === 390 ? 844 : 900,
+        });
         await page
-          .getByRole('button', { name: 'Exporter', exact: true })
+          .getByRole('button', { name: 'Réduire', exact: true })
           .click();
-        const downloadPromise = page.waitForEvent('download', {
-          timeout: 30000,
-        });
-        await page.getByRole('menuitem', { name: label, exact: true }).click();
-        const download = await downloadPromise;
-        const destination = join(output, `report.${format}`);
-        await download.saveAs(destination);
-        const bytes = await readFile(destination);
-        assert.ok(bytes.length > 50);
-        const text = bytes.toString('utf8');
-        if (format === 'pdf')
-          assert.equal(bytes.subarray(0, 5).toString(), '%PDF-');
-        else if (format === 'json')
-          assert.equal(JSON.parse(text).schema_version, '1.1');
-        else if (format === 'svg') assert.match(text, /<svg[\s>]/);
-        else assert.match(text, /Voldigoade/);
-        result.exports.push({
-          format,
-          bytes: bytes.length,
-          filename: download.suggestedFilename(),
-          valid: true,
-        });
+        await page.getByRole('button', { name: 'Ouvrir', exact: true }).click();
+        assert.equal(await page.locator('.compact-report').count(), 1);
+        assert.equal(
+          await page.locator('#spoor-content').getAttribute('inert'),
+          null,
+        );
+        for (const [label, format] of [
+          ['PDF', 'pdf'],
+          ['Markdown', 'md'],
+          ['JSON', 'json'],
+          ['TXT', 'txt'],
+          ['SVG', 'svg'],
+        ]) {
+          await page
+            .getByRole('button', { name: 'Exporter', exact: true })
+            .click();
+          const downloadPromise = page.waitForEvent('download', {
+            timeout: 30000,
+          });
+          await page
+            .getByRole('menuitem', { name: label, exact: true })
+            .click();
+          const download = await downloadPromise;
+          const destination = join(output, `report-${width}.${format}`);
+          await download.saveAs(destination);
+          const bytes = await readFile(destination);
+          assert.ok(bytes.length > 50);
+          const text = bytes.toString('utf8');
+          if (format === 'pdf')
+            assert.equal(bytes.subarray(0, 5).toString(), '%PDF-');
+          else if (format === 'json')
+            assert.equal(JSON.parse(text).schema_version, '1.1');
+          else if (format === 'svg') assert.match(text, /<svg[\s>]/);
+          else assert.match(text, /Voldigoade/);
+          result.exports.push({
+            width,
+            format,
+            bytes: bytes.length,
+            filename: download.suggestedFilename(),
+            valid: true,
+          });
+        }
       }
       await page.setViewportSize({ width: 390, height: 844 });
       await page.locator('#spoor').scrollIntoViewIfNeeded();

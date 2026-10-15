@@ -8,7 +8,7 @@ The public portfolio uses Spoor **v0.1.3**, report schema **1.1**, inspected at 
 - [Server handlers](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/crates/spoor-server/src/routes.rs)
 - [Canonical report](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/crates/spoor-core/src/report.rs)
 
-The guide and reference client still illustrate schema 1.0. The current canonical Rust report defines 1.1; the adapter follows that implementation.
+The adapter follows the canonical Rust schema 1.1. The reference client wraps requests; this portfolio also owns polling recovery and result lifecycle handling.
 
 ## Boundary and configuration
 
@@ -32,7 +32,7 @@ The adapter listens for named SSE events: `lookup.started`, `target.resolved`, `
 
 The server broadcasts without replay and can announce completion before storing the report. Real status polling runs immediately and once per second until completion, including after an SSE disconnect. Only completed status triggers report retrieval. There is no simulated progress or minimum loading duration.
 
-Individual requests time out after 20 seconds; active lookups time out after 120 seconds. Cancel, unmount or a new submission aborts pending requests, closes SSE and clears timers. Session guards ignore late responses. Cancellation stops browser observation; it does not cancel server work already started.
+Individual requests time out after 20 seconds; active lookups time out after 120 seconds. Cancel, unmount or a new submission aborts pending requests, closes SSE and clears timers. Session guards ignore late responses. Completion retrieval is idempotent within a session, and settled success ignores late progress or failure callbacks. Success clears recovery and error state. The card reopens on success and reveals an offscreen result heading without moving focus. Cancellation stops browser observation; it does not cancel server work already started.
 
 ## Report mapping and errors
 

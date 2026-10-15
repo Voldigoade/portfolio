@@ -25,11 +25,30 @@ export function SpoorTerminal({
     scene && scene !== 'idle' ? 'demo-user' : '',
   );
   const input = useRef<HTMLInputElement>(null);
+  const result = useRef<HTMLDivElement>(null);
   const client = useMemo(() => createSpoorClient(scene), [scene]);
   const lookup = useSpoor(client);
   const { run } = lookup;
   const busy = lookup.phase === 'starting' || lookup.phase === 'running';
   const invalid = lookup.error?.code === 'invalidTarget';
+  useEffect(() => {
+    if (!lookup.report) return;
+    setExpanded(true);
+    const frame = requestAnimationFrame(() => {
+      const heading = result.current?.querySelector('h3');
+      if (!heading) return;
+      const bounds = heading.getBoundingClientRect();
+      if (bounds.top < 80 || bounds.bottom > window.innerHeight - 32)
+        heading.scrollIntoView({
+          block: 'center',
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)')
+            .matches
+            ? 'instant'
+            : 'smooth',
+        });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [lookup.report]);
   useEffect(() => {
     if (scene && scene !== 'idle' && scene !== 'populated')
       void run('demo-user');
@@ -187,7 +206,7 @@ export function SpoorTerminal({
               </div>
             )}
             {lookup.report && (
-              <div className="lookup-output">
+              <div className="lookup-output" ref={result}>
                 <CompactReport
                   key={lookup.report.id}
                   client={client}
