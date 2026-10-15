@@ -15,7 +15,6 @@ import {
   useFloating,
 } from '@floating-ui/react-dom';
 import { Button } from '@once-ui-system/core/components/Button';
-import { Dropdown } from '@once-ui-system/core/components/Dropdown';
 
 export function Menu({
   label,
@@ -33,6 +32,7 @@ export function Menu({
   const [open, setOpen] = useState(false);
   const id = useId();
   const trigger = useRef<HTMLElement | null>(null);
+  const openAtEnd = useRef(false);
   const { refs, floatingStyles, isPositioned } = useFloating({
     open,
     strategy: 'fixed',
@@ -47,23 +47,24 @@ export function Menu({
   useEffect(() => {
     if (!open || !isPositioned) return;
     const panel = refs.floating.current;
-    (
-      panel?.querySelector<HTMLElement>('[role="menuitem"]:not(:disabled)') ||
-      panel
-    )?.focus();
+    const items = panel?.querySelectorAll<HTMLElement>(
+      '[role="menuitem"]:not(:disabled)',
+    );
+    (items?.[openAtEnd.current ? items.length - 1 : 0] || panel)?.focus();
+    openAtEnd.current = false;
   }, [open, isPositioned, refs.floating]);
   useEffect(() => {
     if (!open) return;
-    const outside = (event: PointerEvent) => {
+    const outside = (event: MouseEvent) => {
       const node = event.target as Node;
       if (
         !refs.floating.current?.contains(node) &&
         !trigger.current?.contains(node)
       )
-        setOpen(false);
+        close();
     };
-    document.addEventListener('pointerdown', outside);
-    return () => document.removeEventListener('pointerdown', outside);
+    document.addEventListener('click', outside);
+    return () => document.removeEventListener('click', outside);
   }, [open, refs.floating]);
   const keyboard = (event: KeyboardEvent<HTMLElement>) => {
     if (event.key === 'Escape') {
@@ -105,13 +106,21 @@ export function Menu({
         rounded
         size="s"
         loading={busy}
+        aria-disabled={busy}
+        aria-busy={busy}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? id : undefined}
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (busy) return;
+          openAtEnd.current = false;
+          setOpen(!open);
+        }}
         onKeyDown={(event: KeyboardEvent<HTMLElement>) => {
+          if (busy) return;
           if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
             event.preventDefault();
+            openAtEnd.current = event.key === 'ArrowUp';
             setOpen(true);
           }
         }}
@@ -123,7 +132,7 @@ export function Menu({
       </Button>
       {open &&
         createPortal(
-          <Dropdown
+          <div
             ref={refs.setFloating}
             style={floatingStyles}
             id={id}
@@ -132,11 +141,9 @@ export function Menu({
             tabIndex={-1}
             onKeyDown={keyboard}
             data-site-menu=""
-            padding={6}
-            radius="l"
           >
             {children(close)}
-          </Dropdown>,
+          </div>,
           document.body,
         )}
     </div>

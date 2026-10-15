@@ -9,7 +9,7 @@ export default defineConfig({
     csp: {
       directives: [
         "default-src 'self'",
-        "img-src 'self'",
+        "img-src 'self' https://avatars.githubusercontent.com",
         "font-src 'self'",
         "connect-src 'self' https://api--spoor--xsw6djgrvwtl.code.run",
         "object-src 'none'",

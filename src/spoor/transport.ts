@@ -20,7 +20,9 @@ export async function fetchResponse(
       return response;
     const data = await response.json().catch(() => ({}));
     const code = data?.code;
-    const retry = Number(response.headers.get('Retry-After'));
+    const retry = Number(
+      response.headers.get('Retry-After') || data?.retry_after,
+    );
     const problem =
       response.status === 429
         ? 'rateLimited'
@@ -32,7 +34,11 @@ export async function fetchResponse(
                 ['in_progress', 'report_not_ready'].includes(code)
               ? 'notReady'
               : 'provider';
-    throw new SpoorError(problem, retry > 0 ? retry : undefined);
+    throw new SpoorError(
+      problem,
+      retry > 0 ? retry : undefined,
+      response.status >= 500,
+    );
   } catch (error) {
     if (signal.aborted) throw error;
     if (error instanceof SpoorError) throw error;

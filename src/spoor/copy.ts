@@ -74,6 +74,7 @@ export const spoorCopy: Record<Locale, SpoorCopy> = {
       created: 'Création',
       languages: 'Langages',
       identities: 'Adresses observées',
+      followers: 'Abonnés',
       keys: 'Clés publiques',
     },
     statuses: {
@@ -82,6 +83,7 @@ export const spoorCopy: Record<Locale, SpoorCopy> = {
       complete: 'complet',
       partial: 'partiel',
       cached: 'en cache',
+      skipped: 'non utilisé',
       unavailable: 'indisponible',
     },
   },
@@ -126,6 +128,7 @@ export const spoorCopy: Record<Locale, SpoorCopy> = {
       created: 'Created',
       languages: 'Languages',
       identities: 'Emails observed',
+      followers: 'Followers',
       keys: 'Public keys',
     },
     statuses: {
@@ -134,6 +137,7 @@ export const spoorCopy: Record<Locale, SpoorCopy> = {
       complete: 'complete',
       partial: 'partial',
       cached: 'cached',
+      skipped: 'not used',
       unavailable: 'unavailable',
     },
   },
@@ -179,6 +183,7 @@ export const spoorCopy: Record<Locale, SpoorCopy> = {
       created: 'Creación',
       languages: 'Lenguajes',
       identities: 'Correos observados',
+      followers: 'Seguidores',
       keys: 'Claves públicas',
     },
     statuses: {
@@ -187,6 +192,7 @@ export const spoorCopy: Record<Locale, SpoorCopy> = {
       complete: 'completo',
       partial: 'parcial',
       cached: 'en caché',
+      skipped: 'no utilizado',
       unavailable: 'no disponible',
     },
   },

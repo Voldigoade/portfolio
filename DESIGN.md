@@ -29,15 +29,15 @@ The approved foundation is Concept A: a centered name, one factual supporting li
 
 ## Composition
 
-The homepage contains the hero, a two-sentence About section, three open stack columns, a compact collapsible Spoor component and the footer. The personal portfolio must remain complete if Spoor is removed. The hero action leads to About. Navigation puts the identity and About before Spoor. Existing localized research detail URLs remain available, but the homepage is not a project gallery.
+The homepage contains the hero, two short About paragraphs adapted from the public profile README, six compact area groups, two restrained Selected Work entries, a compact collapsible Spoor component and the footer. The personal portfolio must remain complete if Spoor is removed. The hero action leads to About. Navigation puts the identity and About before Spoor. Existing localized research detail URLs remain available, but the homepage is not a project gallery.
 
-The desktop hero is 365px high with an 80px heading, 24px supporting line and 40px actions. Homepage sections have a 900px maximum width. At 390px, the hero is 325px high with 20px content gutters. Mobile keeps a small identity mark, two section links and language links at the top. Stack content becomes three compact rows. The Spoor input and action remain on one line; the report uses one column.
+The desktop hero is 365px high with an 80px heading, 24px supporting line and 40px actions. Homepage sections have a 900px maximum width. At 390px, the hero is 325px high with 20px content gutters. Mobile keeps a small identity mark, two section links and language links at the top. Areas become compact rows. At 430px and narrower, the Spoor input and action stack; results use one readable column.
 
 The hero stays in the same position across terminal states. Results expand the page below it. Do not move the hero to accommodate a report. Do not add filler sections, slogans, diagrams, telemetry or decorative paths.
 
 ## Components and tokens
 
-`src/styles/global.css` owns the site tokens mirrored above. Once UI Core supplies headings, buttons, inputs, the matrix effect, dropdown surfaces, theme and responsive layout context. The theme is dark, neutral gray, with contrast buttons and a restrained pale indigo status/focus accent. Fonts are self-hosted Geist and Geist Mono. Translucency, backdrop blur and a thin inner highlight are confined to the Spoor shell. About and stack remain open content without cards, pills or icons.
+`src/styles/global.css` owns the site tokens mirrored above. Once UI Core supplies headings, buttons, inputs, the matrix effect, theme and responsive layout context. Export uses a small semantic surface positioned with Floating UI. The theme is dark, neutral gray, with contrast buttons and a restrained pale indigo status/focus accent. Fonts are self-hosted Geist and Geist Mono. Translucency, backdrop blur and a thin inner highlight are confined to the Spoor shell. About and stack remain open content without cards, pills or icons.
 
 Shared export-menu behavior lives in `src/components/site/Menu.tsx`. Menus support outside dismissal, Escape, Arrow keys, Home and End, and return focus to their trigger. The report uses semantic headings and definition lists; status uses text and shapes in addition to color.
 
@@ -47,7 +47,7 @@ Shared export-menu behavior lives in `src/components/site/Menu.tsx`. Menus suppo
 
 The ordinary page starts with Spoor collapsed. Its disclosure animates height, opacity and a small vertical offset; collapsed content is inert and excluded from the accessibility tree. Input and results survive minimizing. There are no public fixture controls, demo badges, provider-debugging panels or terminal jokes.
 
-The public client uses the deployed Spoor v0.1.2 service in fast mode with schema 1.1. Progress and results come from real API responses, with SSE, polling recovery and bounded timeouts. No fixture fallback is allowed. Development-only `/preview/spoor/:scene` routes exercise idle, populated input, starting, provider events, complete, error, rate limited and partial results. These routes are omitted from production, and their fixture notice sits outside the portfolio composition. Fixtures are never presented as real public results.
+The public client uses the deployed Spoor v0.1.3 service in fast mode with schema 1.1. Progress and results come from real API responses, with SSE, polling recovery and bounded timeouts. No fixture fallback is allowed. Development-only `/preview/spoor/:scene` routes exercise idle, populated input, starting, provider events, complete, error, rate limited and partial results. These routes are omitted from production, and their fixture notice sits outside the portfolio composition. Fixtures are never presented as real public results.
 
 Summary fields are optional. Missing fields disappear; partial status stays visible. Copy copies the visible summary with localized feedback. Export offers PDF, Markdown, JSON, TXT and SVG; preview exports stay disabled. There is no full-report action until a useful report experience exists. No fake downloads are generated.
 
@@ -59,6 +59,6 @@ Use a short hero entrance, quiet navigation and button responses, a height-based
 
 ## Content and privacy
 
-French, English and Spanish are complete equivalents with explicit language links. Language is not evidence of location. The public identity is Voldigoade only. Keep copy short and factual. No biography, personality adjectives or technical manifesto.
+French, English and Spanish are complete equivalents with explicit language links. Language is not evidence of location. The public identity is Voldigoade only. Keep copy short and factual. Use the public profile voice: concrete technical habits and interests, without personality adjectives or a manifesto.
 
 The document title is simply Voldigoade. Localized metadata descriptions describe the portfolio. The site remains statically rendered by Astro with a React island. No analytics, visitor database, external fonts, cookies or stored inputs. Only an explicit submission transmits a target to the public Spoor API. All provider credentials stay in the external backend.

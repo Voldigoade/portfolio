@@ -52,7 +52,10 @@ for (const file of files) {
   const emails =
     content.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g) || [];
   const unapprovedEmails = emails.filter(
-    (email) => email !== expectedEmail && !file.startsWith('public/licenses/'),
+    (email) =>
+      email !== expectedEmail &&
+      !file.startsWith('public/licenses/') &&
+      !(file.startsWith('tests/') && email.endsWith('@example.invalid')),
   );
   if (unapprovedEmails.length) failures.push(`${file}: email requires review`);
 }

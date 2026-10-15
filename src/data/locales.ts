@@ -60,19 +60,19 @@ export const copy = {
     privacySections: [
       {
         title: 'Spoor',
-        text: 'Quand vous lancez une recherche, le nom de profil ou de dépôt est envoyé à l’API publique de Spoor. Le mode rapide consulte des données publiques GitHub, sans appel à GitLeak. Les résultats restent en mémoire dans votre navigateur ; les fichiers exportés sont fournis par Spoor. Le service et son hébergeur reçoivent les informations techniques nécessaires à ces requêtes.',
+        text: 'Une recherche envoie le profil ou dépôt à Spoor. L’analyse rapide examine un échantillon de données GitHub et demande un enrichissement public à GitLeak lorsqu’il est disponible. Les résultats restent en mémoire dans le navigateur ; Spoor fournit les exports. Les avatars des résultats proviennent de GitHub.',
       },
       {
         title: 'Dans le navigateur',
-        text: 'Ce site ne dépose aucun cookie et n’utilise ni stockage local, ni traceur, ni outil d’analyse d’audience. Aucun compteur de visites n’est activé. Les polices et les images sont servies avec le site.',
+        text: 'Ce site ne dépose aucun cookie et n’utilise ni stockage local, ni traceur, ni outil d’analyse d’audience. Aucun compteur de visites n’est activé. Les polices et les visuels du portfolio sont servis avec le site.',
       },
       {
         title: 'Lors d’une requête',
-        text: 'L’application ne collecte ni adresse IP ni profil de visiteur. L’hébergeur reçoit les informations nécessaires à la livraison des pages et peut traiter des journaux techniques selon sa propre politique.',
+        text: 'Spoor traite temporairement l’adresse IP pour limiter les abus. Son limiteur conserve uniquement des identifiants salés en mémoire, sans profil visiteur. Les hébergeurs reçoivent les métadonnées réseau habituelles et peuvent conserver des journaux techniques.',
       },
       {
         title: 'Liens externes',
-        text: 'Les liens GitHub et le site de recherche vous conduisent vers des services distincts, avec leurs propres règles. Aucun contenu de ces services n’est chargé automatiquement ici.',
+        text: 'GitHub, GitLeak et le site de recherche sont des services distincts, avec leurs propres règles de traitement des données.',
       },
     ],
     hostPrivacy: 'Politique de confidentialité de Vercel',
@@ -102,19 +102,19 @@ export const copy = {
     privacySections: [
       {
         title: 'Spoor',
-        text: 'When you start a lookup, the profile or repository name is sent to Spoor’s public API. Fast mode checks public GitHub data without calling GitLeak. Results stay in browser memory; exported files come from Spoor. The service and its hosting provider receive the technical information needed for these requests.',
+        text: 'A lookup sends the profile or repository to Spoor. Fast analysis samples public GitHub data and requests public GitLeak enrichment when available. Results stay in browser memory; exports come from Spoor. Result avatars come from GitHub.',
       },
       {
         title: 'In your browser',
-        text: 'This site uses no cookies, local storage, trackers or audience analytics. No view counter is enabled. Fonts and images are served with the site.',
+        text: 'This site uses no cookies, local storage, trackers or audience analytics. No view counter is enabled. Portfolio fonts and visuals are served with the site.',
       },
       {
         title: 'When you request a page',
-        text: 'The application does not collect IP addresses or build visitor profiles. The hosting provider receives the information needed to deliver pages and may process technical logs under its own policy.',
+        text: 'Spoor briefly processes the client IP to prevent abuse. Its limiter keeps only salted identifiers in memory, without a visitor profile. Hosting providers receive normal network metadata and may keep technical logs.',
       },
       {
         title: 'External links',
-        text: 'GitHub links and the research website take you to separate services with their own policies. No content from those services is loaded automatically here.',
+        text: 'GitHub, GitLeak and the research website are separate services with their own data policies.',
       },
     ],
     hostPrivacy: 'Vercel privacy policy',
@@ -144,19 +144,19 @@ export const copy = {
     privacySections: [
       {
         title: 'Spoor',
-        text: 'Al iniciar una consulta, el nombre del perfil o repositorio se envía a la API pública de Spoor. El modo rápido consulta datos públicos de GitHub sin llamar a GitLeak. Los resultados permanecen en la memoria del navegador; Spoor proporciona los archivos exportados. El servicio y su proveedor de alojamiento reciben la información técnica necesaria para estas solicitudes.',
+        text: 'Una consulta envía el perfil o repositorio a Spoor. El análisis rápido examina una muestra de datos públicos de GitHub y solicita enriquecimiento público a GitLeak cuando está disponible. Los resultados permanecen en la memoria del navegador; Spoor proporciona los archivos exportados. Los avatares proceden de GitHub.',
       },
       {
         title: 'En el navegador',
-        text: 'Este sitio no utiliza cookies, almacenamiento local, rastreadores ni análisis de audiencia. No hay contador de visitas. Las fuentes y las imágenes se sirven desde el propio sitio.',
+        text: 'Este sitio no utiliza cookies, almacenamiento local, rastreadores ni análisis de audiencia. No hay contador de visitas. Las fuentes y los recursos gráficos del portfolio se sirven con el sitio.',
       },
       {
         title: 'Al solicitar una página',
-        text: 'La aplicación no recoge direcciones IP ni crea perfiles de visitantes. El proveedor de alojamiento recibe la información necesaria para servir las páginas y puede tratar registros técnicos según su propia política.',
+        text: 'Spoor procesa temporalmente la IP para prevenir abusos. Su limitador conserva únicamente identificadores con sal en memoria, sin crear perfiles de visitantes. Los proveedores de alojamiento reciben los metadatos de red habituales y pueden conservar registros técnicos.',
       },
       {
         title: 'Enlaces externos',
-        text: 'Los enlaces a GitHub y a la web de investigación llevan a servicios distintos, con sus propias políticas. Aquí no se carga automáticamente ningún contenido de esos servicios.',
+        text: 'GitHub, GitLeak y la web de investigación son servicios independientes con sus propias políticas de datos.',
       },
     ],
     hostPrivacy: 'Política de privacidad de Vercel',

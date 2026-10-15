@@ -36,6 +36,7 @@ try {
   page.on('request', (request) => {
     if (request.url().includes('/v1/lookups') && request.method() === 'POST') {
       assert.equal(request.postDataJSON().mode, 'fast');
+      assert.equal(request.postDataJSON().enrich, true);
       result.requests.push(request.postDataJSON());
     }
   });
@@ -58,6 +59,16 @@ try {
     await page.goto(base + path);
     await page.locator('astro-island[ssr]').waitFor({ state: 'detached' });
     await page.evaluate(() => document.fonts.ready);
+    if (path === '/')
+      await page
+        .locator('h1')
+        .evaluateAll((nodes) =>
+          Promise.all(
+            nodes.flatMap((node) =>
+              node.getAnimations().map((animation) => animation.finished),
+            ),
+          ),
+        );
     if (path === '/')
       await page.screenshot({ path: join(output, 'desktop-top.png') });
     await page.getByRole('button', { name: open, exact: true }).click();
@@ -95,6 +106,11 @@ try {
       coverage: raw.coverage,
       providers: raw.provider_status,
       warnings: raw.warnings,
+      backend: raw.generator?.version,
+      profile: raw.profile,
+      identities: raw.identities?.filter(
+        (identity) => identity.email_type !== 'git_hub_system',
+      ),
     });
     await page.locator('#spoor').scrollIntoViewIfNeeded();
     await page.screenshot({
@@ -104,6 +120,35 @@ try {
       ),
     });
     if (path === '/') {
+      await page.locator('.profile-avatar').waitFor();
+      assert.equal(
+        await page
+          .locator('.profile-avatar')
+          .evaluate((image) => image.complete && image.naturalWidth > 0),
+        true,
+      );
+      await page.locator('.identity-evidence summary').click();
+      const evidence = await page.locator('.observed-identities').innerText();
+      for (const identity of raw.identities
+        .filter((identity) => identity.email_type !== 'git_hub_system')
+        .slice(0, 5))
+        assert.ok(evidence.includes(identity.email));
+      const expected = process.env.SPOOR_EXPECTED_IDENTITY;
+      const enrichment = raw.provider_status.GitLeak?.status;
+      if (expected && ['ok', 'cached'].includes(enrichment))
+        assert.ok(
+          evidence.includes(expected),
+          'Available enrichment must reach the visible evidence section',
+        );
+      result.enrichment = {
+        status: enrichment,
+        expectedEvidenceVisible: expected
+          ? evidence.includes(expected)
+          : undefined,
+      };
+      await page
+        .locator('#spoor')
+        .screenshot({ path: join(output, 'desktop-user-evidence.png') });
       await page.getByRole('button', { name: 'Copier', exact: true }).click();
       const copied = await page.evaluate(() => navigator.clipboard.readText());
       assert.match(copied, /Voldigoade\r?\nCompte GitHub/);

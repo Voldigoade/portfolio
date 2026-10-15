@@ -327,3 +327,141 @@ test('Copy contains only the localized visible summary; export filenames are saf
   );
   assert.equal(exportFilename(null, 'safe.json'), 'safe.json');
 });
+
+test('SSE disconnect plus transient polling failures recovers the same lookup', async (t) => {
+  const streams = [];
+  let calls = 0;
+  const events = [];
+  const failures = [];
+  class Stream {
+    constructor() {
+      streams.push(this);
+    }
+    addEventListener() {}
+    close() {}
+  }
+  t.mock.property(globalThis, 'EventSource', Stream);
+  t.mock.method(globalThis, 'fetch', async () => {
+    calls++;
+    if (calls === 2) throw new TypeError('temporary disconnect');
+    if (calls === 3)
+      return Response.json({ code: 'internal_error' }, { status: 503 });
+    return Response.json({
+      id: 'same-id',
+      status: calls >= 4 ? 'completed' : 'running',
+    });
+  });
+  const client = new HttpSpoorClient('https://example.invalid/v1', {
+    requestTimeoutMs: 100,
+    lookupTimeoutMs: 500,
+    pollIntervalMs: 5,
+  });
+  client.subscribeToLookup(
+    'same-id',
+    (event) => events.push(event),
+    (error) => failures.push(error),
+  );
+  await delay(2);
+  streams[0].onerror();
+  await delay(100);
+  assert.equal(calls, 4);
+  assert.deepEqual(failures, []);
+  assert.equal(events.filter((event) => event.type === 'finished').length, 1);
+  assert.ok(
+    events.some((event) => event.type === 'connection' && event.recovering),
+  );
+});
+
+test('polling failures have a finite retry policy and do not leave work running forever', async (t) => {
+  class Stream {
+    addEventListener() {}
+    close() {}
+  }
+  t.mock.property(globalThis, 'EventSource', Stream);
+  let calls = 0;
+  const errors = [];
+  t.mock.method(globalThis, 'fetch', async () => {
+    calls++;
+    throw new TypeError('offline');
+  });
+  const client = new HttpSpoorClient('https://example.invalid/v1', {
+    requestTimeoutMs: 100,
+    lookupTimeoutMs: 1000,
+    pollIntervalMs: 1,
+  });
+  client.subscribeToLookup(
+    'id',
+    () => {},
+    (error) => errors.push(error.code),
+  );
+  await delay(100);
+  assert.equal(calls, 6);
+  assert.deepEqual(errors, ['network']);
+  await delay(15);
+  assert.equal(calls, 6);
+});
+
+test('rich report preserves public evidence, profile and coverage without treating system records as people', () => {
+  const raw = rawReport();
+  raw.profile = {
+    login: 'example',
+    name: 'Display name',
+    bio: 'Public bio',
+    avatar_url: 'https://avatars.githubusercontent.com/u/1',
+    html_url: 'https://github.com/example',
+    followers: 3,
+  };
+  raw.identities = [
+    { email: 'service@example.invalid', email_type: 'git_hub_system' },
+    {
+      email: 'observed@example.invalid',
+      email_type: 'domain_email',
+      name: 'Observed name',
+      sources: ['Public Git Commit Metadata'],
+      repositories: ['example/repo'],
+      first_seen: '2025-01-01T00:00:00Z',
+      last_seen: '2026-01-01T00:00:00Z',
+    },
+  ];
+  raw.coverage = {
+    is_partial: true,
+    commits_scanned: 30,
+    repositories_scanned: 1,
+    repositories_total: 2,
+  };
+  raw.provider_status.gitleak.status = 'unavailable';
+  raw.activity = {
+    total_events_observed: 5,
+    active_repositories: ['example/repo'],
+    recent_actions: [{ created_at: '2026-01-01T00:00:00Z' }],
+  };
+  const report = mapReport('id', raw);
+  assert.equal(report.name, 'Display name');
+  assert.equal(report.profile.login, 'example');
+  assert.equal(report.identities.length, 1);
+  assert.equal(report.identities[0].email, 'observed@example.invalid');
+  assert.equal(report.identities[0].sources[0], 'Public Git Commit Metadata');
+  assert.equal(report.scan.partial, true);
+  assert.equal(report.enrichment, 'unavailable');
+  assert.equal(report.activity.events, 5);
+  raw.profile.avatar_url = 'https://example.invalid/avatar.png';
+  assert.equal(mapReport('id', raw).profile.avatar, undefined);
+});
+
+test('repository results preserve source link/description and omit unqueried public activity', () => {
+  const raw = rawReport();
+  raw.target = { type: 'repo', owner: 'example', repo: 'project' };
+  raw.repositories = [
+    {
+      html_url: 'https://github.com/example/project',
+      description: 'A real repository description.',
+      languages: null,
+      hygiene: null,
+    },
+  ];
+  raw.activity = { total_events_observed: 0, active_repositories: [] };
+  const report = mapReport('repo-id', raw);
+  assert.equal(report.repository.url, 'https://github.com/example/project');
+  assert.equal(report.repository.description, 'A real repository description.');
+  assert.equal(report.activity, undefined);
+});

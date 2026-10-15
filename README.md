@@ -1,6 +1,6 @@
 # Voldigoade portfolio
 
-A personal technical portfolio in French, English and Spanish: identity, short About, compact stack and an optional Spoor component. Astro renders static pages; React and Once UI Core provide interaction and shared controls. Fonts are self-hosted Geist and Geist Mono.
+A personal technical portfolio in French, English and Spanish: identity, About, technical areas, Selected Work and an optional Spoor component. Astro renders static pages; React and Once UI Core provide interaction and shared controls. Fonts are self-hosted Geist and Geist Mono.
 
 ## Development
 
@@ -35,7 +35,7 @@ Tests inspect the production output, so build first. Browser checks use installe
 
 ## Spoor
 
-Spoor starts collapsed and uses the deployed v0.1.2 HTTP service with schema 1.1. Public lookups use fast mode. The adapter consumes real SSE progress, recovers completion through status polling, handles cancellation/errors/timeouts and downloads actual backend exports. No GitHub or GitLeak calls, analysis engine or provider credentials belong in this repository.
+Spoor starts collapsed and uses the deployed v0.1.3 HTTP service with schema 1.1. Public lookups use bounded fast mode with public enrichment requested. The adapter consumes real SSE progress, recovers completion through status polling, handles cancellation/errors/timeouts and downloads actual backend exports. No GitHub or GitLeak calls, analysis engine or provider credentials belong in this repository.
 
 Development-only `/preview/spoor/:scene` routes use isolated fixtures for UI testing. They have no production static paths, and their fixture branch is excluded from the production bundle. Production never falls back to mock results. No state selector appears in the portfolio.
 

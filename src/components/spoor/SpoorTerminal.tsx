@@ -7,6 +7,7 @@ import { spoorCopy } from '../../spoor/copy';
 import type { DemoScene } from '../../spoor/demo/fixtures';
 import { useSpoor } from '../../spoor/useSpoor';
 import { CompactReport } from './CompactReport';
+import { reportCopy } from '../../spoor/report-copy';
 import { ProgressLog } from './ProgressLog';
 
 export function SpoorTerminal({
@@ -19,6 +20,7 @@ export function SpoorTerminal({
   const t = spoorCopy[locale];
   const scene = import.meta.env.DEV ? previewScene : undefined;
   const [expanded, setExpanded] = useState(Boolean(scene));
+  const [navigationRequest, setNavigationRequest] = useState(0);
   const [target, setTarget] = useState(
     scene && scene !== 'idle' ? 'demo-user' : '',
   );
@@ -35,17 +37,44 @@ export function SpoorTerminal({
   useEffect(() => {
     if (invalid) input.current?.focus();
   }, [invalid]);
+  useEffect(() => {
+    const reveal = () => {
+      if (window.location.hash !== '#spoor') return;
+      setExpanded(true);
+      setNavigationRequest((value) => value + 1);
+    };
+    window.addEventListener('hashchange', reveal);
+    window.addEventListener('spoor:open', reveal);
+    reveal();
+    return () => {
+      window.removeEventListener('hashchange', reveal);
+      window.removeEventListener('spoor:open', reveal);
+    };
+  }, []);
+  useEffect(() => {
+    if (!expanded || !navigationRequest) return;
+    input.current?.focus({ preventScroll: true });
+    document.getElementById('spoor')?.scrollIntoView({
+      block: 'start',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'instant'
+        : 'smooth',
+    });
+  }, [expanded, navigationRequest]);
   const submit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     void run(target);
   };
-  const status = busy
-    ? lookup.phase === 'starting'
-      ? t.starting
-      : t.running
-    : lookup.report
-      ? t[lookup.report.status]
-      : '';
+  const status =
+    busy && lookup.recovering
+      ? reportCopy[locale].recovering
+      : busy
+        ? lookup.phase === 'starting'
+          ? t.starting
+          : t.running
+        : lookup.report
+          ? t[lookup.report.status]
+          : '';
   return (
     <section
       id="spoor"
@@ -116,7 +145,7 @@ export function SpoorTerminal({
                 variant="ghost"
                 size="s"
                 errorMessage={invalid ? t.errors.invalidTarget : undefined}
-                focusRing
+                focusRing={false}
               />
               <Button
                 type="submit"

@@ -73,7 +73,7 @@ export class HttpSpoorClient implements SpoorClient {
       await this.request(spoorConfig.paths.lookups, signal, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target: target.value, mode }),
+        body: JSON.stringify({ target: target.value, mode, enrich: true }),
       }),
     );
   }
@@ -90,6 +90,8 @@ export class HttpSpoorClient implements SpoorClient {
     );
     let closed = false;
     let checking = false;
+    let failures = 0;
+    let nextCheck = 0;
     const close = () => {
       closed = true;
       controller.abort();
@@ -103,19 +105,33 @@ export class HttpSpoorClient implements SpoorClient {
       onError(error instanceof SpoorError ? error : new SpoorError('network'));
     };
     const checkStatus = async () => {
-      if (closed || checking) return;
+      if (closed || checking || Date.now() < nextCheck) return;
       checking = true;
       try {
         const lookup = this.lookup(
           await this.request(spoorConfig.paths.lookup(id), controller.signal),
         );
         if (closed) return;
+        failures = 0;
+        onEvent({ type: 'connection', recovering: false });
         if (lookup.status === 'completed') {
           close();
           onEvent({ type: 'finished', status: 'complete' });
         } else if (lookup.status === 'failed') fail(new SpoorError('provider'));
       } catch (error) {
-        if (!closed) fail(error);
+        if (!closed) {
+          const retryable =
+            error instanceof SpoorError &&
+            (error.transient ||
+              ['network', 'timeout', 'notReady'].includes(error.code));
+          if (!retryable || ++failures >= 6) fail(error);
+          else {
+            nextCheck =
+              Date.now() +
+              Math.min(this.timing.pollIntervalMs * 2 ** (failures - 1), 8000);
+            onEvent({ type: 'connection', recovering: true });
+          }
+        }
       } finally {
         checking = false;
       }
@@ -168,11 +184,13 @@ export class HttpSpoorClient implements SpoorClient {
             };
           onEvent({ type: 'progress', line });
         } catch {
-          fail(new SpoorError('provider'));
+          void checkStatus();
         }
       });
     stream.onerror = () => {
       stream.close();
+      if (closed) return;
+      onEvent({ type: 'connection', recovering: true });
       void checkStatus();
     };
     // v0.1 broadcasts without replay; status also covers a lookup that finished before subscription.
@@ -189,10 +207,39 @@ export class HttpSpoorClient implements SpoorClient {
   }
 
   async getReport(id: string, signal: AbortSignal) {
-    return mapReport(
-      id,
-      await this.request(spoorConfig.paths.report(id), signal),
-    );
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return mapReport(
+          id,
+          await this.request(spoorConfig.paths.report(id), signal),
+        );
+      } catch (error) {
+        if (
+          signal.aborted ||
+          attempt >= 3 ||
+          !(error instanceof SpoorError) ||
+          !(
+            error.transient ||
+            ['network', 'timeout', 'notReady'].includes(error.code)
+          )
+        )
+          throw error;
+        await new Promise<void>((resolve, reject) => {
+          const aborted = () => {
+            clearTimeout(timer);
+            reject(signal.reason);
+          };
+          const timer = setTimeout(
+            () => {
+              signal.removeEventListener('abort', aborted);
+              resolve();
+            },
+            500 * 2 ** attempt,
+          );
+          signal.addEventListener('abort', aborted, { once: true });
+        });
+      }
+    }
   }
 
   async getExportUrl(id: string, format: ExportFormat) {

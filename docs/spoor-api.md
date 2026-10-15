@@ -1,12 +1,12 @@
 # Spoor integration
 
-The public portfolio uses Spoor **v0.1.2**, report schema **1.1**, inspected at commit `177cfb0ff2357734b9843818b18bd845bc734e0f`:
+The public portfolio uses Spoor **v0.1.3**, report schema **1.1**, inspected at commit `6b9833b56ce6035a19df47370f4d5cd758aafaf9`:
 
-- [README](https://github.com/Voldigoade/spoor/blob/177cfb0ff2357734b9843818b18bd845bc734e0f/README.md)
-- [Embed guide](https://github.com/Voldigoade/spoor/blob/177cfb0ff2357734b9843818b18bd845bc734e0f/docs/EMBED.md)
-- [TypeScript reference client](https://github.com/Voldigoade/spoor/blob/177cfb0ff2357734b9843818b18bd845bc734e0f/packages/spoor-client/src/index.ts)
-- [Server handlers](https://github.com/Voldigoade/spoor/blob/177cfb0ff2357734b9843818b18bd845bc734e0f/crates/spoor-server/src/routes.rs)
-- [Canonical report](https://github.com/Voldigoade/spoor/blob/177cfb0ff2357734b9843818b18bd845bc734e0f/crates/spoor-core/src/report.rs)
+- [README](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/README.md)
+- [Embed guide](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/docs/EMBED.md)
+- [TypeScript reference client](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/packages/spoor-client/src/index.ts)
+- [Server handlers](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/crates/spoor-server/src/routes.rs)
+- [Canonical report](https://github.com/Voldigoade/spoor/blob/6b9833b56ce6035a19df47370f4d5cd758aafaf9/crates/spoor-core/src/report.rs)
 
 The guide and reference client still illustrate schema 1.0. The current canonical Rust report defines 1.1; the adapter follows that implementation.
 
@@ -16,15 +16,15 @@ The guide and reference client still illustrate schema 1.0. The current canonica
 
 The UI uses `startLookup`, `subscribeToLookup`, `getReport` and `getExportUrl`. The public client is always `HttpSpoorClient`. `MockSpoorClient` is restricted to development-only preview routes; both the routes and fixture branch are removed from production. Network errors never cause a fixture fallback.
 
-| Operation | Endpoint                                         |
-| --------- | ------------------------------------------------ |
-| Start     | `POST /v1/lookups` with `{target, mode: "fast"}` |
-| Status    | `GET /v1/lookups/:id`                            |
-| Progress  | `GET /v1/lookups/:id/events`                     |
-| Report    | `GET /v1/lookups/:id/report`                     |
-| File      | `GET /v1/lookups/:id/export/:format`             |
+| Operation | Endpoint                                                       |
+| --------- | -------------------------------------------------------------- |
+| Start     | `POST /v1/lookups` with `{target, mode: "fast", enrich: true}` |
+| Status    | `GET /v1/lookups/:id`                                          |
+| Progress  | `GET /v1/lookups/:id/events`                                   |
+| Report    | `GET /v1/lookups/:id/report`                                   |
+| File      | `GET /v1/lookups/:id/export/:format`                           |
 
-The portfolio only starts fast lookups. It does not expose deep mode or invoke GitLeak. Start returns 202 with the lookup ID; statuses are pending, running, completed and failed.
+The portfolio only starts fast lookups. It does not expose deep mode. The backend handles optional, budget-protected GitLeak enrichment. Start returns 202 with the lookup ID; statuses are pending, running, completed and failed.
 
 ## Progress and cancellation
 
@@ -36,11 +36,11 @@ Individual requests time out after 20 seconds; active lookups time out after 120
 
 ## Report mapping and errors
 
-`report.ts` requires schema 1.1 and maps the canonical summary. Null/omitted repository languages and hygiene are not interpreted by the frontend. Counts use the backend summary, which excludes GitHub system identities from observed addresses. No frontend identity classification or raw email list is implemented. Optional summary fields disappear gracefully.
+`report.ts` requires schema 1.1 and maps the canonical summary. Null/omitted repository languages and hygiene are not interpreted by the frontend. Counts use the backend summary, which excludes GitHub system identities from observed addresses. The frontend preserves backend identity classification and provenance rather than reclassifying addresses. Optional summary fields disappear gracefully.
 
-Coverage and provider limitations preserve partial status. Cached providers and warnings are retained in the display model. The compact page does not expose provider debugging details, locations or the complete report.
+Coverage and provider limitations preserve partial status. Cached providers and warnings are retained in the display model. The compact page includes the backend profile/avatar, optional bio/followers, observed public identity evidence, activity and separate scan/provider coverage. It excludes system identities, inferences and locations. Observed addresses are not represented as current contacts.
 
-400 invalid target, 404 missing lookup, 422 failed lookup, 429 rate limit, 500/provider failures, network loss and timeout have localized recoverable errors. Both 202 `in_progress` and 409 `report_not_ready` are recognized. Rate-limit responses retain Retry-After seconds without automatically restarting work.
+400 invalid target, 404 missing lookup, 422 failed lookup, 429 rate limit, 500/provider failures, network loss and timeout have localized recoverable errors. Both 202 `in_progress` and 409 `report_not_ready` are recognized. Rate-limit responses retain Retry-After seconds without automatically restarting work. After an SSE disconnect, the same lookup continues through polling. Transient network/timeout/5xx status failures retry at bounded exponential intervals (up to six consecutive failures, at most eight seconds between checks) within the 120-second deadline. Report retrieval retries transient or not-ready responses up to three times. Lookup creation is never automatically retried.
 
 Copy uses the same formatted fields as the visible localized summary. Export downloads actual backend bytes for PDF, Markdown, JSON, TXT and SVG. Content-Disposition filenames are used when CORS exposes the header; otherwise safe target-based filenames are used. Empty/HTML responses are rejected. No substitute exports are generated client-side.
 

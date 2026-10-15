@@ -22,6 +22,7 @@ type State = {
   lines: ProgressLine[];
   report?: SpoorReport;
   error?: SpoorError;
+  recovering?: boolean;
 };
 const initial: State = { phase: 'idle', lines: [] };
 
@@ -90,7 +91,12 @@ export function useSpoor(client: SpoorClient) {
         if (lookup.status === 'failed') throw new SpoorError('provider');
         const receive = (event: LookupEvent) => {
           if (signal.aborted || active.current !== session) return;
-          if (event.type === 'progress')
+          if (event.type === 'connection')
+            setState((previous) => ({
+              ...previous,
+              recovering: event.recovering,
+            }));
+          else if (event.type === 'progress')
             setState((previous) => ({
               ...previous,
               phase: 'running',

@@ -1,7 +1,8 @@
 export type LookupMode = 'fast' | 'deep';
 export type ExportFormat = 'pdf' | 'md' | 'json' | 'txt' | 'svg';
 export type LookupStatus = 'pending' | 'running' | 'completed' | 'failed';
-export type CoverageStatus = 'complete' | 'partial' | 'cached' | 'unavailable';
+export type CoverageStatus =
+  'complete' | 'partial' | 'cached' | 'unavailable' | 'skipped';
 
 export interface LookupTarget {
   value: string;
@@ -36,9 +37,29 @@ export interface SpoorReport {
   coverage: { provider: string; status: CoverageStatus }[];
   hasWarnings?: boolean;
   exports?: ExportFormat[];
+  profile?: { login: string; bio?: string; avatar?: string; url?: string };
+  repository?: { description?: string; url?: string };
+  identities?: {
+    email: string;
+    name?: string;
+    type: string;
+    sources: string[];
+    repositories: string[];
+    firstSeen?: string;
+    lastSeen?: string;
+  }[];
+  scan?: {
+    partial: boolean;
+    commits?: number;
+    repositories?: number;
+    total?: number;
+  };
+  activity?: { events: number; repositories: number; latest?: string };
+  enrichment?: CoverageStatus;
 }
 
 export type LookupEvent =
+  | { type: 'connection'; recovering: boolean }
   | { type: 'progress'; line: ProgressLine }
   | { type: 'finished'; status: 'complete' | 'partial' }
   | {
@@ -74,6 +95,7 @@ export class SpoorError extends Error {
       | 'notReady'
       | 'timeout',
     public readonly retryAfter?: number,
+    public readonly transient = false,
   ) {
     super(code);
     this.name = 'SpoorError';

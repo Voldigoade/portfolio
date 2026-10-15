@@ -61,6 +61,12 @@ export function Header({
         <span className="nav-separator" aria-hidden="true" />
         <Button
           href={`${route(locale)}#spoor`}
+          onClick={() => {
+            if (page === 'home') {
+              window.location.hash = 'spoor';
+              window.dispatchEvent(new Event('spoor:open'));
+            }
+          }}
           size="s"
           rounded
           variant="tertiary"

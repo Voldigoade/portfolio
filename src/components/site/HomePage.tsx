@@ -48,7 +48,11 @@ export function HomePage({
         aria-labelledby="about-heading"
       >
         <h2 id="about-heading">{t.about}</h2>
-        <p>{t.introduction}</p>
+        <div className="about-copy">
+          {t.introduction.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
       </section>
       <section
         className="stack-section portfolio-section"
@@ -65,6 +69,30 @@ export function HomePage({
                 ))}
               </ul>
             </div>
+          ))}
+        </div>
+      </section>
+      <section
+        id="work"
+        className="work-section portfolio-section"
+        aria-labelledby="work-heading"
+      >
+        <h2 id="work-heading">{t.work}</h2>
+        <div className="work-list">
+          {t.projects.map((project) => (
+            <article className="work-entry" key={project.name}>
+              <h3>
+                <a href={project.url}>
+                  {project.name} <span aria-hidden="true">↗</span>
+                </a>
+              </h3>
+              <p>{project.description}</p>
+              <span className="work-meta">{project.detail}</span>
+              <div className="work-links">
+                <a href={project.url}>{t.source}</a>
+                {'website' in project && <a href={project.website}>{t.read}</a>}
+              </div>
+            </article>
           ))}
         </div>
       </section>

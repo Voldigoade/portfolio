@@ -5,6 +5,8 @@ import type { SpoorClient, SpoorReport } from '../../spoor/types';
 import { spoorCopy } from '../../spoor/copy';
 import { ExportMenu } from './ExportMenu';
 import { displayValue, summaryText, visibleFields } from '../../spoor/summary';
+import { reportCopy } from '../../spoor/report-copy';
+import { ReportEvidence } from './ReportEvidence';
 
 export function CompactReport({
   client,
@@ -31,9 +33,35 @@ export function CompactReport({
   return (
     <div className="compact-report" data-report-status={report.status}>
       <header className="report-heading">
-        <div>
-          <h3>{report.name}</h3>
-          <p>{report.kind === 'user' ? t.user : t.repository}</p>
+        <div className="report-person">
+          {report.profile?.avatar && (
+            <img
+              className="profile-avatar"
+              src={report.profile.avatar}
+              width="48"
+              height="48"
+              alt=""
+              referrerPolicy="no-referrer"
+              onError={(event) => {
+                event.currentTarget.hidden = true;
+              }}
+            />
+          )}
+          <div>
+            <h3>{report.name}</h3>
+            <p>
+              {report.profile
+                ? `@${report.profile.login}`
+                : report.kind === 'user'
+                  ? t.user
+                  : t.repository}
+            </p>
+            {report.profile?.url && (
+              <a className="profile-link" href={report.profile.url}>
+                {reportCopy[locale].profile} <span aria-hidden="true">↗</span>
+              </a>
+            )}
+          </div>
         </div>
         <span className="report-status">
           <span aria-hidden="true">
@@ -42,7 +70,18 @@ export function CompactReport({
           {t[report.status]}
         </span>
       </header>
-      {report.status === 'partial' && (
+      {report.repository?.url && (
+        <a className="profile-link" href={report.repository.url}>
+          {t.repository} <span aria-hidden="true">↗</span>
+        </a>
+      )}
+      {report.repository?.description && (
+        <p className="profile-bio">{report.repository.description}</p>
+      )}
+      {report.profile?.bio && (
+        <p className="profile-bio">{report.profile.bio}</p>
+      )}
+      {report.status === 'partial' && !report.scan && (
         <p className="partial-notice">{t.partialText}</p>
       )}
       {report.status !== 'partial' && report.hasWarnings && (
@@ -56,6 +95,7 @@ export function CompactReport({
           </div>
         ))}
       </dl>
+      <ReportEvidence report={report} locale={locale} />
       <div className="report-actions">
         <Button
           type="button"

@@ -35,6 +35,10 @@ const routes = [
   '/es/privacidad',
 ];
 const viewports = [
+  { width: 320, height: 568 },
+  { width: 360, height: 800 },
+  { width: 430, height: 932 },
+  { width: 768, height: 1024 },
   { width: 390, height: 844 },
   { width: 375, height: 812 },
   { width: 1280, height: 800 },
@@ -57,8 +61,37 @@ const fixture = {
       ['Python', 25],
     ],
   },
-  coverage: { is_partial: false },
-  provider_status: { github: { status: 'cached' } },
+  coverage: {
+    is_partial: false,
+    commits_scanned: 30,
+    repositories_scanned: 3,
+    repositories_total: 8,
+  },
+  profile: {
+    login: 'example',
+    name: 'Browser test',
+    bio: 'Public profile biography.',
+    followers: 12,
+    html_url: 'https://github.com/example',
+    avatar_url: 'https://avatars.githubusercontent.com/u/1',
+  },
+  identities: [
+    {
+      email: 'observed@example.invalid',
+      email_type: 'domain_email',
+      name: 'Observed name',
+      sources: ['Public Git Commit Metadata'],
+      repositories: ['example/repository-with-a-long-name'],
+      first_seen: '2025-01-01T00:00:00Z',
+      last_seen: '2026-10-01T00:00:00Z',
+    },
+  ],
+  activity: {
+    total_events_observed: 24,
+    active_repositories: ['example/repo'],
+    recent_actions: [{ created_at: '2026-10-01T00:00:00Z' }],
+  },
+  provider_status: { github: { status: 'cached' }, GitLeak: { status: 'ok' } },
   repositories: [{ languages: null, hygiene: null }],
 };
 const json = (value, status = 200) => ({
@@ -93,6 +126,16 @@ async function audit(page, state) {
   });
 }
 async function capture(page, name, fullPage = false) {
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((animation) =>
+          Number.isFinite(animation.effect?.getTiming().iterations),
+        )
+        .map((animation) => animation.finished.catch(() => {})),
+    ),
+  );
   await page.screenshot({ path: join(output, `${name}.png`), fullPage });
   report.screenshots.push(name);
 }
@@ -121,6 +164,7 @@ async function assertLayout(page) {
 }
 try {
   if (!process.env.PORTFOLIO_BASE_URL) {
+    let serverOutput = '';
     server = spawn(
       process.execPath,
       [
@@ -131,10 +175,17 @@ try {
         '--port',
         '4325',
       ],
-      { stdio: 'ignore' },
+      { stdio: ['ignore', 'pipe', 'pipe'] },
     );
+    server.stdout.on('data', (data) => {
+      serverOutput = (serverOutput + data).slice(-4000);
+    });
+    server.stderr.on('data', (data) => {
+      serverOutput = (serverOutput + data).slice(-4000);
+    });
     let ready = false;
     for (let i = 0; i < 100; i++) {
+      if (server.exitCode !== null) break;
       try {
         if ((await fetch(base)).ok) {
           ready = true;
@@ -145,7 +196,7 @@ try {
       }
       await delay(100);
     }
-    assert.ok(ready, 'Preview did not become ready');
+    assert.ok(ready, `Preview did not become ready: ${serverOutput}`);
   }
   browser = await chromium.launch({
     channel: process.env.PORTFOLIO_BROWSER || 'msedge',
@@ -205,7 +256,41 @@ try {
   );
   await page.keyboard.press('Enter');
   assert.ok(page.url().endsWith('#main'));
-  await page.getByRole('button', { name: 'Ouvrir', exact: true }).click();
+  await page
+    .locator('.floating-nav')
+    .getByRole('link', { name: 'Spoor', exact: true })
+    .click();
+  assert.equal(
+    await page
+      .getByRole('button', { name: 'Réduire', exact: true })
+      .getAttribute('aria-expanded'),
+    'true',
+  );
+  assert.equal(
+    await page
+      .locator('#spoor-target')
+      .evaluate((node) => node === document.activeElement),
+    true,
+  );
+  await capture(page, 'focused-input');
+  await page.locator('#spoor-target').scrollIntoViewIfNeeded();
+  await capture(page, 'focused-field');
+  assert.equal(
+    await page
+      .locator('#spoor-target')
+      .evaluate((node) => getComputedStyle(node).outlineStyle),
+    'none',
+  );
+  assert.deepEqual(
+    await page
+      .locator('.lookup-input [data-surface="field"]')
+      .evaluate((node) => ({
+        outline: getComputedStyle(node).outlineWidth,
+        offset: getComputedStyle(node).outlineOffset,
+        shadow: getComputedStyle(node).boxShadow,
+      })),
+    { outline: '2px', offset: '-1px', shadow: 'none' },
+  );
   await page
     .locator('#spoor-target')
     .fill('https://example.invalid/not-github');
@@ -222,6 +307,17 @@ try {
   );
   let scenario = 'complete';
   let releaseFirst;
+  let polls = 0;
+  let exportRelease;
+  await page.route('https://avatars.githubusercontent.com/**', (route) =>
+    route.fulfill({
+      contentType: 'image/png',
+      body: Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jOUcAAAAASUVORK5CYII=',
+        'base64',
+      ),
+    }),
+  );
   await page.route(api + '/**', async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
@@ -236,6 +332,7 @@ try {
       });
     if (request.method() === 'POST') {
       assert.equal(request.postDataJSON().mode, 'fast');
+      assert.equal(request.postDataJSON().enrich, true);
       if (scenario === 'network') return route.abort('failed');
       if (scenario === 'stale') {
         await new Promise((resolve) => {
@@ -256,7 +353,9 @@ try {
         json(
           {
             id: 'test',
-            status: scenario === 'loading' ? 'pending' : 'completed',
+            status: ['loading', 'recovery'].includes(scenario)
+              ? 'pending'
+              : 'completed',
           },
           202,
         ),
@@ -272,10 +371,30 @@ try {
       return route.fulfill(
         json({
           ...fixture,
-          coverage: { is_partial: scenario === 'partial' },
+          coverage: { ...fixture.coverage, is_partial: scenario === 'partial' },
+          provider_status:
+            scenario === 'enrichmentUnavailable'
+              ? { github: { status: 'ok' }, GitLeak: { status: 'unavailable' } }
+              : fixture.provider_status,
           warnings: scenario === 'warning' ? ['test warning'] : [],
         }),
       );
+    if (path.includes('/export/')) {
+      if (scenario === 'exportBusy')
+        await new Promise((resolve) => {
+          exportRelease = resolve;
+        });
+      return route.fulfill(json({ code: 'internal_error' }, 500));
+    }
+    if (scenario === 'recovery') {
+      polls++;
+      if (polls === 1) return route.abort('failed');
+      if (polls === 2)
+        return route.fulfill(json({ code: 'internal_error' }, 503));
+      return route.fulfill(
+        json({ id: 'test', status: polls >= 4 ? 'completed' : 'running' }),
+      );
+    }
     return route.fulfill(json({ id: 'test', status: 'running' }));
   });
   const submit = async (value = 'Voldigoade') => {
@@ -302,6 +421,15 @@ try {
   await audit(page, 'loading');
   await page.getByRole('button', { name: 'Annuler', exact: true }).click();
   assert.equal(await page.locator('[aria-busy="true"]').count(), 0);
+  scenario = 'recovery';
+  await submit();
+  await page.getByText('Reconnexion…', { exact: true }).first().waitFor();
+  await capture(page, 'sse-recovery');
+  await page.locator('.compact-report').waitFor();
+  assert.ok(polls >= 4);
+  report.interactions.push(
+    'SSE disconnect + network/503 status failures recovered',
+  );
   scenario = 'stale';
   await submit('old-target');
   await page.getByRole('button', { name: 'Annuler', exact: true }).click();
@@ -314,7 +442,12 @@ try {
     'Browser test',
   );
   report.interactions.push('cancelled/stale request ignored');
-  for (const state of ['complete', 'partial', 'warning']) {
+  for (const state of [
+    'complete',
+    'partial',
+    'enrichmentUnavailable',
+    'warning',
+  ]) {
     scenario = state;
     await submit();
     await page.locator('.compact-report').waitFor();
@@ -330,6 +463,12 @@ try {
       assert.equal(await page.locator('.partial-notice').count(), 1);
   }
   await page.getByRole('button', { name: 'Copier', exact: true }).click();
+  await page.locator('.identity-evidence summary').click();
+  assert.match(
+    await page.locator('.observed-identities').innerText(),
+    /observed@example.invalid/,
+  );
+  await audit(page, 'rich-identities');
   assert.match(
     await page.evaluate(() => navigator.clipboard.readText()),
     /Browser test\r?\nCompte GitHub/,
@@ -353,12 +492,56 @@ try {
       .evaluate((node) => node === document.activeElement),
     true,
   );
+  await page
+    .getByRole('button', { name: 'Exporter', exact: true })
+    .press('ArrowUp');
+  assert.equal(
+    await page.evaluate(() => document.activeElement.textContent.trim()),
+    'SVG',
+  );
+  await page.keyboard.press('Home');
+  assert.equal(
+    await page.evaluate(() => document.activeElement.textContent.trim()),
+    'PDF',
+  );
+  await page.locator('.report-heading h3').click();
+  assert.equal(await page.getByRole('menu').count(), 0);
+  assert.equal(
+    await page
+      .getByRole('button', { name: 'Exporter', exact: true })
+      .evaluate((node) => node === document.activeElement),
+    true,
+  );
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     await page.locator('#spoor').scrollIntoViewIfNeeded();
     await assertLayout(page);
     await capture(page, `result-${viewport.width}`);
+    await page.getByRole('button', { name: 'Exporter', exact: true }).click();
+    await assertLayout(page);
+    const menu = await page.getByRole('menu').boundingBox();
+    assert.ok(
+      menu.x >= 0 && menu.x + menu.width <= viewport.width && menu.height < 280,
+    );
+    assert.equal(
+      await page
+        .getByRole('menu')
+        .evaluate((node) => node.scrollHeight <= node.clientHeight),
+      true,
+    );
+    await capture(page, `export-${viewport.width}`);
+    await page.keyboard.press('Escape');
   }
+  scenario = 'exportBusy';
+  await page.getByRole('button', { name: 'Exporter', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'PDF', exact: true }).click();
+  await page.locator('.report-actions button[aria-busy="true"]').waitFor();
+  await capture(page, 'export-busy');
+  await audit(page, 'export-busy');
+  exportRelease();
+  await page.locator('.export-control [role="alert"]').waitFor();
+  await capture(page, 'export-error');
+  await audit(page, 'export-error');
   await page.getByRole('button', { name: 'Réduire', exact: true }).click();
   assert.equal(await page.locator('#spoor-content').getAttribute('inert'), '');
   await page.getByRole('button', { name: 'Ouvrir', exact: true }).click();
@@ -418,7 +601,7 @@ try {
   const staticPage = await noJs.newPage();
   await staticPage.goto(base);
   assert.equal(await staticPage.locator('#about').isVisible(), true);
-  assert.equal(await staticPage.locator('.areas-grid .area').count(), 3);
+  assert.equal(await staticPage.locator('.areas-grid .area').count(), 6);
   await noJs.close();
   assert.deepEqual(
     report.errors.filter(
