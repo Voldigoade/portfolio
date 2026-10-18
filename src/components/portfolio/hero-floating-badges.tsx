@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const floatingBadges = [
   {
@@ -24,12 +24,13 @@ const floatingBadges = [
 ];
 
 export function HeroFloatingBadges() {
+  const reduceMotion = useReducedMotion();
   return (
     <>
       {floatingBadges.map((badge) => (
         <motion.div
           key={badge.text}
-          animate={badge.animate}
+          animate={reduceMotion ? undefined : badge.animate}
           transition={{
             duration: 3.4,
             repeat: Number.POSITIVE_INFINITY,

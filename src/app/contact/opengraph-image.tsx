@@ -8,7 +8,7 @@ export default function Image() {
   return buildOgImage({
     eyebrow: "Contact",
     title: "Get In Touch",
-    subtitle: "Systems | Security Auditing | Open Source",
+    subtitle: "Project Questions | Feedback | Ideas",
     accent: "primary",
   });
 }

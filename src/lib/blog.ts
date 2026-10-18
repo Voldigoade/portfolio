@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import matter from "gray-matter";
-import { Marked } from "marked";
+import { load } from "js-yaml";
+import { Marked, type Tokens } from "marked";
 import { codeToHtml } from "shiki";
 import type { BlogPost, WritingType } from "@/lib/portfolio-types";
 
@@ -14,6 +14,8 @@ export const VALID_WRITING_TYPES: WritingType[] = [
 ];
 
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+// biome-ignore lint/suspicious/noControlCharactersInRegex: URL schemes must reject browser-ignored control characters.
+const UNSAFE_URL_CHARACTERS = /[\u0000-\u0020\\]/;
 
 export interface ArticleFrontmatter {
   title: string;
@@ -80,24 +82,27 @@ export function validateFrontmatter(
     );
   }
 
-  if (!Array.isArray(data.tags)) {
+  if (
+    !Array.isArray(data.tags) ||
+    data.tags.length === 0 ||
+    data.tags.some((tag) => typeof tag !== "string" || !tag.trim())
+  ) {
     errors.push(`'tags' in ${filename} must be an array of strings`);
   }
 
-  if (
-    typeof data.publishedAt !== "string" ||
-    Number.isNaN(Date.parse(data.publishedAt))
-  ) {
+  const publishedAt = normalizeDate(data.publishedAt);
+  const updatedAt =
+    data.updatedAt === undefined || data.updatedAt === ""
+      ? undefined
+      : normalizeDate(data.updatedAt);
+
+  if (!publishedAt) {
     errors.push(
       `Invalid 'publishedAt' date in ${filename}: '${String(data.publishedAt)}'`,
     );
   }
 
-  if (
-    data.updatedAt !== undefined &&
-    (typeof data.updatedAt !== "string" ||
-      Number.isNaN(Date.parse(data.updatedAt)))
-  ) {
+  if (data.updatedAt !== undefined && data.updatedAt !== "" && !updatedAt) {
     errors.push(
       `Invalid 'updatedAt' date in ${filename}: '${String(data.updatedAt)}'`,
     );
@@ -107,12 +112,22 @@ export function validateFrontmatter(
     errors.push(`'draft' in ${filename} must be a boolean (true or false)`);
   }
 
-  if (data.cover !== undefined && typeof data.cover !== "string") {
-    errors.push(`'cover' in ${filename} must be a string path or URL`);
+  if (
+    data.cover !== undefined &&
+    data.cover !== "" &&
+    (typeof data.cover !== "string" || !isWritingImage(data.cover))
+  ) {
+    errors.push(
+      `'cover' in ${filename} must be a raster image under /images/writing/`,
+    );
   }
 
-  if (data.canonical !== undefined && typeof data.canonical !== "string") {
-    errors.push(`'canonical' in ${filename} must be a string URL`);
+  if (
+    data.canonical !== undefined &&
+    data.canonical !== "" &&
+    (typeof data.canonical !== "string" || !isHttpUrl(data.canonical))
+  ) {
+    errors.push(`'canonical' in ${filename} must be an absolute HTTP(S) URL`);
   }
 
   if (errors.length > 0) {
@@ -124,129 +139,197 @@ export function validateFrontmatter(
     slug: (data.slug as string).trim(),
     summary: (data.summary as string).trim(),
     type: data.type as WritingType,
-    tags: (data.tags as unknown[]).map((t) => String(t).trim()).filter(Boolean),
-    publishedAt: (data.publishedAt as string).trim(),
-    updatedAt: data.updatedAt ? String(data.updatedAt).trim() : undefined,
+    tags: [...new Set((data.tags as string[]).map((tag) => tag.trim()))],
+    publishedAt: publishedAt as string,
+    updatedAt,
     draft: Boolean(data.draft),
     cover: data.cover ? String(data.cover).trim() : undefined,
     canonical: data.canonical ? String(data.canonical).trim() : undefined,
   };
 }
 
+function normalizeDate(value: unknown): string | undefined {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? undefined : value.toISOString();
+  }
+  if (
+    typeof value !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z)?$/.test(value)
+  )
+    return undefined;
+  const date = new Date(value);
+  // Date.parse silently rolls dates such as February 31 into the following month.
+  if (
+    Number.isNaN(date.getTime()) ||
+    date.toISOString().slice(0, 10) !== value.slice(0, 10)
+  )
+    return undefined;
+  return value;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function isHttpUrl(value: string): boolean {
+  if (!/^https?:\/\//i.test(value) || UNSAFE_URL_CHARACTERS.test(value))
+    return false;
+  try {
+    const url = new URL(value);
+    return Boolean(url.hostname) && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
+function isWritingImage(value: string): boolean {
+  return /^\/images\/writing\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-][a-zA-Z0-9_.-]*\.(?:png|jpe?g|webp|avif)$/i.test(
+    value,
+  );
+}
+
+function isSafeLink(value: string): boolean {
+  if (UNSAFE_URL_CHARACTERS.test(value)) return false;
+  return (
+    isHttpUrl(value) ||
+    /^mailto:[^<>"\s]+$/i.test(value) ||
+    /^\/(?![/%&])/.test(value) ||
+    value.startsWith("#")
+  );
+}
+
 export async function renderMarkdownToHtml(markdown: string): Promise<string> {
-  const marked = new Marked();
-
-  let blockIndex = 0;
-
-  marked.use({
+  // Raw HTML is text. Marked owns all ordinary tag/attribute escaping; only
+  // its link/image destinations need an explicit policy. Shiki HTML is trusted
+  // output from code tokens, never substituted into user-controlled text.
+  const highlighted = new Map<Tokens.Code, string>();
+  const marked = new Marked({
+    async: true,
+    async walkTokens(token) {
+      if (token.type !== "code") return;
+      const code = token as Tokens.Code;
+      try {
+        highlighted.set(
+          code,
+          await codeToHtml(code.text, {
+            lang: code.lang?.split(/\s+/)[0] || "text",
+            theme: "nord",
+          }),
+        );
+      } catch {
+        highlighted.set(
+          code,
+          `<pre class="border-2 border-black bg-muted p-4 overflow-x-auto"><code>${escapeHtml(code.text)}</code></pre>`,
+        );
+      }
+    },
     renderer: {
-      code() {
-        const placeholder = `__SHIKI_CODE_BLOCK_${blockIndex++}__`;
-        return placeholder;
+      code(token) {
+        return (
+          highlighted.get(token) ||
+          `<pre><code>${escapeHtml(token.text)}</code></pre>`
+        );
       },
       html({ text }) {
-        return text
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;");
+        return escapeHtml(text);
+      },
+      link(token) {
+        return isSafeLink(token.href)
+          ? false
+          : this.parser.parseInline(token.tokens);
+      },
+      image(token) {
+        return isWritingImage(token.href) ? false : escapeHtml(token.text);
       },
     },
   });
+  return marked.parse(markdown, { async: true });
+}
 
-  // Extract code blocks first to highlight with Shiki
-  const fenceRegex = /```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g;
-  const blocks: Array<{ lang: string; code: string }> = [];
-  let match: RegExpExecArray | null = fenceRegex.exec(markdown);
-
-  while (match !== null) {
-    blocks.push({
-      lang: match[1]?.trim() || "text",
-      code: match[2] ?? "",
-    });
-    match = fenceRegex.exec(markdown);
+function parseYamlFrontmatter(source: string) {
+  const normalized = source.replace(/^\uFEFF/, "");
+  const opening = /^---\r?\n/.exec(normalized);
+  const remainder = opening ? normalized.slice(opening[0].length) : "";
+  const closing = /(?:^|\r?\n)---(?:\r?\n|$)/.exec(remainder);
+  // Only a complete YAML fence is accepted. No content-selected parser or
+  // executable frontmatter engine participates in this pipeline.
+  if (!opening || !closing) {
+    throw new Error(
+      "Articles require complete YAML frontmatter delimited by ---",
+    );
   }
+  const data: unknown = load(remainder.slice(0, closing.index));
+  if (
+    data === null ||
+    typeof data !== "object" ||
+    (Object.getPrototypeOf(data) !== Object.prototype &&
+      Object.getPrototypeOf(data) !== null)
+  ) {
+    throw new Error("Article YAML frontmatter must be a mapping object");
+  }
+  return {
+    data: data as Record<string, unknown>,
+    content: remainder.slice(closing.index + closing[0].length),
+  };
+}
 
-  const highlightedBlocks = await Promise.all(
-    blocks.map(async (block) => {
-      try {
-        return await codeToHtml(block.code, {
-          lang: block.lang || "text",
-          theme: "nord",
-        });
-      } catch {
-        // Fallback for unsupported language
-        return `<pre class="border-2 border-black bg-muted p-4 overflow-x-auto"><code>${block.code
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")}</code></pre>`;
-      }
-    }),
+export interface ArticleSource {
+  filename: string;
+  content: string;
+}
+
+export function parseArticleSources(
+  sources: ArticleSource[],
+  options?: { includeDrafts?: boolean },
+): Article[] {
+  const seenSlugs = new Set<string>();
+  const articles: Article[] = [];
+  for (const source of sources) {
+    const { data, content } = parseYamlFrontmatter(source.content);
+    const frontmatter = validateFrontmatter(data, source.filename);
+    if (seenSlugs.has(frontmatter.slug))
+      throw new Error(
+        `Duplicate slug '${frontmatter.slug}' found in ${source.filename}`,
+      );
+    seenSlugs.add(frontmatter.slug);
+    if (frontmatter.draft && !options?.includeDrafts) continue;
+    articles.push({
+      ...frontmatter,
+      id: frontmatter.slug,
+      body: content,
+      readingMinutes: calculateReadingTime(content),
+      url: `/blog/${frontmatter.slug}`,
+    });
+  }
+  return articles.sort(
+    (a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt),
   );
-
-  let parsed = await marked.parse(markdown);
-
-  // Replace placeholders with highlighted code
-  highlightedBlocks.forEach((html, i) => {
-    parsed = parsed.replace(`__SHIKI_CODE_BLOCK_${i}__`, html);
-  });
-
-  return parsed;
 }
 
 export async function getAllArticles(options?: {
   includeDrafts?: boolean;
 }): Promise<Article[]> {
-  const includeDrafts = options?.includeDrafts ?? false;
-
   try {
-    await fs.mkdir(CONTENT_DIR, { recursive: true });
     const entries = await fs.readdir(CONTENT_DIR, { withFileTypes: true });
-    const mdFiles = entries
-      .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
-      .map((entry) => entry.name);
-
-    const articles: Article[] = [];
-    const seenSlugs = new Set<string>();
-
-    for (const filename of mdFiles) {
-      const fullPath = path.join(CONTENT_DIR, filename);
-      const rawContent = await fs.readFile(fullPath, "utf-8");
-      const { data, content } = matter(rawContent);
-
-      const frontmatter = validateFrontmatter(data, filename);
-
-      if (seenSlugs.has(frontmatter.slug)) {
-        throw new Error(
-          `Duplicate slug '${frontmatter.slug}' found in ${filename}`,
-        );
-      }
-      seenSlugs.add(frontmatter.slug);
-
-      if (!includeDrafts && frontmatter.draft) {
-        continue;
-      }
-
-      const readingMinutes = calculateReadingTime(content);
-
-      articles.push({
-        ...frontmatter,
-        id: frontmatter.slug,
-        body: content,
-        readingMinutes,
-        url: `/blog/${frontmatter.slug}`,
-      });
-    }
-
-    // Sort descending by publishedAt
-    return articles.sort(
-      (a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt),
+    const sources = await Promise.all(
+      entries
+        .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+        .map(async (entry) => ({
+          filename: entry.name,
+          content: await fs.readFile(
+            path.join(CONTENT_DIR, entry.name),
+            "utf-8",
+          ),
+        })),
     );
+    return parseArticleSources(sources, options);
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      return [];
-    }
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
     throw error;
   }
 }
@@ -274,24 +357,12 @@ export async function getArticleBySlug(
 
   try {
     const rawContent = await fs.readFile(resolved, "utf-8");
-    const { data, content } = matter(rawContent);
-    const frontmatter = validateFrontmatter(data, `${slug}.md`);
-
-    if (!includeDrafts && frontmatter.draft) {
-      return null;
-    }
-
-    const readingMinutes = calculateReadingTime(content);
-    const html = await renderMarkdownToHtml(content);
-
-    return {
-      ...frontmatter,
-      id: frontmatter.slug,
-      body: content,
-      html,
-      readingMinutes,
-      url: `/blog/${frontmatter.slug}`,
-    };
+    const article = parseArticleSources(
+      [{ filename: `${slug}.md`, content: rawContent }],
+      { includeDrafts },
+    )[0];
+    if (!article) return null;
+    return { ...article, html: await renderMarkdownToHtml(article.body) };
   } catch {
     return null;
   }

@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import dynamic from "next/dynamic";
 import { Bungee, Press_Start_2P, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { AnalyticsManager } from "@/components/layout/analytics-manager";
 import { AnimePageAnimator } from "@/components/layout/anime-page-animator";
+import { CookieNotice } from "@/components/layout/cookie-notice";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { RouteProgressBar } from "@/components/layout/route-progress-bar";
@@ -28,26 +28,6 @@ const bungee = Bungee({
   subsets: ["latin"],
 });
 
-const CookieNotice = dynamic(
-  () =>
-    import("@/components/layout/cookie-notice").then(
-      (module) => module.CookieNotice,
-    ),
-  {
-    loading: () => null,
-  },
-);
-
-const ReleaseUpdateNotice = dynamic(
-  () =>
-    import("@/components/layout/release-update-notice").then(
-      (module) => module.ReleaseUpdateNotice,
-    ),
-  {
-    loading: () => null,
-  },
-);
-
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: "Voldigoade Portfolio",
@@ -56,7 +36,7 @@ export const metadata: Metadata = {
     template: "%s | Voldigoade",
   },
   description:
-    "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript by Voldigoade.",
+    "Public software projects and source-linked research into systems, security, privacy, and developer tools by Voldigoade.",
   alternates: {
     canonical: "/",
   },
@@ -69,7 +49,7 @@ export const metadata: Metadata = {
     "Security",
     "Privacy",
     "Open Source",
-    "Software Engineer",
+    "Developer Tools",
   ],
   creator: "Voldigoade",
   publisher: "Voldigoade",
@@ -87,7 +67,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Voldigoade | Software, Systems, Security and Privacy",
     description:
-      "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript.",
+      "Public software projects and source-linked research into systems, security, privacy, and developer tools.",
     url: siteUrl,
     siteName: "Voldigoade",
     type: "website",
@@ -139,7 +119,6 @@ export default function RootLayout({
     "@type": "Person",
     name: "Voldigoade",
     url: siteUrl,
-    jobTitle: "Software, Systems & Security Engineer",
     sameAs: [githubUrl],
   };
 
@@ -155,11 +134,6 @@ export default function RootLayout({
       url: siteUrl,
     },
     sameAs: [githubUrl],
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${siteUrl}/project?query={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
   };
 
   const shellFallback = (
@@ -215,7 +189,6 @@ export default function RootLayout({
               </main>
               <Footer />
               <CookieNotice />
-              <ReleaseUpdateNotice />
             </div>
           </ThemeProvider>
         </Suspense>

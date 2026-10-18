@@ -30,12 +30,12 @@ export default function TermsOfServicePage() {
   return (
     <PolicyPageClient
       pageTitle="Terms of Service"
-      intro="These Terms of Service govern access to voldigoade.xyz, including its open-source project documentation, technical writing, benchmarks, and research materials."
+      intro="These Terms of Service govern access to voldigoade.xyz, including its project links and technical writing."
       sections={[
         {
           title: "Open Source Code & Content",
           content: [
-            "Source code repositories linked from this site (such as Spoor, Recherche Messageries, etc.) are distributed under their respective open-source licenses (typically MIT or Apache 2.0).",
+            "Linked repositories publish their own license terms. Research text, data, and code may use different licenses; check the relevant repository before reusing material.",
             "Technical articles, architectural write-ups, and documentation published on this website are provided for educational and technical research purposes.",
           ],
         },
@@ -50,7 +50,7 @@ export default function TermsOfServicePage() {
           title: "Disclaimer of Warranties",
           content: [
             "All content, benchmarks, code samples, and utilities on this site are provided 'AS IS' without warranty of any kind, express or implied.",
-            "While substantial care is taken to verify technical accuracy and reproducible benchmarks, Voldigoade does not guarantee that code samples are completely bug-free or suitable for every production environment.",
+            "Materials may be incomplete or outdated. Check the linked sources and project limitations before relying on technical claims or code samples.",
           ],
         },
         {
@@ -62,7 +62,7 @@ export default function TermsOfServicePage() {
         {
           title: "Vulnerability Disclosure",
           content: [
-            "If you discover a security vulnerability in any project maintained by Voldigoade, please report it privately via GitHub Security Advisories or through the contact form prior to public disclosure.",
+            "If you discover a security vulnerability, follow the relevant repository’s SECURITY.md reporting instructions where available. Do not include secrets or sensitive exploit details in a public issue or the general contact form.",
           ],
         },
       ]}

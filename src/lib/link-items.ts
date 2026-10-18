@@ -8,7 +8,7 @@ export const links: LinkItem[] = [
   {
     href: "https://github.com/Voldigoade",
     name: "GitHub",
-    description: "Open source projects, research and systems software",
+    description: "Public software projects and source-linked research",
   },
   {
     href: "https://voldigoade.xyz",
@@ -36,6 +36,6 @@ export const links: LinkItem[] = [
   {
     href: "https://github.com/Voldigoade/crukst",
     name: "Crukst",
-    description: "Semantic firmware diff and triage built in Rust",
+    description: "Experimental Rust foundation for planned firmware comparison",
   },
 ];

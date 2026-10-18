@@ -14,91 +14,99 @@ const stepLines: Array<{
   text: string;
   className?: string;
 }> = [
-  { kind: "type", text: "C:\\ops> terminal.exe", className: "text-[#64cbff]" },
+  {
+    kind: "type",
+    text: "$ # Spoor usage examples",
+    className: "text-[#64cbff]",
+  },
   {
     kind: "line",
-    text: "# Launching deployment shell for production workflow.",
+    text: "# Illustrative commands from the public Spoor README.",
     className: "text-[#ffc96b]",
   },
   {
     kind: "type",
-    text: "$ ssh deploy@prod-node-01",
+    text: "$ spoor --help",
     className: "text-[#64cbff]",
   },
   {
     kind: "line",
-    text: "✔ Connected to production host.",
+    text: "# Explore the available commands and options.",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "# Checking env vars, secrets mount, and release version tag.",
+    text: "# Inspect public GitHub metadata.",
     className: "text-[#ffc96b]",
   },
   {
     kind: "type",
-    text: "$ sudo nano /etc/nginx/sites-available/portfolio.conf",
+    text: "$ spoor inspect Voldigoade",
     className: "text-[#64cbff]",
   },
   {
     kind: "line",
-    text: "# Updated reverse-proxy rules for app and API routes.",
+    text: "# Profiles, repositories, commit identities, and keys.",
     className: "text-[#ffc96b]",
   },
   {
     kind: "line",
-    text: "# Enabled gzip and basic caching headers for static assets.",
-    className: "text-[#ffc96b]",
-  },
-  { kind: "type", text: "$ sudo nginx -t", className: "text-[#64cbff]" },
-  {
-    kind: "line",
-    text: "✔ nginx config syntax is valid and clean.",
-    className: "text-[#84ff6f]",
-  },
-  {
-    kind: "line",
-    text: "# Running pre-deploy smoke checks before restart.",
+    text: "# Reports keep source references and distinguish inferences.",
     className: "text-[#ffc96b]",
   },
   {
     kind: "type",
-    text: "$ bun run build ; pm2 restart portfolio-app",
+    text: "$ spoor repo Voldigoade/spoor",
     className: "text-[#64cbff]",
   },
   {
     kind: "line",
-    text: "✔ Build passed. Zero red flags.",
+    text: "# Repository inspection has its own documented scope.",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "✔ Health checks green across routes and API.",
-    className: "text-[#84ff6f]",
-  },
-  {
-    kind: "line",
-    text: "# Verifying CDN cache, SSL cert, and fallback routes.",
+    text: "# Choose a report format and output path.",
     className: "text-[#ffc96b]",
   },
   {
-    kind: "line",
-    text: "ℹ modules live: home.hero, github.graphs, project.filters, blog.filters",
+    kind: "type",
+    text: "$ spoor inspect Voldigoade -f json -o report.json",
     className: "text-[#64cbff]",
   },
   {
     kind: "line",
-    text: "# Release logs archived and on-call alert channel updated.",
-    className: "text-[#ffc96b]",
-  },
-  {
-    kind: "line",
-    text: "✔ Success: Portfolio deployment completed with business-ready uptime.",
+    text: "# JSON retains the canonical report.",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "Next: Contact me to build your next product release pipeline.",
+    text: "# Readable exports are available in other formats.",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "# Convert a saved report using the export command.",
+    className: "text-[#ffc96b]",
+  },
+  {
+    kind: "line",
+    text: "$ spoor export report.json --format pdf -o report.pdf",
+    className: "text-[#64cbff]",
+  },
+  {
+    kind: "line",
+    text: "# Scan bounds, cache age, and provider availability matter.",
+    className: "text-[#ffc96b]",
+  },
+  {
+    kind: "line",
+    text: "# Public identities do not prove ownership or current contact details.",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "# This animation does not execute commands or show a live scan.",
     className: "text-[#ffc96b]",
   },
 ];
@@ -220,29 +228,31 @@ export function RetroTerminalSection() {
   return (
     <section ref={sectionRef} className="space-y-4" data-anim="item">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        Deployment Operations Console
+        Terminal Tooling Console
       </h2>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card className="border-4 border-black bg-card shadow-retro-md">
           <Card.Header>
             <Card.Title className="font-display text-2xl uppercase">
-              Cloud Deployment Ownership
+              A Look at Spoor
             </Card.Title>
           </Card.Header>
           <Card.Content className="space-y-3">
             <p className="font-medium leading-relaxed">
-              I handle end-to-end deployments for modern product stacks across
-              AWS, Google Cloud, DigitalOcean, and serverless platforms.
+              Spoor is a Rust tool for inspecting public GitHub profiles,
+              repositories, commit identities, and keys from a terminal or HTTP
+              client.
             </p>
             <p className="font-medium leading-relaxed">
-              From Nginx routing and TLS setup to CI/CD pipelines, rollback
-              safety, monitoring, and uptime checks, delivery is
-              production-ready and business-focused.
+              The terminal shows example commands from its public README. It is
+              an illustration, not a live scan or a record of commands executed
+              by this website.
             </p>
             <p className="font-medium leading-relaxed">
-              You get reliable launches, clean handover docs, and systems built
-              to scale without late-night panic patches.
+              Read the repository documentation before using the tool. Results
+              depend on scan limits, cached data, and upstream provider
+              availability.
             </p>
           </Card.Content>
         </Card>
@@ -267,7 +277,7 @@ export function RetroTerminalSection() {
       </div>
 
       <h3 className="font-display text-2xl uppercase sm:text-3xl">
-        Support & Services
+        Reading the Results
       </h3>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -277,13 +287,13 @@ export function RetroTerminalSection() {
         >
           <Card.Header>
             <Card.Title className="font-display text-xl uppercase">
-              24/7 Support
+              Observed Data
             </Card.Title>
           </Card.Header>
           <Card.Content className="flex-1">
             <p className="font-medium leading-relaxed">
-              Around-the-clock support for deployments, incidents, hotfixes, and
-              release operations.
+              Public metadata is evidence with a source and a context. An
+              address in an old commit may no longer be a contact address.
             </p>
           </Card.Content>
         </Card>
@@ -293,13 +303,13 @@ export function RetroTerminalSection() {
         >
           <Card.Header>
             <Card.Title className="font-display text-xl uppercase">
-              Guaranteed Transparency
+              Derived Values
             </Card.Title>
           </Card.Header>
           <Card.Content className="flex-1">
             <p className="font-medium leading-relaxed">
-              Clear status updates, honest timelines, and straightforward
-              communication from planning to production.
+              Computed summaries depend on the records available within the scan
+              bounds and on the age of cached responses.
             </p>
           </Card.Content>
         </Card>
@@ -309,13 +319,13 @@ export function RetroTerminalSection() {
         >
           <Card.Header>
             <Card.Title className="font-display text-xl uppercase">
-              Service Reliability
+              Inference Limits
             </Card.Title>
           </Card.Header>
           <Card.Content className="flex-1">
             <p className="font-medium leading-relaxed">
-              Stable architecture, documented workflows, and practical
-              guardrails that keep your product running smoothly.
+              Public identities do not prove ownership. Activity or timezone
+              inferences do not establish a person&apos;s location.
             </p>
           </Card.Content>
         </Card>

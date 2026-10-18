@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const items = [
   "OPEN SOURCE",
@@ -12,6 +12,7 @@ const items = [
 ];
 
 export function StatsMarquee() {
+  const reduceMotion = useReducedMotion();
   const lineItems: Array<{ id: string; label: string }> = [];
 
   for (const cycle of ["a", "b", "c", "d"] as const) {
@@ -24,7 +25,7 @@ export function StatsMarquee() {
     <div className="relative overflow-hidden border-y-4 border-black bg-primary py-3 text-primary-foreground">
       <motion.div
         className="flex w-max font-black uppercase tracking-wide"
-        animate={{ x: ["0%", "-50%"] }}
+        animate={reduceMotion ? undefined : { x: ["0%", "-50%"] }}
         transition={{
           duration: 18,
           repeat: Number.POSITIVE_INFINITY,

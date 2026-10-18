@@ -1,14 +1,7 @@
 import { getPublishedArticles } from "@/lib/blog";
 import { siteName, siteUrl } from "@/lib/site-config";
 
-function escapeXml(unsafe: string): string {
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
+import { escapeXml } from "@/lib/writing-xml";
 
 export async function GET() {
   const articles = await getPublishedArticles();
@@ -32,9 +25,9 @@ export async function GET() {
   const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${escapeXml(siteName)} - Writing &amp; Research</title>
+    <title>${escapeXml(siteName)} - Writing</title>
     <link>${siteUrl}/blog</link>
-    <description>Software, systems, security and privacy by Voldigoade.</description>
+    <description>Technical notes and project writing by Voldigoade.</description>
     <language>en-us</language>
     <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>
 ${itemsXml}
@@ -43,7 +36,7 @@ ${itemsXml}
 
   return new Response(rssXml, {
     headers: {
-      "Content-Type": "application/xml; charset=utf-8",
+      "Content-Type": "application/rss+xml; charset=utf-8",
       "Cache-Control": "public, max-age=3600, s-maxage=3600",
     },
   });

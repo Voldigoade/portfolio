@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { SignInButton } from "@/components/layout/sign-in-button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Button } from "@/components/retroui/Button";
@@ -21,6 +21,7 @@ const navItems = [
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <header className="fixed top-0 z-50 w-full border-b-4 border-black bg-background/95 backdrop-blur">
@@ -32,11 +33,15 @@ export function Navbar() {
           ~/ Voldigoade
         </Link>
 
-        <nav className="hidden items-center gap-2 md:flex">
+        <nav
+          aria-label="Main navigation"
+          className="hidden items-center gap-2 md:flex"
+        >
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
+              aria-current={pathname === item.href ? "page" : undefined}
               className={cn(
                 "border-4 border-black px-3 py-2 text-sm font-black uppercase tracking-wide shadow-retro transition hover:translate-x-1 hover:translate-y-1 hover:shadow-none",
                 pathname === item.href
@@ -59,7 +64,10 @@ export function Navbar() {
             size="icon"
             className="md:hidden h-11 w-11"
             onClick={() => setOpen((v) => !v)}
-            aria-label="Open menu"
+            ref={menuButtonRef}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-navigation"
           >
             <Menu className="h-5 w-5" />
           </Button>
@@ -68,7 +76,15 @@ export function Navbar() {
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <motion.nav
+            id="mobile-navigation"
+            aria-label="Mobile navigation"
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setOpen(false);
+                menuButtonRef.current?.focus();
+              }
+            }}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -81,6 +97,7 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setOpen(false)}
+                  aria-current={pathname === item.href ? "page" : undefined}
                   className={cn(
                     "border-4 border-black px-3 py-2 text-center text-sm font-black uppercase shadow-retro",
                     pathname === item.href
@@ -92,7 +109,7 @@ export function Navbar() {
                 </Link>
               ))}
             </div>
-          </motion.div>
+          </motion.nav>
         )}
       </AnimatePresence>
     </header>

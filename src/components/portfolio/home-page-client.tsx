@@ -1,76 +1,23 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-// Hero section components — loaded eagerly (above the fold, must render immediately)
+import { BlogGrid } from "@/components/portfolio/blog-grid";
+import { GithubOverviewBento } from "@/components/portfolio/github-overview-bento";
+import { HackatimeBento } from "@/components/portfolio/hackatime-bento";
 import { HeroFloatingBadges } from "@/components/portfolio/hero-floating-badges";
+import { HomeDeliveryProcess } from "@/components/portfolio/home-delivery-process";
+import { HomeEngagementModel } from "@/components/portfolio/home-engagement-model";
 import { HyperNameReveal } from "@/components/portfolio/hyper-name-reveal";
+import { MorphScrollShowcase } from "@/components/portfolio/morph-scroll-showcase";
+import { ProjectsGrid } from "@/components/portfolio/projects-grid";
+import { RetroCodeShowcase } from "@/components/portfolio/retro-code-showcase";
+import { RetroTerminalSection } from "@/components/portfolio/retro-terminal-section";
 import { StatsMarquee } from "@/components/portfolio/stats-marquee";
 import { BentoCard, BentoGrid } from "@/components/retroui/Bento";
 import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
-import { Github, Linkedin, Twitter } from "@/components/retroui/icons";
-
-// Below-the-fold components — lazy loaded for performance
-const BlogGrid = dynamic(
-  () => import("@/components/portfolio/blog-grid").then((m) => m.BlogGrid),
-  { ssr: false },
-);
-const GithubOverviewBento = dynamic(
-  () =>
-    import("@/components/portfolio/github-overview-bento").then(
-      (m) => m.GithubOverviewBento,
-    ),
-  { ssr: false },
-);
-const HackatimeBento = dynamic(
-  () =>
-    import("@/components/portfolio/hackatime-bento").then(
-      (m) => m.HackatimeBento,
-    ),
-  { ssr: false },
-);
-const HomeDeliveryProcess = dynamic(
-  () =>
-    import("@/components/portfolio/home-delivery-process").then(
-      (m) => m.HomeDeliveryProcess,
-    ),
-  { ssr: false },
-);
-const HomeEngagementModel = dynamic(
-  () =>
-    import("@/components/portfolio/home-engagement-model").then(
-      (m) => m.HomeEngagementModel,
-    ),
-  { ssr: false },
-);
-const MorphScrollShowcase = dynamic(
-  () =>
-    import("@/components/portfolio/morph-scroll-showcase").then(
-      (m) => m.MorphScrollShowcase,
-    ),
-  { ssr: false },
-);
-const ProjectsGrid = dynamic(
-  () =>
-    import("@/components/portfolio/projects-grid").then((m) => m.ProjectsGrid),
-  { ssr: false },
-);
-const RetroCodeShowcase = dynamic(
-  () =>
-    import("@/components/portfolio/retro-code-showcase").then(
-      (m) => m.RetroCodeShowcase,
-    ),
-  { ssr: false },
-);
-const RetroTerminalSection = dynamic(
-  () =>
-    import("@/components/portfolio/retro-terminal-section").then(
-      (m) => m.RetroTerminalSection,
-    ),
-  { ssr: false },
-);
+import { Github, Link2, Mail } from "@/components/retroui/icons";
 
 import { links } from "@/lib/link-items";
 import type {
@@ -79,33 +26,25 @@ import type {
   GithubRepo,
   HackatimePayload,
 } from "@/lib/portfolio-types";
-import {
-  donationUrl,
-  githubUrl,
-  linkedinUrl,
-  linkHubUrl,
-  siteHost,
-  sponsorUrl,
-  xUrl,
-} from "@/lib/site-config";
+import { githubUrl, linkHubUrl, siteHost } from "@/lib/site-config";
 import { useHomeStore } from "@/store/home-store";
 
 const traits = [
   {
-    title: "Systems & Security Focus",
-    text: "Building auditable, resilient software with careful threat modeling, strict isolation, and clean architecture.",
+    title: "Systems & Security Questions",
+    text: "Exploring how software behaves, what it exposes, and where its assumptions need to be made explicit.",
   },
   {
     title: "Rust & Systems Tooling",
-    text: "Designing high-performance CLI utilities, memory-safe system tools, and inspectable developer workflows.",
+    text: "Building terminal-first tools in Rust and learning from their implementation, tests, and limitations.",
   },
   {
     title: "Local-First & Privacy",
-    text: "Prioritizing user data ownership, client-side encryption, and minimal external surface area.",
+    text: "Interested in local control, privacy trade-offs, and understanding which external services software depends on.",
   },
   {
     title: "Open Source Engineering",
-    text: "Documenting research, sharing reproducible benchmarks, and contributing clean, inspectable code.",
+    text: "Sharing code and source-linked comparisons so readers can inspect the evidence and project scope.",
   },
 ];
 
@@ -126,42 +65,42 @@ type FaqItem = {
 
 const faqItems: readonly FaqItem[] = [
   {
-    question: "What technical domains do you specialize in?",
+    question: "What are you working on?",
     answer:
-      "My primary work centers on systems programming (Rust, C, Linux), security research (threat modeling, metadata auditing, credential isolation), and developer tooling.",
+      "I am building Rust tools and researching secure messaging and development environments. The public repositories show each project’s current scope and limitations.",
   },
   {
     question: "What is Spoor?",
     answer:
-      "Spoor is an open-source footprint scanner designed to audit public GitHub activity, assess developer exposure, and identify unintended data leaks.",
+      "Spoor is a terminal-first tool for inspecting public GitHub profiles, repositories, commit identities, and keys. Its reports distinguish observed data, derived values, and inferences.",
     ctaHref: "https://github.com/Voldigoade/spoor",
     ctaLabel: "View Spoor",
   },
   {
-    question: "What stack and tools do you use?",
+    question: "What technologies appear in the projects?",
     answer:
-      "For systems and CLI tools, I rely heavily on Rust and Linux environments. For web tooling, research interfaces, and data pipelines, I use TypeScript, React/Next.js, Python, and SQLite.",
+      "Spoor uses Rust and a SQLite cache. The research sites use Python and web tooling. This portfolio uses Next.js, React, and TypeScript.",
   },
   {
     question: "Are your projects open source?",
     answer:
-      "Yes. The majority of my tools, research write-ups, and benchmarks are published publicly under permissive open-source licenses on GitHub.",
+      "The projects linked here have public repositories. Check each repository’s license: research text, data, and code can have different terms.",
     ctaHref: githubUrl,
     ctaLabel: "GitHub Profile",
   },
   {
     question: "How can I get in touch?",
     answer:
-      "You can reach out through the contact form on this site, find me on GitHub discussions and issues, or open a conversation on Matrix/GitHub.",
+      "Use the contact page for a message, or the relevant GitHub repository for public project questions and feedback.",
     ctaHref: "/contact",
     ctaLabel: "Contact Page",
   },
   {
     question: "Do you publish technical write-ups?",
     answer:
-      "Yes. I regularly write detailed articles, vulnerability case studies, and engineering postmortems in the Writing section.",
+      "The Writing section is available for future articles and notes. For now, the linked research repositories contain the public documentation.",
     ctaHref: "/blog",
-    ctaLabel: "Read Articles",
+    ctaLabel: "View Writing",
   },
 ] as const;
 
@@ -180,6 +119,12 @@ export function HomePageClient({
 }: HomePageClientProps) {
   const hackatime = initialHackatime ?? null;
   const githubOverview = initialGitHubOverview ?? null;
+  const codingStatsProvider =
+    process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER === "hackatime"
+      ? "Hackatime"
+      : "WakaTime";
+  const codingStatsProfileUrl =
+    process.env.NEXT_PUBLIC_CODING_STATS_PROFILE_URL;
   const focus = useHomeStore((state) => state.focus);
   const setFocus = useHomeStore((state) => state.setFocus);
 
@@ -187,22 +132,22 @@ export function HomePageClient({
     {
       key: "Systems",
       title: "Systems & Infrastructure",
-      body: "Building reliable system software, low-level tooling, and memory-safe utilities in Rust, Linux, and modern TypeScript.",
+      body: "Working on Rust command-line tools, including Spoor and the experimental Crukst project foundation.",
     },
     {
       key: "Security",
       title: "Security & Threat Research",
-      body: "Auditing protocols, analyzing credential footprints, evaluating threat models, and assessing privacy trade-offs.",
+      body: "Comparing messaging systems through public sources, threat models, metadata exposure, and documented limitations.",
     },
     {
       key: "Open Source",
       title: "Open Source & Reproducibility",
-      body: "Publishing inspectable tools, open datasets, and clear documentation with zero hidden telemetry or lock-in.",
+      body: "Sharing public code and source-linked research. Each repository documents its own scope, evidence, and licensing.",
     },
     {
       key: "Tooling",
       title: "Developer & CLI Tooling",
-      body: "Crafting ergonomic developer tools, automation scripts, and workflow utilities that respect developer focus.",
+      body: "Exploring terminal interfaces and comparing development environments, remote workflows, privacy, and licensing.",
     },
   ] as const;
 
@@ -258,8 +203,8 @@ export function HomePageClient({
                 </span>
               </h1>
               <p className="max-w-2xl border-l-4 border-black pl-3 text-xs font-medium leading-relaxed sm:pl-4 sm:text-sm md:text-lg">
-                Software engineer and systems researcher focused on security,
-                privacy, memory safety, and developer-first open source tooling.
+                Building software and exploring systems, security, privacy, and
+                developer tools through public projects.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
@@ -306,22 +251,18 @@ export function HomePageClient({
                   <Github className="h-4 w-4" />
                 </Link>
                 <Link
-                  href={xUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
+                  href="/project"
                   className="retro-social-icon"
-                  aria-label="X profile"
+                  aria-label="Explore projects"
                 >
-                  <Twitter className="h-4 w-4" />
+                  <Link2 className="h-4 w-4" />
                 </Link>
                 <Link
-                  href={linkedinUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
+                  href="/contact"
                   className="retro-social-icon"
-                  aria-label="LinkedIn profile"
+                  aria-label="Contact Voldigoade"
                 >
-                  <Linkedin className="h-4 w-4" />
+                  <Mail className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -336,22 +277,21 @@ export function HomePageClient({
         <BentoGrid>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase sm:text-2xl">
-              Systems Engineering & Architecture
+              Rust & Systems Projects
             </p>
             <p className="mt-3 font-medium leading-relaxed">
-              Designing memory-safe, auditable system utilities and backend
-              services in Rust, Linux, and TypeScript, engineered for
-              predictability and low resource footprint.
+              Working on terminal-first tools in Rust, from public GitHub
+              footprint inspection with Spoor to the early foundation of a
+              firmware comparison tool in Crukst.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Security & Threat Modeling
+              Messaging & Threat Models
             </p>
             <p className="mt-2 text-sm font-medium">
-              Mapping attack surfaces, analyzing network metadata and credential
-              exposure, and designing defense-in-depth isolation for critical
-              workflows.
+              Comparing secure messaging systems using public documentation,
+              threat models, metadata exposure, and available audit evidence.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
@@ -359,28 +299,27 @@ export function HomePageClient({
               Open Source Tools & Spoor
             </p>
             <p className="mt-2 text-sm font-medium">
-              Developing inspectable open-source tools like Spoor for automated
-              GitHub footprint auditing, credential risk evaluation, and
-              developer security.
+              Spoor inspects public GitHub profiles, repositories, commit
+              identities, and keys. Reports keep source references and
+              distinguish observations from inferences.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Local-First & Data Sovereignty
+              Privacy & Local Control
             </p>
             <p className="mt-2 text-sm font-medium">
-              Prioritizing offline-first storage, client-side encryption, and
-              minimal telemetry to ensure data stays under the user&apos;s
-              direct control.
+              Exploring how software choices affect metadata exposure, reliance
+              on external services, and control over local workflows.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Auditable & Deterministic Pipelines
+              Development Environments
             </p>
             <p className="mt-2 text-sm font-medium">
-              Building reproducible build environments, clean dependency graphs,
-              and continuous validation gates with zero proprietary lock-in.
+              IDE Research compares development environments across stacks,
+              remote workflows, AI tools, security, privacy, and licensing.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
@@ -388,8 +327,8 @@ export function HomePageClient({
               Technical Writing & Research
             </p>
             <p className="mt-2 text-sm font-medium">
-              Documenting architecture decisions, threat assessments, and
-              benchmarks in deep, rigorous technical write-ups and research
+              Sharing source-linked comparisons in public research repositories.
+              This site&apos;s Writing section is ready for future articles and
               notes.
             </p>
           </BentoCard>
@@ -430,6 +369,7 @@ export function HomePageClient({
               key={item}
               variant={focus === item ? "default" : "secondary"}
               onClick={() => setFocus(item)}
+              aria-pressed={focus === item}
               className="border-4 border-black shadow-retro-sm uppercase"
             >
               {item}
@@ -516,9 +456,7 @@ export function HomePageClient({
       <section className="space-y-4" data-home-reveal>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            {process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER === "hackatime"
-              ? "Hackatime Insights"
-              : "Wakatime Insights"}
+            {hackatime ? `${codingStatsProvider} Insights` : "Coding Activity"}
           </h2>
           <Button
             asChild
@@ -526,60 +464,51 @@ export function HomePageClient({
             className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
           >
             <Link
-              href={
-                process.env.NEXT_PUBLIC_CODING_STATS_PROFILE_URL || githubUrl
-              }
+              href={codingStatsProfileUrl || githubUrl}
               target="_blank"
               rel="noreferrer noopener"
             >
-              View{" "}
-              {process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER === "hackatime"
-                ? "HackClub"
-                : "Wakatime"}{" "}
-              Profile
+              {codingStatsProfileUrl
+                ? `View ${codingStatsProvider} Profile`
+                : "View GitHub Profile"}
             </Link>
           </Button>
         </div>
         <p className="font-bold uppercase text-muted-foreground">
-          {process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER === "hackatime"
-            ? "Live coding insights from Hack Club for the last 7 days and total tracked development time."
-            : "Live coding insights from Wakatime for the last 7 days and total tracked development time."}
+          {hackatime
+            ? `Tracked coding activity reported by ${codingStatsProvider}.`
+            : "Tracked coding statistics are not available. Public project activity can be explored on GitHub."}
         </p>
         <HackatimeBento stats={hackatime ?? null} />
       </section>
 
       <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Testimonials
+          Research Questions
         </h2>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           {[
             {
-              quote:
-                "Deep attention to system details, threat modeling, and defensive architecture.",
-              by: "Systems Engineer",
+              body: "What can public GitHub metadata reveal, and where do observations stop and inferences begin?",
+              title: "Public Footprints",
             },
             {
-              quote:
-                "Exceptional code clarity, rigorous testing, and pragmatic security trade-offs.",
-              by: "Security Researcher",
+              body: "Which messaging app fits a particular threat model, and what metadata remains visible?",
+              title: "Messaging Trade-offs",
             },
             {
-              quote:
-                "High-integrity open-source development with thorough documentation and clean tooling.",
-              by: "Open Source Contributor",
+              body: "How do development environments differ across remote work, AI tooling, privacy, and licensing?",
+              title: "Developer Workflows",
             },
           ].map((item) => (
             <Card
-              key={item.by}
+              key={item.title}
               className="flex h-full w-full flex-col border-4 border-black bg-card shadow-retro-md retro-press"
             >
               <Card.Content className="flex h-full min-h-44 flex-col gap-4">
-                <p className="text-lg font-bold leading-relaxed">
-                  &ldquo;{item.quote}&rdquo;
-                </p>
+                <p className="text-lg font-bold leading-relaxed">{item.body}</p>
                 <p className="mt-auto text-sm font-black uppercase text-muted-foreground">
-                  {item.by}
+                  {item.title}
                 </p>
               </Card.Content>
             </Card>
@@ -589,27 +518,27 @@ export function HomePageClient({
 
       <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Donate & Sponsor
+          Explore & Contribute
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Card className="w-full border-4 border-black bg-card shadow-retro-md retro-press">
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                Support via GitHub Sponsors
+                Explore the Source
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-4">
               <p className="font-medium">
-                Fund open-source work and long-term product experiments through
-                GitHub Sponsors.
+                Browse public repositories, read their documentation, and check
+                what is implemented or still being explored.
               </p>
               <Button asChild className="w-full sm:w-auto">
                 <Link
-                  href={sponsorUrl}
+                  href={githubUrl}
                   target="_blank"
                   rel="noreferrer noopener"
                 >
-                  Sponsor on GitHub
+                  View Public Repositories
                 </Link>
               </Button>
             </Card.Content>
@@ -618,22 +547,16 @@ export function HomePageClient({
           <Card className="w-full border-4 border-black bg-card shadow-retro-md retro-press">
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                Direct Donation
+                Share Project Feedback
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-4">
               <p className="font-medium">
-                If my content, products, or OSS work helped you, you can donate
-                directly here.
+                Found a bug, an unclear explanation, or a source that needs an
+                update? Feedback helps make the projects more useful.
               </p>
               <Button asChild variant="secondary" className="w-full sm:w-auto">
-                <Link
-                  href={donationUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  Donate Now
-                </Link>
+                <Link href="/contact">Get In Touch</Link>
               </Button>
             </Card.Content>
           </Card>
@@ -698,9 +621,9 @@ export function HomePageClient({
               Let&apos;s Connect
             </h2>
             <p className="max-w-xl text-sm font-medium leading-relaxed text-primary-foreground/90 sm:text-base">
-              Interested in collaborating on open-source systems, security
-              audits, or technical research? Send a message through the contact
-              form or connect via GitHub.
+              Have a question about a public project or an idea to explore? Send
+              a message through the contact page or find the relevant repository
+              on GitHub.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">

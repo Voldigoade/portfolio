@@ -1,11 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import * as ReactDialog from "@radix-ui/react-dialog";
 import { animate } from "animejs";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/retroui/Button";
 import { Input } from "@/components/retroui/Input";
 import {
@@ -22,47 +22,11 @@ import {
 } from "@/components/retroui/icons";
 import { Textarea } from "@/components/retroui/Textarea";
 import { useContactSubmissionMutation } from "@/lib/client/portfolio-queries";
+import { type ContactFormValues, contactSchema } from "@/lib/contact-schema";
 import {
   CONTACT_SUBMISSION_COOLDOWN_MS,
   useContactFormStore,
 } from "@/store/contact-form-store";
-
-const contactSchema = z
-  .object({
-    name: z.string().min(2, "Name must be at least 2 characters."),
-    email: z.email("Enter a valid email."),
-    country: z.string().min(2, "Country is required."),
-    phone: z
-      .string()
-      .trim()
-      .optional()
-      .refine(
-        (value) => !value || /^\+?[0-9()\-\s]{7,20}$/.test(value),
-        "Phone number format looks invalid.",
-      ),
-    businessInquiry: z.string().min(4, "Business inquiry topic is required."),
-    projectDetails: z
-      .string()
-      .min(20, "Project details must be at least 20 characters."),
-    expectedStartDate: z.string().optional(),
-    expectedEndDate: z.string().optional(),
-  })
-  .superRefine((values, ctx) => {
-    if (values.expectedStartDate && values.expectedEndDate) {
-      const start = Date.parse(values.expectedStartDate);
-      const end = Date.parse(values.expectedEndDate);
-
-      if (!Number.isNaN(start) && !Number.isNaN(end) && end < start) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["expectedEndDate"],
-          message: "Expected end date must be after start date.",
-        });
-      }
-    }
-  });
-
-type ContactFormValues = z.infer<typeof contactSchema>;
 
 export function ContactForm() {
   const mutation = useContactSubmissionMutation();
@@ -72,6 +36,7 @@ export function ContactForm() {
   const openPopup = useContactFormStore((state) => state.openPopup);
   const closePopup = useContactFormStore((state) => state.closePopup);
   const popupPanelRef = useRef<HTMLDivElement>(null);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const [clockTick, setClockTick] = useState<number | null>(null);
 
@@ -121,7 +86,11 @@ export function ContactForm() {
   }, []);
 
   useEffect(() => {
-    if (!popup.open || !popupPanelRef.current) {
+    if (
+      !popup.open ||
+      !popupPanelRef.current ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       return;
     }
 
@@ -133,23 +102,6 @@ export function ContactForm() {
       ease: "outQuad",
     });
   }, [popup.open]);
-
-  useEffect(() => {
-    if (!popup.open) {
-      return;
-    }
-
-    const onEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closePopup();
-      }
-    };
-
-    window.addEventListener("keydown", onEscape);
-    return () => {
-      window.removeEventListener("keydown", onEscape);
-    };
-  }, [popup.open, closePopup]);
 
   const onSubmit = async (values: ContactFormValues) => {
     const normalizedEmail = values.email.trim().toLowerCase();
@@ -187,7 +139,7 @@ export function ContactForm() {
         status: "success",
         title: "Message Sent",
         description:
-          "Your inquiry was submitted successfully. I will get back to you soon.",
+          "Your inquiry was submitted successfully. Thank you for getting in touch.",
       });
     } catch (error) {
       const message =
@@ -205,6 +157,15 @@ export function ContactForm() {
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div hidden aria-hidden="true">
+          <label htmlFor="contact-website">Leave this field empty</label>
+          <input
+            id="contact-website"
+            tabIndex={-1}
+            autoComplete="off"
+            {...register("website")}
+          />
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           <label htmlFor="contact-name" className="space-y-2">
             <span className="flex items-center gap-2 text-sm font-black uppercase">
@@ -278,12 +239,12 @@ export function ContactForm() {
 
         <label htmlFor="contact-business-inquiry" className="block space-y-2">
           <span className="flex items-center gap-2 text-sm font-black uppercase">
-            <Briefcase className="h-4 w-4" /> Business Inquiry Topic
+            <Briefcase className="h-4 w-4" /> Topic
           </span>
           <Input
             id="contact-business-inquiry"
             {...register("businessInquiry")}
-            placeholder="MVP build, automation setup, product redesign..."
+            placeholder="Question about a repository, documentation, an issue..."
             className="border-4 border-black bg-card py-3 shadow-retro"
           />
           {errors.businessInquiry ? (
@@ -295,13 +256,13 @@ export function ContactForm() {
 
         <label htmlFor="contact-project-details" className="block space-y-2">
           <span className="flex items-center gap-2 text-sm font-black uppercase">
-            <MessageSquare className="h-4 w-4" /> Project Details / Requirements
+            <MessageSquare className="h-4 w-4" /> Message / Project Details
           </span>
           <Textarea
             id="contact-project-details"
             {...register("projectDetails")}
             rows={6}
-            placeholder="Share scope, core requirements, timeline expectations, and success criteria."
+            placeholder="Share your question, relevant repository, or project context."
             className="border-4 border-black bg-card py-3 shadow-retro"
           />
           {errors.projectDetails ? (
@@ -349,18 +310,13 @@ export function ContactForm() {
           </p>
         ) : null}
 
-        {/* Summer offer promo disabled: the offer has ended. */}
-        {/* <p className="border-4 border-primary bg-primary/10 px-3 py-2 text-xs font-bold uppercase sm:text-sm">
-          🔥 Claim the 20% off limited time summer offer by submitting your
-          inquiry now.
-        </p> */}
-
         <div className="flex flex-col gap-3 sm:flex-row">
           <motion.div
             whileHover={{ x: 4, y: 4, boxShadow: "0px 0px 0px rgba(0,0,0,1)" }}
           >
             <Button
               type="submit"
+              ref={submitButtonRef}
               size="lg"
               disabled={isSubmitting || mutation.isPending || isCooldownActive}
               className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
@@ -373,57 +329,63 @@ export function ContactForm() {
         </div>
       </form>
 
-      {popup.open ? (
-        <div
-          className="fixed inset-0 z-120 flex items-center justify-center bg-black/70 p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-live="polite"
-        >
-          <div
-            ref={popupPanelRef}
-            className="w-full max-w-md border-4 border-black bg-card p-4 shadow-retro-lg sm:p-5"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-2">
-                {popup.status === "success" ? (
-                  <CheckCircle2 className="mt-0.5 h-5 w-5" />
-                ) : popup.status === "error" ? (
-                  <XCircle className="mt-0.5 h-5 w-5" />
-                ) : (
-                  <Info className="mt-0.5 h-5 w-5" />
-                )}
-                <div>
-                  <p className="font-display text-2xl uppercase">
-                    {popup.title}
-                  </p>
-                  <p className="mt-1 text-sm font-medium leading-relaxed sm:text-base">
-                    {popup.description}
-                  </p>
+      <ReactDialog.Root
+        open={popup.open}
+        onOpenChange={(open) => {
+          if (!open) closePopup();
+        }}
+      >
+        <ReactDialog.Portal>
+          <ReactDialog.Overlay className="fixed inset-0 z-120 flex items-center justify-center bg-black/70 p-4">
+            <ReactDialog.Content
+              ref={popupPanelRef}
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                submitButtonRef.current?.focus();
+              }}
+              className="w-full max-w-md border-4 border-black bg-card p-4 shadow-retro-lg sm:p-5"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2">
+                  {popup.status === "success" ? (
+                    <CheckCircle2 className="mt-0.5 h-5 w-5" />
+                  ) : popup.status === "error" ? (
+                    <XCircle className="mt-0.5 h-5 w-5" />
+                  ) : (
+                    <Info className="mt-0.5 h-5 w-5" />
+                  )}
+                  <div>
+                    <ReactDialog.Title className="font-display text-2xl uppercase">
+                      {popup.title}
+                    </ReactDialog.Title>
+                    <ReactDialog.Description className="mt-1 text-sm font-medium leading-relaxed sm:text-base">
+                      {popup.description}
+                    </ReactDialog.Description>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={closePopup}
+                  className="retro-social-icon"
+                  aria-label="Close popup"
+                >
+                  <XCircle className="h-4 w-4" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={closePopup}
-                className="retro-social-icon"
-                aria-label="Close popup"
-              >
-                <XCircle className="h-4 w-4" />
-              </button>
-            </div>
 
-            <div className="mt-4 flex justify-end">
-              <Button
-                type="button"
-                onClick={closePopup}
-                className="border-4 border-black uppercase shadow-retro-sm"
-              >
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+              <div className="mt-4 flex justify-end">
+                <Button
+                  type="button"
+                  onClick={closePopup}
+                  className="border-4 border-black uppercase shadow-retro-sm"
+                >
+                  Close
+                </Button>
+              </div>
+            </ReactDialog.Content>
+          </ReactDialog.Overlay>
+        </ReactDialog.Portal>
+      </ReactDialog.Root>
     </>
   );
 }

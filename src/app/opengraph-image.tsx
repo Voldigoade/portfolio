@@ -8,7 +8,7 @@ export default function OpenGraphImage() {
   return buildOgImage({
     eyebrow: "Voldigoade Portfolio",
     title: "Voldigoade",
-    subtitle: "Systems Engineer | Security Researcher | Open Source",
+    subtitle: "Software Projects | Systems | Privacy",
     accent: "primary",
   });
 }

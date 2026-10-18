@@ -5,7 +5,7 @@ type CloudflareAnalyticsProps = {
 };
 
 export function CloudflareAnalytics({ token }: CloudflareAnalyticsProps) {
-  if (!token || token.trim() === "") {
+  if (!/^[a-f0-9]{32}$/i.test(token.trim())) {
     return null;
   }
 
@@ -13,6 +13,7 @@ export function CloudflareAnalytics({ token }: CloudflareAnalyticsProps) {
 
   return (
     <Script
+      type="module"
       defer
       src="https://static.cloudflareinsights.com/beacon.min.js"
       data-cf-beacon={beaconPayload}

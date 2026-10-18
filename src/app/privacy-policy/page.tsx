@@ -7,12 +7,12 @@ const privacyPolicyOgImageUrl = `${siteUrl}/privacy-policy/opengraph-image`;
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Privacy Policy for voldigoade.xyz: privacy-first architecture, consent gating, and zero fingerprinting.",
+    "How voldigoade.xyz handles analytics preferences and contact messages.",
   alternates: { canonical: "/privacy-policy" },
   openGraph: {
     title: "Privacy Policy | Voldigoade",
     description:
-      "How data is protected on voldigoade.xyz with privacy-preserving telemetry and strict consent gating.",
+      "Information about analytics, browser preferences, and contact messages on voldigoade.xyz.",
     url: `${siteUrl}/privacy-policy`,
     type: "website",
     images: [privacyPolicyOgImageUrl],
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Privacy Policy | Voldigoade",
     description:
-      "How data is protected on voldigoade.xyz with privacy-preserving telemetry and strict consent gating.",
+      "Information about analytics, browser preferences, and contact messages on voldigoade.xyz.",
     images: [privacyPolicyOgImageUrl],
   },
 };
@@ -30,41 +30,41 @@ export default function PrivacyPolicyPage() {
   return (
     <PolicyPageClient
       pageTitle="Privacy Policy"
-      intro="This Privacy Policy outlines how Voldigoade protects your privacy when visiting voldigoade.xyz. Privacy, data minimization, and transparency are core design principles of this site."
+      intro="This policy describes the data used by voldigoade.xyz for browsing preferences, optional analytics, and contact messages."
       sections={[
         {
           title: "Core Privacy Principles",
           content: [
-            "This site is designed with data minimization as a primary invariant: no intrusive tracking, no canvas fingerprinting, and no sale of personal information.",
-            "Static content, open-source articles, and project documentation are freely accessible without accounts or paywalls.",
+            "Browsing the portfolio does not require an account. This application does not implement visitor fingerprinting or sell contact-form information.",
+            "Links to GitHub and other external sites are subject to those services’ own privacy policies.",
           ],
         },
         {
           title: "Analytics & Telemetry",
           content: [
-            "Cloudflare Web Analytics: We use Cloudflare Web Analytics for non-invasive, privacy-preserving aggregated traffic analysis. It does not use cookies, does not track individual IP addresses across sites, and does not profile visitors.",
-            "Google Analytics / Tag Manager: Optional analytics are strictly consent-gated. If consent is not explicitly granted via the Cookie Notice, Google Analytics scripts are completely prevented from loading or running.",
+            "Cloudflare Web Analytics can be enabled through site configuration. Its cookieless beacon operates independently of the Google analytics consent choice.",
+            "Google Analytics and Google Tag Manager load only when configured and after you explicitly accept the Cookie Notice. Google services may then use cookies or other browser storage according to their configuration.",
           ],
         },
         {
           title: "Contact Form Submissions",
           content: [
-            "If you submit an inquiry through the Contact page, the information you provide (name, email, topic, project scope) is processed securely via HTTPS solely to reply to your message.",
-            "Form input is not stored in plain-text browser local storage, nor is it ever shared with advertisers or third-party marketers.",
+            "When the contact service is configured, submitting the form sends your name, email, topic, and message to Web3Forms for delivery. These details are used to handle your inquiry. Do not submit secrets or sensitive security reports.",
+            "The application does not persist contact-form fields in browser local storage. Its temporary submission throttle runs in server memory and is not a durable abuse-prevention service.",
           ],
         },
         {
           title: "Cookies & Local Storage",
           content: [
-            "Local storage is used strictly for client-side user preferences: theme selection (dark/light) and your cookie consent preference (voldigoade_cookie_consent).",
-            "No advertising or cross-site tracking cookies are set by this website.",
+            "Browser local storage remembers theme, cookie consent, filters, and interactive display preferences. See the Cookies Policy for details.",
+            "Without explicit acceptance, the application does not load its configured Google analytics scripts. Cloudflare’s cookieless beacon may still be enabled.",
           ],
         },
         {
           title: "Data Security & Hygiene",
           content: [
-            "All connections are enforced via TLS/HTTPS with modern cipher suites.",
-            "Third-party integrations are kept to a strict minimum to reduce external attack surface.",
+            "The public site uses HTTPS. Hosting, form delivery, analytics, and linked services each have their own processing and retention policies.",
+            "No online service can guarantee complete security. Avoid sending credentials, private keys, or confidential information through the general contact form.",
           ],
         },
         {

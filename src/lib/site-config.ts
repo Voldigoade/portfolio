@@ -33,12 +33,6 @@ export const rechercheMessageriesUrl =
 export const ideResearchUrl = "https://github.com/Voldigoade/ide-research";
 export const crukstUrl = "https://github.com/Voldigoade/crukst";
 
-// Compatibility exports safely mapped to Voldigoade resources
+// Public profile destination for the link hub
 export const linkHubUrl = githubUrl;
-export const linkedinUrl = "";
-export const xUrl = "";
-export const youtubeUrl = "";
-export const hackatimeUrl = "";
-export const sponsorUrl = "";
-export const donationUrl = "";
 export const ogImageUrl = `${siteUrl}/opengraph-image`;

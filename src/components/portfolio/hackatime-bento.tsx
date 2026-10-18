@@ -46,8 +46,7 @@ export function HackatimeBento({ stats }: { stats: HackatimePayload | null }) {
   if (!stats) {
     return (
       <div className="border-4 border-black bg-card p-6 text-center font-bold uppercase shadow-retro-md">
-        {providerName} data is unavailable right now. Please check server API
-        key.
+        Coding activity statistics are not available.
       </div>
     );
   }
@@ -57,7 +56,9 @@ export function HackatimeBento({ stats }: { stats: HackatimePayload | null }) {
     hours: item.hours,
   }));
 
-  const totalHours = splitNumericText(stats.totalHours);
+  const totalHours = stats.totalHours
+    ? splitNumericText(stats.totalHours)
+    : null;
   const last7DaysTotal = splitNumericText(stats.last7DaysTotalHours);
   const dailyAverage = splitNumericText(stats.dailyAverage);
   const activeDayChartData = [
@@ -99,7 +100,7 @@ export function HackatimeBento({ stats }: { stats: HackatimePayload | null }) {
           />
         </div>
         <p className="mt-2 text-sm font-bold uppercase text-muted-foreground">
-          Live validated data from {providerName} statusbar API
+          Tracked time from the {providerName} API
         </p>
       </BentoCard>
 
@@ -250,16 +251,20 @@ export function HackatimeBento({ stats }: { stats: HackatimePayload | null }) {
 
       <BentoCard className="sm:col-span-2 lg:col-span-2">
         <p className="font-display text-2xl uppercase">
-          {providerName} Validation Snapshot
+          {providerName} Activity Snapshot
         </p>
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between border-2 border-black bg-muted px-3 py-2 font-bold uppercase">
             <span>Grand Total</span>
-            <AnimatedNumberTicker
-              value={totalHours.value}
-              decimals={1}
-              suffix={totalHours.suffix ? ` ${totalHours.suffix}` : "h"}
-            />
+            {totalHours ? (
+              <AnimatedNumberTicker
+                value={totalHours.value}
+                decimals={1}
+                suffix={totalHours.suffix ? ` ${totalHours.suffix}` : "h"}
+              />
+            ) : (
+              <span>Unavailable</span>
+            )}
           </div>
           <div className="flex items-center justify-between border-2 border-black bg-muted px-3 py-2 font-bold uppercase">
             <span>Daily Average</span>
@@ -277,7 +282,7 @@ export function HackatimeBento({ stats }: { stats: HackatimePayload | null }) {
           </div>
         </div>
         <p className="mt-3 text-xs font-black uppercase text-muted-foreground">
-          Values are validated from {providerName} API endpoints.
+          Values are reported by the configured {providerName} account.
         </p>
       </BentoCard>
     </BentoGrid>

@@ -8,31 +8,31 @@ const models = [
   {
     title: "Systems & CLI Tools",
     summary:
-      "Terminal-first tooling, low-level services, and system utilities built in Rust.",
+      "Spoor provides a terminal interface and HTTP service for public GitHub inspection.",
     bullets: [
-      "Fast native binary execution",
-      "HTTP and Server-Sent Event streaming APIs",
-      "Structured machine-readable JSON exports",
+      "Rust command-line implementation",
+      "HTTP lookups with streamed progress",
+      "JSON and readable report exports",
     ],
   },
   {
     title: "Security & Threat Research",
     summary:
-      "Source-driven comparative analysis of privacy, cryptography, and network protocols.",
+      "Recherche Messageries compares messaging systems using public sources and explicit limits.",
     bullets: [
-      "Threat model and boundary evaluation",
-      "Network exposure and metadata auditing",
-      "Evidence registers with primary source citations",
+      "Threat-model comparisons",
+      "Metadata and network-exposure questions",
+      "Source references and evidence registers",
     ],
   },
   {
-    title: "Local-First & Tooling",
+    title: "Developer Environments",
     summary:
-      "Software designed to run locally, keep state deterministic, and respect privacy.",
+      "IDE Research compares complete working environments and the trade-offs between them.",
     bullets: [
-      "Local-first data persistence",
-      "Automation and agent workflow integrations",
-      "Zero unnecessary telemetry or tracking",
+      "Local, remote, and container workflows",
+      "AI tooling and agent compatibility",
+      "Privacy, licensing, and vendor dependence",
     ],
   },
 ] as const;

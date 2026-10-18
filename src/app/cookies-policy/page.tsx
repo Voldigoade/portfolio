@@ -34,35 +34,35 @@ export default function CookiesPolicyPage() {
         {
           title: "Our Approach to Cookies",
           content: [
-            "voldigoade.xyz minimizes cookie usage to the greatest extent possible. We do not use third-party advertising cookies or cross-site tracking beacons.",
+            "Browsing the portfolio does not require accepting Google analytics. Configured Google services load after explicit acceptance and may use cookies or browser storage.",
             "Default browsing and navigation of all projects, articles, and documentation does not require tracking cookies.",
           ],
         },
         {
           title: "Consent Gating & Storage",
           content: [
-            "voldigoade_cookie_consent: When you interact with the Cookie Notice banner, your choice ('accepted' or 'rejected') is stored locally in your browser's localStorage so you are not prompted repeatedly.",
-            "If you decline or dismiss consent, all optional analytics tools (including Google Analytics / Tag Manager) remain completely disabled and inert.",
+            "voldigoade_cookie_consent: Stores whether you accepted or dismissed the Cookie Notice. Only explicit acceptance enables the configured Google analytics scripts.",
+            "Dismissing the notice leaves Google Analytics and Google Tag Manager disabled. Cloudflare Web Analytics, when configured, operates independently without cookies.",
           ],
         },
         {
           title: "Functional Local Storage",
           content: [
             "theme: Stores your dark mode or light mode appearance preference.",
-            "blog-store / home-store: Stores filter preferences (such as selected writing tag or technical focus area) within your current session.",
-            "No sensitive personal identification data or plain-text credentials are ever placed in local storage.",
+            "voldigoade-blog-store, home-store, and projects-store: Remember writing and project filters across visits. showcase-store remembers interactive display preferences; system-pages-store remembers the last visited system page and retry count.",
+            "The application does not persist contact-form fields or service credentials in local storage.",
           ],
         },
         {
           title: "Cookieless Analytics",
           content: [
-            "We employ Cloudflare Web Analytics, a privacy-first measurement beacon that operates without setting cookies, tracking personal identifiable information, or fingerprinting browser devices.",
+            "Cloudflare Web Analytics may be enabled through site configuration. According to Cloudflare, its Web Analytics beacon does not use cookies, local storage, or browser fingerprinting for analytics.",
           ],
         },
         {
           title: "How to Revoke or Clear",
           content: [
-            "You can reset your consent preference or theme at any time by clearing your browser's local storage for voldigoade.xyz, which will immediately re-trigger the default consent-gated state.",
+            "To reset your choice, clear browser storage for voldigoade.xyz and reload the site. Google analytics will remain disabled until you accept again. Use your browser’s controls to remove any existing Google cookies as well.",
           ],
         },
       ]}

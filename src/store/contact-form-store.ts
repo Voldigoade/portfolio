@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 export const CONTACT_SUBMISSION_COOLDOWN_MS = 10 * 60 * 1000;
 
@@ -19,50 +18,42 @@ type ContactFormState = {
   closePopup: () => void;
 };
 
-export const useContactFormStore = create<ContactFormState>()(
-  persist(
-    (set, get) => ({
-      cooldownByEmail: {},
-      popup: {
-        open: false,
-        status: "info",
-        title: "",
-        description: "",
+export const useContactFormStore = create<ContactFormState>()((set, get) => ({
+  cooldownByEmail: {},
+  popup: {
+    open: false,
+    status: "info",
+    title: "",
+    description: "",
+  },
+  setCooldown: (email, expiresAt) =>
+    set((state) => ({
+      cooldownByEmail: {
+        ...state.cooldownByEmail,
+        [email]: expiresAt,
       },
-      setCooldown: (email, expiresAt) =>
-        set((state) => ({
-          cooldownByEmail: {
-            ...state.cooldownByEmail,
-            [email]: expiresAt,
-          },
-        })),
-      getRemainingMs: (email, nowMs) => {
-        if (!email) {
-          return 0;
-        }
+    })),
+  getRemainingMs: (email, nowMs) => {
+    if (!email) {
+      return 0;
+    }
 
-        const expiresAt = get().cooldownByEmail[email] ?? 0;
-        const currentTime = nowMs ?? Date.now();
-        return Math.max(0, expiresAt - currentTime);
+    const expiresAt = get().cooldownByEmail[email] ?? 0;
+    const currentTime = nowMs ?? Date.now();
+    return Math.max(0, expiresAt - currentTime);
+  },
+  openPopup: (popup) =>
+    set({
+      popup: {
+        ...popup,
+        open: true,
       },
-      openPopup: (popup) =>
-        set({
-          popup: {
-            ...popup,
-            open: true,
-          },
-        }),
-      closePopup: () =>
-        set((state) => ({
-          popup: {
-            ...state.popup,
-            open: false,
-          },
-        })),
     }),
-    {
-      name: "contact-form-store",
-      partialize: () => ({}),
-    },
-  ),
-);
+  closePopup: () =>
+    set((state) => ({
+      popup: {
+        ...state.popup,
+        open: false,
+      },
+    })),
+}));

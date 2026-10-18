@@ -14,11 +14,11 @@ export function CookieNotice() {
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(VOLDIGOADE_CONSENT_KEY);
-      if (!stored) {
+      if (stored !== "accepted" && stored !== "dismissed") {
         setVisible(true);
       }
     } catch {
-      setVisible(false);
+      setVisible(true);
     }
   }, []);
 

@@ -57,7 +57,10 @@ export function ThemeToggle({
     };
 
     const doc = document as ViewTransitionDocument;
-    if (typeof doc.startViewTransition !== "function") {
+    if (
+      typeof doc.startViewTransition !== "function" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       applyTheme();
       return;
     }

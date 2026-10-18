@@ -1,7 +1,6 @@
 "use client";
 
 import { animate, stagger } from "animejs";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { Badge } from "@/components/retroui/Badge";
@@ -10,7 +9,7 @@ import { Button } from "@/components/retroui/Button";
 import { BarChart } from "@/components/retroui/charts/BarChart";
 import { LineChart } from "@/components/retroui/charts/LineChart";
 import type { GitHubOverviewPayload } from "@/lib/portfolio-types";
-import { githubSnakeGraphUrl, githubUrl } from "@/lib/site-config";
+import { githubUrl } from "@/lib/site-config";
 
 export function GithubOverviewBento({
   stats,
@@ -70,30 +69,31 @@ export function GithubOverviewBento({
   const insightsData = [
     {
       metric: "Stars Avg",
-      value: Math.max(
-        0,
-        Math.round(stats.totalStars / Math.max(stats.totalRepositories, 1)),
-      ),
+      value:
+        stats.totalStars === null
+          ? null
+          : Math.round(stats.totalStars / Math.max(stats.totalRepositories, 1)),
     },
     {
       metric: "Forks Avg",
-      value: Math.max(
-        0,
-        Math.round(stats.totalForks / Math.max(stats.totalRepositories, 1)),
-      ),
+      value:
+        stats.totalForks === null
+          ? null
+          : Math.round(stats.totalForks / Math.max(stats.totalRepositories, 1)),
     },
     {
       metric: "Watch Avg",
-      value: Math.max(
-        0,
-        Math.round(stats.totalWatchers / Math.max(stats.totalRepositories, 1)),
-      ),
+      value:
+        stats.totalWatchers === null
+          ? null
+          : Math.round(
+              stats.totalWatchers / Math.max(stats.totalRepositories, 1),
+            ),
     },
-    {
-      metric: "Public Repos",
-      value: stats.publicRepos,
-    },
-  ];
+    { metric: "Public Repos", value: stats.publicRepos },
+  ].flatMap((item) =>
+    item.value === null ? [] : [{ ...item, value: item.value }],
+  );
 
   return (
     <div ref={sectionRef}>
@@ -103,20 +103,24 @@ export function GithubOverviewBento({
           className="sm:col-span-2 lg:col-span-4 self-start"
         >
           <p className="font-display text-2xl uppercase">GitHub Pulse</p>
+          <p className="mt-1 text-xs font-bold uppercase text-muted-foreground">
+            Project totals cover the curated public repositories. Unavailable
+            metrics are omitted.
+          </p>
           <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             <Badge
               data-gh-pill
               variant="surface"
               className="justify-center border-2 border-black bg-[#ffe08a] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Followers {stats.followers}
+              Followers {stats.followers ?? "Unavailable"}
             </Badge>
             <Badge
               data-gh-pill
               variant="surface"
               className="justify-center border-2 border-black bg-[#8cf5ff] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Following {stats.following}
+              Following {stats.following ?? "Unavailable"}
             </Badge>
             <Badge
               data-gh-pill
@@ -130,21 +134,21 @@ export function GithubOverviewBento({
               variant="surface"
               className="justify-center border-2 border-black bg-[#ffd146] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Stars {stats.totalStars}
+              Stars {stats.totalStars ?? "Unavailable"}
             </Badge>
             <Badge
               data-gh-pill
               variant="surface"
               className="justify-center border-2 border-black bg-[#ff9ac2] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Forks {stats.totalForks}
+              Forks {stats.totalForks ?? "Unavailable"}
             </Badge>
             <Badge
               data-gh-pill
               variant="surface"
               className="justify-center border-2 border-black bg-[#c6a8ff] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Watch {stats.totalWatchers}
+              Watch {stats.totalWatchers ?? "Unavailable"}
             </Badge>
           </div>
         </BentoCard>
@@ -153,21 +157,25 @@ export function GithubOverviewBento({
           data-gh-card
           className="sm:col-span-2 lg:col-span-4 self-start"
         >
-          <p className="font-display text-2xl uppercase">Github Graphs</p>
+          <p className="font-display text-2xl uppercase">Public Project Map</p>
           <p className="mt-1 text-xs font-bold uppercase text-muted-foreground">
-            Contribution snake graph, live from GitHub profile output.
+            A curated selection of public code and research repositories.
           </p>
-          <div className="mt-4 overflow-hidden border-4 border-black bg-muted p-2 shadow-retro-sm sm:p-3">
-            <Image
-              src={githubSnakeGraphUrl}
-              alt="Voldigoade GitHub contribution snake graph"
-              width={1200}
-              height={260}
-              className="h-auto w-full border-2 border-black bg-card"
-              priority={false}
-              loading="lazy"
-              unoptimized
-            />
+          <div className="mt-4 grid min-h-44 grid-cols-1 gap-3 border-4 border-black bg-muted p-2 shadow-retro-sm sm:grid-cols-2 sm:p-3">
+            {stats.projects.map((project) => (
+              <Link
+                key={project.name}
+                href={project.url}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="flex min-h-20 flex-col justify-center gap-1 border-2 border-black bg-card px-4 py-3 font-black uppercase shadow-retro-sm transition-transform hover:translate-x-1 hover:translate-y-1 hover:shadow-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+              >
+                <span className="break-all">{project.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {project.language ?? "Mixed"} · Public repository
+                </span>
+              </Link>
+            ))}
           </div>
           <Button
             asChild
@@ -188,16 +196,22 @@ export function GithubOverviewBento({
             Top Repositories by Stars
           </p>
           <div className="mt-3 h-72 w-full">
-            <BarChart
-              data={stats.topRepositories}
-              index="name"
-              categories={["stars"]}
-              className="h-72"
-              isAnimationActive={false}
-              fillColors={["var(--chart-1)"]}
-              strokeColors={["var(--foreground)"]}
-              valueFormatter={(value) => `${value}`}
-            />
+            {stats.topRepositories.length > 0 ? (
+              <BarChart
+                data={stats.topRepositories}
+                index="name"
+                categories={["stars"]}
+                className="h-72"
+                isAnimationActive={false}
+                fillColors={["var(--chart-1)"]}
+                strokeColors={["var(--foreground)"]}
+                valueFormatter={(value) => `${value}`}
+              />
+            ) : (
+              <p className="flex h-full items-center justify-center text-center font-bold uppercase">
+                Live star counts are unavailable.
+              </p>
+            )}
           </div>
         </BentoCard>
 
@@ -235,15 +249,21 @@ export function GithubOverviewBento({
             Repository Activity by Month
           </p>
           <div className="mt-3 h-72 w-full">
-            <LineChart
-              data={stats.monthlyActivity}
-              index="month"
-              categories={["repos"]}
-              className="h-72"
-              isAnimationActive={false}
-              strokeColors={["var(--chart-2)"]}
-              valueFormatter={(value) => `${value}`}
-            />
+            {stats.monthlyActivity.length > 0 ? (
+              <LineChart
+                data={stats.monthlyActivity}
+                index="month"
+                categories={["repos"]}
+                className="h-72"
+                isAnimationActive={false}
+                strokeColors={["var(--chart-2)"]}
+                valueFormatter={(value) => `${value}`}
+              />
+            ) : (
+              <p className="flex h-full items-center justify-center text-center font-bold uppercase">
+                Public repository activity history is not configured.
+              </p>
+            )}
           </div>
         </BentoCard>
 
@@ -253,21 +273,27 @@ export function GithubOverviewBento({
         >
           <p className="font-display text-2xl uppercase">GitHub Insights</p>
           <div className="mt-4 h-72 w-full">
-            <BarChart
-              data={insightsData}
-              index="metric"
-              categories={["value"]}
-              className="h-72"
-              alignment="horizontal"
-              isAnimationActive={false}
-              fillColors={["var(--chart-3)"]}
-              strokeColors={["var(--foreground)"]}
-              valueFormatter={(value) => `${value}`}
-            />
+            {insightsData.length > 0 ? (
+              <BarChart
+                data={insightsData}
+                index="metric"
+                categories={["value"]}
+                className="h-72"
+                alignment="horizontal"
+                isAnimationActive={false}
+                fillColors={["var(--chart-3)"]}
+                strokeColors={["var(--foreground)"]}
+                valueFormatter={(value) => `${value}`}
+              />
+            ) : (
+              <p className="flex h-full items-center justify-center text-center font-bold uppercase">
+                Live GitHub metrics are unavailable.
+              </p>
+            )}
           </div>
           <p className="mt-4 text-sm font-medium leading-relaxed">
-            Live snapshot based on your current GitHub repository portfolio and
-            profile engagement metrics.
+            Available metrics from curated public projects and the public GitHub
+            profile.
           </p>
         </BentoCard>
       </BentoGrid>

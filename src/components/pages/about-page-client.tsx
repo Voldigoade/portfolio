@@ -10,8 +10,8 @@ import {
 } from "@/components/portfolio/about-timeline";
 import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
-import { Github, Linkedin, Twitter } from "@/components/retroui/icons";
-import { githubUrl, linkedinUrl, xUrl } from "@/lib/site-config";
+import { Github, Link2, Mail } from "@/components/retroui/icons";
+import { githubUrl } from "@/lib/site-config";
 
 type AboutPageClientProps = {
   timelineItems: TimelineItem[];
@@ -21,6 +21,7 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
   const aboutRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const root = aboutRef.current;
     if (!root) {
       return;
@@ -85,22 +86,18 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
                 <Github className="h-4 w-4" />
               </Link>
               <Link
-                href={xUrl}
-                target="_blank"
-                rel="noreferrer noopener"
+                href="/project"
                 className="retro-social-icon"
-                aria-label="X profile"
+                aria-label="Explore projects"
               >
-                <Twitter className="h-4 w-4" />
+                <Link2 className="h-4 w-4" />
               </Link>
               <Link
-                href={linkedinUrl}
-                target="_blank"
-                rel="noreferrer noopener"
+                href="/contact"
                 className="retro-social-icon"
-                aria-label="LinkedIn profile"
+                aria-label="Contact Voldigoade"
               >
-                <Linkedin className="h-4 w-4" />
+                <Mail className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -111,19 +108,19 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
             </h1>
             <div className="mt-5 space-y-4 text-sm font-medium leading-relaxed sm:text-base md:text-lg">
               <p>
-                Hey there, I&apos;m Voldigoade, a software engineer and systems
-                researcher focused on security, privacy, memory safety, and
-                open-source tooling.
+                Hey there, I&apos;m Voldigoade. I&apos;m building software and
+                exploring systems, security, privacy, and developer tools
+                through public projects.
               </p>
               <p>
-                I build auditable software with minimal attack surfaces, threat
-                model communication protocols, and design developer-first
-                utilities that prioritize user sovereignty.
+                My projects include Spoor, a GitHub public-footprint inspection
+                tool, and source-driven comparisons of secure messaging apps and
+                development environments.
               </p>
               <p>
-                My primary work revolves around Rust, Linux internals, defensive
-                architecture, and local-first systems. I believe in public code
-                verification, reproducible builds, and transparency.
+                I&apos;m learning through implementation and research. Each
+                repository documents its own scope, evidence, and limitations,
+                including work that is still experimental.
               </p>
             </div>
 
@@ -148,24 +145,24 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
 
       <section className="space-y-4" data-about-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Execution Snapshot
+          Project Snapshot
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[
             {
-              title: "Systems Programming",
+              title: "Rust Tooling",
               detail:
-                "Low-level, memory-safe utilities and backend systems in Rust and Linux engineered for predictability.",
+                "Building terminal-first tools with Rust; Spoor inspects public GitHub profiles, repositories, commit identities, and keys.",
             },
             {
-              title: "Security & Threat Research",
+              title: "Messaging Research",
               detail:
-                "Deep auditing of metadata leakage, credential isolation, and cryptographic protocol trade-offs.",
+                "Comparing messaging systems through public sources, threat models, metadata exposure, audits, and documented limitations.",
             },
             {
-              title: "Open Source Tooling",
+              title: "Developer Environments",
               detail:
-                "Transparent, inspectable tools like Spoor designed with zero telemetry and permissive licenses.",
+                "Comparing IDEs, remote workflows, AI tooling, privacy, and licensing using source-linked evidence.",
             },
           ].map((item) => (
             <Card
@@ -194,10 +191,10 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {[
-            "Defensive by default: I design software under the assumption of hostile network environments and credential exposure.",
-            "Systems & Rust: Memory safety and zero-cost abstractions allow building fast, auditable tools without garbage collection overhead.",
-            "Local-first & sovereignty: User data should remain encrypted, local, and under direct user control whenever possible.",
-            "Inspectable engineering: Open-source code, reproducible builds, and explicit dependencies over opaque black boxes.",
+            "Security questions: What information is exposed, who can observe it, and which assumptions matter?",
+            "Learning through Rust: Build focused command-line tools and make their behavior easier to inspect.",
+            "Privacy as a design question: Consider local control, external services, and the information a tool needs.",
+            "Public evidence: Keep source references and distinguish observed data from assumptions and inferences.",
           ].map((point) => (
             <Card
               key={point}
@@ -218,9 +215,9 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[
-            "Threat model first: define attack surfaces, trust boundaries, and data flows before writing code.",
-            "Build iteratively: ship minimal, auditable increments with verifiable tests and clear invariants.",
-            "Document and benchmark: leave systems thoroughly documented with reproducible benchmarks and zero hidden surprises.",
+            "Start with scope: identify the question, intended use, and limits of a project.",
+            "Build iteratively: work on focused changes and check them against the intended behavior.",
+            "Document uncertainty: link evidence and make unfinished or unverified behavior visible.",
           ].map((item) => (
             <Card
               key={item}
@@ -241,7 +238,7 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase text-primary-foreground sm:text-4xl">
-            Experience Journey
+            Public Project Map
           </h2>
           <Button
             asChild

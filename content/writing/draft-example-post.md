@@ -1,15 +1,20 @@
 ---
-title: "Internal Notes on Linux Kernel Tracing and BPF"
+title: "Internal CMS and rendering test"
 slug: "draft-example-post"
-summary: "Draft notes on eBPF instrumentation and kernel tracepoints."
+summary: "Internal test fixture. This is not a published article."
 type: "Note"
-tags: ["Linux", "Kernel", "eBPF", "Systems"]
+tags: ["internal-test"]
 publishedAt: "2026-10-18"
 draft: true
 ---
 
-# Internal Notes on Linux Kernel Tracing and BPF
+# Internal CMS and rendering test
 
-These are unreleased working notes on tracing kernel syscalls using libbpf.
+This internal fixture checks Markdown editing and draft exclusion. It makes no
+claims about projects or published work. Keep `draft: true`.
 
-This file is marked with `draft: true` and must never appear in public listings, sitemaps, or RSS feeds.
+**Formatting check** and a [local link](/blog).
+
+```text
+Internal rendering fixture
+```

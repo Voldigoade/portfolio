@@ -5,7 +5,7 @@ type GoogleTagManagerProps = {
 };
 
 export function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
-  if (!gtmId || gtmId.trim() === "") {
+  if (!/^GTM-[A-Z0-9]+$/.test(gtmId)) {
     return null;
   }
   return (

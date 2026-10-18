@@ -7,18 +7,18 @@ import { ContactForm } from "@/components/portfolio/contact-form";
 import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
 import { Github, MessageSquare, Shield } from "@/components/retroui/icons";
-import { githubUrl, linkedinUrl } from "@/lib/site-config";
+import { githubUrl } from "@/lib/site-config";
 
 const contactFaqItems = [
   {
     question: "How long will it take for you to respond?",
     answer:
-      "I generally respond within 24 to 48 hours for technical inquiries, research collaboration, and security reports.",
+      "Response times vary. Include the relevant project and enough context to help me understand your question.",
   },
   {
     question: "How will I receive your response?",
     answer:
-      "You will receive a response directly at the email address provided in the form. If you prefer GitHub, you can also open an issue or discussion on one of my repositories.",
+      "If I reply to a form submission, I will use the email address you provide. For public project feedback, use the relevant GitHub repository.",
   },
 ] as const;
 
@@ -26,6 +26,7 @@ export function ContactPageClient() {
   const pageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const root = pageRef.current;
     if (!root) {
       return;
@@ -52,13 +53,13 @@ export function ContactPageClient() {
             Contact
           </h1>
           <span className="inline-block w-fit px-3 py-1.5 bg-primary text-primary-foreground font-black uppercase text-sm sm:text-base border-2 border-black rotate-[-2deg] shadow-retro-sm">
-            Open For Research & Systems Collaboration
+            Project Questions & Ideas
           </span>
         </div>
         <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed sm:text-base">
-          Have a question about Spoor, security research, systems architecture,
-          or open-source collaboration? Submit your details below or reach out
-          directly via GitHub.
+          Have a question about Spoor, messaging research, developer tools, or
+          another public project? Use the form below or find the relevant
+          repository on GitHub.
         </p>
       </section>
 
@@ -69,21 +70,21 @@ export function ContactPageClient() {
         {[
           {
             icon: Shield,
-            title: "Security & Threat Audits",
+            title: "Messaging & Privacy",
             description:
-              "Evaluating attack surfaces, analyzing credential exposure, and auditing cryptographic invariants.",
+              "Questions about the sources, threat models, and limitations in the messaging comparison.",
           },
           {
             icon: MessageSquare,
             title: "Technical Discussions",
             description:
-              "Collaborating on low-level systems programming, Linux internals, Rust libraries, and CLI tooling.",
+              "Discuss Rust tools, development environments, or an idea you would like to explore.",
           },
           {
             icon: Github,
             title: "Open Source Collaboration",
             description:
-              "Contributing to inspectable tools, reproducible benchmarks, and community security tooling.",
+              "Share a bug report, documentation correction, or contribution idea for a public repository.",
           },
         ].map((item) => (
           <Card
@@ -104,7 +105,7 @@ export function ContactPageClient() {
         data-contact-reveal
       >
         <h2 className="font-display text-3xl uppercase text-secondary-foreground sm:text-4xl">
-          Project Inquiry Form
+          Send a Message
         </h2>
         <div className="mt-5 border-4 border-black bg-background p-4 shadow-retro-md">
           <ContactForm />
@@ -155,26 +156,20 @@ export function ContactPageClient() {
           <Card className="border-4 border-black bg-card shadow-retro-md">
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                Professional Network
+                Explore the Projects
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-3">
               <p className="font-medium leading-relaxed">
-                For research collaboration and professional networking, connect
-                directly via LinkedIn.
+                Browse the project collection to find the repository and
+                documentation most relevant to your question.
               </p>
               <Button
                 asChild
                 variant="secondary"
                 className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
               >
-                <Link
-                  href={linkedinUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  Connect on LinkedIn
-                </Link>
+                <Link href="/project">View Projects</Link>
               </Button>
             </Card.Content>
           </Card>

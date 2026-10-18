@@ -9,6 +9,8 @@ interface ArticlePageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const articles = await getPublishedArticles();
   return articles.map((article) => ({
@@ -23,9 +25,7 @@ export async function generateMetadata({
   const article = await getArticleBySlug(slug, { includeDrafts: false });
 
   if (!article) {
-    return {
-      title: "Article Not Found",
-    };
+    notFound();
   }
 
   const canonicalUrl = article.canonical || `${siteUrl}/blog/${article.slug}`;
