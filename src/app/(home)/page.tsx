@@ -6,39 +6,31 @@ import {
   getGithubRepos,
   getHackatimeStats,
 } from "@/lib/server/portfolio-data";
-import {
-  donationUrl,
-  fiazDevUrl,
-  githubUrl,
-  hackatimeUrl,
-  linkedinUrl,
-  linkHubUrl,
-  ogImageUrl,
-  siteUrl,
-  sponsorUrl,
-  xUrl,
-} from "@/lib/site-config";
+import { githubUrl, ogImageUrl, siteName, siteUrl } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Muhammad Fiaz",
+    absolute: "Voldigoade | Software, Systems, Security and Privacy",
   },
   description:
-    "Muhammad Fiaz portfolio: founder, entrepreneur, full stack developer and open-source contributor.",
+    "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript by Voldigoade.",
   alternates: {
     canonical: "/",
   },
   keywords: [
-    "Muhammad Fiaz portfolio",
-    "full stack developer",
-    "startup engineer",
-    "open source projects",
-    "software services",
+    "Voldigoade",
+    "voldigoade.xyz",
+    "systems developer",
+    "Rust",
+    "Linux",
+    "security research",
+    "privacy engineering",
+    "open source",
   ],
   openGraph: {
-    title: "Muhammad Fiaz | Founder, Entrepreneur, Full Stack Developer",
+    title: "Voldigoade | Software, Systems, Security and Privacy",
     description:
-      "Business-first product engineering and open-source execution.",
+      "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript.",
     url: siteUrl,
     type: "website",
     images: [
@@ -46,15 +38,15 @@ export const metadata: Metadata = {
         url: ogImageUrl,
         width: 1200,
         height: 630,
-        alt: "Muhammad Fiaz Portfolio Home",
+        alt: "Voldigoade Portfolio Home",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Muhammad Fiaz",
+    title: "Voldigoade",
     description:
-      "Business-first product engineering and open-source execution.",
+      "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript.",
     images: [ogImageUrl],
   },
 };
@@ -83,36 +75,29 @@ export default async function HomePage() {
   const homepageJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Muhammad Fiaz Portfolio",
+    name: "Voldigoade Portfolio",
     url: siteUrl,
-    description: "Founder, entrepreneur, and full stack developer portfolio.",
+    description:
+      "Software, systems, security and privacy portfolio of Voldigoade.",
     mainEntity: {
       "@type": "Person",
-      name: "Muhammad Fiaz",
+      name: siteName,
       url: siteUrl,
-      sameAs: [
-        githubUrl,
-        linkedinUrl,
-        xUrl,
-        hackatimeUrl,
-        linkHubUrl,
-        fiazDevUrl,
-      ],
+      sameAs: [githubUrl],
     },
-    significantLink: [linkHubUrl, sponsorUrl, donationUrl, fiazDevUrl],
   };
 
   const profileStatsJsonLd = initialGitHubOverview
     ? {
         "@context": "https://schema.org",
         "@type": "Dataset",
-        name: "Muhammad Fiaz GitHub Portfolio Stats",
+        name: "Voldigoade GitHub Portfolio Stats",
         description:
-          "Live GitHub repository, stars, forks, and watcher metrics.",
+          "Public GitHub repository, stars, forks, and language metrics.",
         license: "https://opensource.org/licenses/MIT",
         creator: {
           "@type": "Person",
-          name: "Muhammad Fiaz",
+          name: siteName,
         },
         distribution: {
           "@type": "DataDownload",

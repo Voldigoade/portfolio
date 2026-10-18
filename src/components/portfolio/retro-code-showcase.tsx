@@ -12,37 +12,37 @@ const snippetOrder = ["next", "query", "store"] as const;
 
 const stackItems = [
   {
-    title: "Discovery",
-    body: "Clarify founder goals, user pain, and the fastest path to revenue impact.",
+    title: "Threat Model",
+    body: "Map trust boundaries, data flows, and external dependencies before writing code.",
   },
   {
-    title: "Build",
-    body: "Ship reliable product features with clean architecture and practical automation.",
+    title: "Implement",
+    body: "Build minimal, auditable systems in Rust, Linux, and TypeScript with zero unnecessary complexity.",
   },
   {
-    title: "Scale",
-    body: "Improve retention, conversion, and velocity with measurable release loops.",
+    title: "Verify",
+    body: "Validate against edge cases, enforce strict sandboxing, and publish reproducible benchmarks.",
   },
 ];
 
 const snippets = {
-  next: `// Frontend delivery stack\nNext.js + React + TypeScript\nFramer Motion + Anime.js\nTailwind + Panda CSS + retro UI systems`,
-  query: `// Backend and data execution\nNode.js/Bun services + REST APIs\nTanStack Query + Zustand state flow\nSecure auth, caching, and reliable data sync`,
-  store: `// Cloud and operations delivery\nCI/CD pipelines + cloud deployments\nMonitoring, rollback planning, and uptime checks\nArchitecture adapts to startup, SaaS, and enterprise needs`,
+  next: `// Systems & low-level tooling\nRust + C + Linux syscalls\nMemory safety, zero-cost abstractions\nCLI utilities with deterministic output`,
+  query: `// Research & data analysis\nPython + SQLite + DuckDB\nNetwork metadata & credential exposure auditing\nLocal-first data pipelines with zero telemetry`,
+  store: `// Web interfaces & tooling\nNext.js + TypeScript + Tailwind\nRetro UI systems with strict CSP & sandboxing\nClient-side verification & cryptographic tooling`,
 } as const;
 
 const flipCards = [
   {
-    front: "Speed",
-    back: "Launch quickly with clear milestones, stable delivery, and zero guesswork.",
+    front: "Integrity",
+    back: "Deterministic builds, explicit dependencies, and cryptographic verification at every step.",
   },
   {
-    front: "Quality",
-    back: "Production-grade engineering with maintainable systems and strong code standards.",
+    front: "Security",
+    back: "Defensive design with minimal attack surface, strict sandboxing, and no hidden telemetry.",
   },
   {
-    front: "Growth",
-    back: "Features tied to measurable outcomes: retention, conversion, and revenue impact.",
+    front: "Efficiency",
+    back: "High-performance systems programming with minimal resource footprint and predictable latency.",
   },
 ] as const;
 

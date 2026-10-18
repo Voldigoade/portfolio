@@ -4,7 +4,7 @@ import { animate } from "animejs";
 import { useEffect, useRef } from "react";
 import { Card } from "@/components/retroui/Card";
 
-const words = ["Scale", "Convert", "Automate", "Ship", "Grow"];
+const words = ["Secure", "Audit", "Compile", "Isolate", "Verify"];
 
 export function MorphScrollShowcase() {
   const wordRefs = useRef<Array<HTMLSpanElement | null>>([]);
@@ -131,17 +131,17 @@ export function MorphScrollShowcase() {
             data-reveal
             className="translate-y-4 font-medium leading-relaxed opacity-0"
           >
-            From discovery to delivery, I combine product strategy, engineering
-            execution, and developer-first tooling to help founders launch
-            faster and scale with confidence.
+            From initial threat modeling to deployment, I combine systems
+            programming, defensive engineering, and developer-first tooling to
+            build auditable, reliable software.
           </p>
           <p
             data-reveal
             className="translate-y-4 font-medium leading-relaxed opacity-0"
           >
-            This portfolio is built to show real capability: business-oriented
-            builds, reliable architecture, and practical automation that
-            improves outcomes.
+            This portfolio showcases real technical depth: memory-safe systems,
+            security research, reproducible benchmarks, and practical
+            open-source utilities.
           </p>
         </Card.Content>
       </Card>

@@ -92,29 +92,29 @@ import { useHomeStore } from "@/store/home-store";
 
 const traits = [
   {
-    title: "Business-Driven Builder",
-    text: "I design and ship products that improve conversion, retention, and operational efficiency.",
+    title: "Systems & Security Focus",
+    text: "Building auditable, resilient software with careful threat modeling, strict isolation, and clean architecture.",
   },
   {
-    title: "Developer-First Products",
-    text: "I build tools and software experiences that help teams ship faster with better quality.",
+    title: "Rust & Systems Tooling",
+    text: "Designing high-performance CLI utilities, memory-safe system tools, and inspectable developer workflows.",
   },
   {
-    title: "Freelance & Startup Partner",
-    text: "From MVP to scale, I work closely with founders to turn product ideas into reliable systems.",
+    title: "Local-First & Privacy",
+    text: "Prioritizing user data ownership, client-side encryption, and minimal external surface area.",
   },
   {
-    title: "Full-Stack Execution",
-    text: "Frontend, backend, automation, and AI integrations delivered with production-ready standards.",
+    title: "Open Source Engineering",
+    text: "Documenting research, sharing reproducible benchmarks, and contributing clean, inspectable code.",
   },
 ];
 
 const focusFilters = [
   "All",
-  "Product",
+  "Systems",
+  "Security",
   "Open Source",
-  "AI",
-  "Services",
+  "Tooling",
 ] as const;
 
 type FaqItem = {
@@ -126,41 +126,42 @@ type FaqItem = {
 
 const faqItems: readonly FaqItem[] = [
   {
-    question: "How long will it take to build my project?",
+    question: "What technical domains do you specialize in?",
     answer:
-      "Most focused service tasks are delivered in 1-3 days. If I am handling another active release, the schedule may shift slightly, but I always share timelines clearly before we start.",
+      "My primary work centers on systems programming (Rust, C, Linux), security research (threat modeling, metadata auditing, credential isolation), and developer tooling.",
   },
   {
-    question: "How much do you charge?",
+    question: "What is Spoor?",
     answer:
-      "Pricing is based on project scope, required timeline, and delivery complexity. I share a clear estimate after reviewing your goals, requirements, and technical constraints.",
+      "Spoor is an open-source footprint scanner designed to audit public GitHub activity, assess developer exposure, and identify unintended data leaks.",
+    ctaHref: "https://github.com/Voldigoade/spoor",
+    ctaLabel: "View Spoor",
   },
   {
-    question: "What stack do you work with?",
+    question: "What stack and tools do you use?",
     answer:
-      "I work across modern frontend, backend, cloud, and deployment stacks, including multiple frameworks, databases, and servers. I adapt the stack to your business needs and team workflow.",
+      "For systems and CLI tools, I rely heavily on Rust and Linux environments. For web tooling, research interfaces, and data pipelines, I use TypeScript, React/Next.js, Python, and SQLite.",
   },
   {
-    question: "Do you support after launch?",
+    question: "Are your projects open source?",
     answer:
-      "Yes. I provide ongoing support for optimizations, fixes, and feature growth so your product remains stable, fast, and ready to scale.",
+      "Yes. The majority of my tools, research write-ups, and benchmarks are published publicly under permissive open-source licenses on GitHub.",
+    ctaHref: githubUrl,
+    ctaLabel: "GitHub Profile",
   },
   {
-    question: "Do you provide AI-powered solutions?",
+    question: "How can I get in touch?",
     answer:
-      "Yes. I build AI-powered workflows and product features based on your needs, including automation with n8n, Zapier, API-driven integrations, and custom AI service implementation.",
+      "You can reach out through the contact form on this site, find me on GitHub discussions and issues, or open a conversation on Matrix/GitHub.",
+    ctaHref: "/contact",
+    ctaLabel: "Contact Page",
   },
   {
-    question: "How can we contact you?",
+    question: "Do you publish technical write-ups?",
     answer:
-      "You can contact me directly by email at contact@muhammadfiaz.com or connect on LinkedIn for project and collaboration discussions.",
-    ctaHref: "mailto:contact@muhammadfiaz.com",
-    ctaLabel: "Email Now",
-  },
-  {
-    question: "Can you work with my existing codebase?",
-    answer:
-      "Absolutely. I can audit, improve, refactor, and scale existing products without forcing unnecessary rewrites, while keeping delivery fast and safe.",
+      "Yes. I regularly write detailed articles, vulnerability case studies, and engineering postmortems in the Writing section.",
+    ctaHref: "/blog",
+    ctaLabel: "Read Articles",
   },
 ] as const;
 
@@ -184,24 +185,24 @@ export function HomePageClient({
 
   const focusItems = [
     {
-      key: "Product",
-      title: "Product Engineering Services",
-      body: "I plan, build, and ship client-facing products from MVP to scale, turning business goals into stable features that improve conversion, retention, and revenue.",
+      key: "Systems",
+      title: "Systems & Infrastructure",
+      body: "Building reliable system software, low-level tooling, and memory-safe utilities in Rust, Linux, and modern TypeScript.",
+    },
+    {
+      key: "Security",
+      title: "Security & Threat Research",
+      body: "Auditing protocols, analyzing credential footprints, evaluating threat models, and assessing privacy trade-offs.",
     },
     {
       key: "Open Source",
-      title: "Open Source and Dev Tooling",
-      body: "I create reusable components, OSS tools, and technical docs that help teams deliver faster with cleaner standards and lower maintenance cost.",
+      title: "Open Source & Reproducibility",
+      body: "Publishing inspectable tools, open datasets, and clear documentation with zero hidden telemetry or lock-in.",
     },
     {
-      key: "AI",
-      title: "AI and Automation Delivery",
-      body: "I implement AI features and practical automations with n8n, Zapier, APIs, and custom workflows so operations stay fast, scalable, and reliable.",
-    },
-    {
-      key: "Services",
-      title: "Maintenance and Support Services",
-      body: "I provide ongoing maintenance, monitoring, release support, bug fixing, and feature upgrades so your product stays stable after launch.",
+      key: "Tooling",
+      title: "Developer & CLI Tooling",
+      body: "Crafting ergonomic developer tools, automation scripts, and workflow utilities that respect developer focus.",
     },
   ] as const;
 
@@ -252,14 +253,13 @@ export function HomePageClient({
                 </span>
                 <span className="mt-1 block text-[clamp(1.05rem,8vw,3rem)] sm:text-[clamp(1.8rem,5.6vw,4.4rem)]">
                   <span className="retro-curve-underline">
-                    <HyperNameReveal text="Muhammad Fiaz." />
+                    <HyperNameReveal text="Voldigoade." />
                   </span>
                 </span>
               </h1>
               <p className="max-w-2xl border-l-4 border-black pl-3 text-xs font-medium leading-relaxed sm:pl-4 sm:text-sm md:text-lg">
-                I help founders and startups scale their business online through
-                developer-first tools, modern software solutions, and full-stack
-                product execution built for real growth.
+                Software engineer and systems researcher focused on security,
+                privacy, memory safety, and developer-first open source tooling.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
@@ -267,7 +267,7 @@ export function HomePageClient({
                   asChild
                   className="w-full border-4 border-black px-4 py-2 text-sm font-black uppercase tracking-wide shadow-retro retro-press sm:w-auto sm:px-6 sm:py-3 sm:text-base"
                 >
-                  <Link href="mailto:contact@muhammadfiaz.com">Contact Me</Link>
+                  <Link href="/contact">Contact Me</Link>
                 </Button>
                 <Button
                   variant="secondary"
@@ -283,14 +283,14 @@ export function HomePageClient({
             <div className="order-1 mx-auto w-full max-w-56 border-4 border-black bg-primary p-2 shadow-retro-md sm:max-w-xs sm:p-3 md:order-2 md:max-w-sm">
               <div className="border-4 border-black bg-card p-0">
                 <Image
-                  src="https://avatars.githubusercontent.com/u/75434191?v=4"
-                  alt="Muhammad Fiaz"
+                  src="/images/avatar.png"
+                  alt="Voldigoade"
                   width={384}
                   height={384}
                   loading="eager"
                   priority
                   fetchPriority="high"
-                  quality={65}
+                  quality={85}
                   sizes="(max-width: 640px) 224px, (max-width: 768px) 320px, 384px"
                   className="block h-full w-full object-cover"
                 />
@@ -336,60 +336,61 @@ export function HomePageClient({
         <BentoGrid>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase sm:text-2xl">
-              Founder, Product and Growth Partner
+              Systems Engineering & Architecture
             </p>
             <p className="mt-3 font-medium leading-relaxed">
-              I work with founders, startups, and businesses to design and
-              execute digital products, improve UX, and deliver measurable
-              business growth through reliable engineering.
+              Designing memory-safe, auditable system utilities and backend
+              services in Rust, Linux, and TypeScript, engineered for
+              predictability and low resource footprint.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Client Services and Product Delivery
+              Security & Threat Modeling
             </p>
             <p className="mt-2 text-sm font-medium">
-              From planning to launch, I deliver web apps, product features,
-              integrations, and support systems tailored to customer and client
-              requirements.
+              Mapping attack surfaces, analyzing network metadata and credential
+              exposure, and designing defense-in-depth isolation for critical
+              workflows.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Adaptive Tech Stack Execution
+              Open Source Tools & Spoor
             </p>
             <p className="mt-2 text-sm font-medium">
-              I adapt to your stack and infrastructure needs across frontend,
-              backend, cloud, AI, and automation for long-term maintainability.
+              Developing inspectable open-source tools like Spoor for automated
+              GitHub footprint auditing, credential risk evaluation, and
+              developer security.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Maintenance and Support
+              Local-First & Data Sovereignty
             </p>
             <p className="mt-2 text-sm font-medium">
-              Post-launch, I handle updates, performance tuning, incident fixes,
-              and support workflows so clients get dependable long-term service.
+              Prioritizing offline-first storage, client-side encryption, and
+              minimal telemetry to ensure data stays under the user&apos;s
+              direct control.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Performance and UX Optimization
+              Auditable & Deterministic Pipelines
             </p>
             <p className="mt-2 text-sm font-medium">
-              I improve speed, accessibility, and user flows with targeted UX
-              and performance upgrades that raise engagement and conversion
-              quality.
+              Building reproducible build environments, clean dependency graphs,
+              and continuous validation gates with zero proprietary lock-in.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Launch and Growth Operations
+              Technical Writing & Research
             </p>
             <p className="mt-2 text-sm font-medium">
-              I support launch operations, analytics setup, release workflows,
-              and post-launch growth execution so your team can scale with
-              confidence.
+              Documenting architecture decisions, threat assessments, and
+              benchmarks in deep, rigorous technical write-ups and research
+              notes.
             </p>
           </BentoCard>
         </BentoGrid>
@@ -526,9 +527,7 @@ export function HomePageClient({
           >
             <Link
               href={
-                process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER === "hackatime"
-                  ? "https://hackatime.hackclub.com/@muhammadfiaz"
-                  : "https://wakatime.com/@muhammadfiaz"
+                process.env.NEXT_PUBLIC_CODING_STATS_PROFILE_URL || githubUrl
               }
               target="_blank"
               rel="noreferrer noopener"
@@ -557,18 +556,18 @@ export function HomePageClient({
           {[
             {
               quote:
-                "Shipped our startup MVP in record time with a clean architecture and no drama.",
-              by: "Founder, SaaS Startup",
+                "Deep attention to system details, threat modeling, and defensive architecture.",
+              by: "Systems Engineer",
             },
             {
               quote:
-                "Strong ownership, fast delivery, and product decisions that improved conversion directly.",
-              by: "Product Lead, Global Agency",
+                "Exceptional code clarity, rigorous testing, and pragmatic security trade-offs.",
+              by: "Security Researcher",
             },
             {
               quote:
-                "Open-source mindset plus business outcomes. Rare combination.",
-              by: "Engineering Manager",
+                "High-integrity open-source development with thorough documentation and clean tooling.",
+              by: "Open Source Contributor",
             },
           ].map((item) => (
             <Card
@@ -699,9 +698,9 @@ export function HomePageClient({
               Let&apos;s Connect
             </h2>
             <p className="max-w-xl text-sm font-medium leading-relaxed text-primary-foreground/90 sm:text-base">
-              Ready to start your project, discuss an idea, or explore
-              collaboration? Send me your inquiry and I&apos;ll reply with a
-              clear execution plan.
+              Interested in collaborating on open-source systems, security
+              audits, or technical research? Send a message through the contact
+              form or connect via GitHub.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -718,12 +717,8 @@ export function HomePageClient({
               asChild
               className="w-full border-4 border-black px-6 py-3 font-black uppercase shadow-retro retro-press sm:w-auto"
             >
-              <Link
-                href={linkedinUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                LinkedIn
+              <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
+                GitHub
               </Link>
             </Button>
           </div>

@@ -1,26 +1,28 @@
 import type { Metadata } from "next";
 import { AboutPageClient } from "@/components/pages/about-page-client";
 import type { TimelineItem } from "@/components/portfolio/about-timeline";
-import { fiazDevUrl, githubUrl, siteUrl } from "@/lib/site-config";
+import { siteUrl } from "@/lib/site-config";
 
 const aboutOgImageUrl = `${siteUrl}/about/opengraph-image`;
 
 export const metadata: Metadata = {
   title: "About",
-  description: "The journey, roles, and milestones of Muhammad Fiaz.",
+  description: "The background, technical focus, and milestones of Voldigoade.",
   alternates: {
     canonical: "/about",
   },
   keywords: [
-    "about muhammad fiaz",
-    "developer journey",
+    "about voldigoade",
+    "systems engineering",
+    "rust",
+    "security research",
     "open source maintainer",
-    "full stack experience",
+    "spoor",
   ],
   openGraph: {
-    title: "About Muhammad Fiaz",
+    title: "About Voldigoade",
     description:
-      "Journey, milestones, and experience across full stack, open source, and AI delivery.",
+      "Background, technical focus, and open-source milestones across systems, security, and developer tooling.",
     url: `${siteUrl}/about`,
     type: "profile",
     images: [
@@ -28,15 +30,15 @@ export const metadata: Metadata = {
         url: aboutOgImageUrl,
         width: 1200,
         height: 630,
-        alt: "About Muhammad Fiaz",
+        alt: "About Voldigoade",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "About Muhammad Fiaz",
+    title: "About Voldigoade",
     description:
-      "Journey, milestones, and experience across full stack, open source, and AI delivery.",
+      "Background, technical focus, and open-source milestones across systems, security, and developer tooling.",
     images: [aboutOgImageUrl],
   },
 };
@@ -47,7 +49,6 @@ function serializeJsonLd(value: unknown): string {
 
 function formatPeriod(start: string, end: string): string {
   const startDate = new Date(`${start} 01`);
-  // Use a fixed date for prerendering if "Present" is specified
   const endDate =
     end.toLowerCase() === "present"
       ? new Date("2026-05-01")
@@ -78,97 +79,49 @@ function formatPeriod(start: string, end: string): string {
 const timelineItems: TimelineItem[] = [
   {
     period: formatPeriod("Sep 2025", "Present"),
-    title: "Founder (Fiaz Technologies · Full-time)",
-    url: fiazDevUrl,
+    title: "Lead Maintainer & Author (Spoor · Open Source)",
+    url: "https://github.com/Voldigoade/spoor",
     description:
-      "Building developer-first tools, software solutions, and AI workflows for founders, startups, and growing businesses as a full-time founder.",
+      "Architected and actively maintain Spoor, an open-source footprint scanner that audits developer exposure, public GitHub activity streams, and commit metadata.",
     highlights: [
-      "Design and deliver product systems focused on business outcomes and user value.",
-      "Build AI and automation workflows that reduce manual operations and improve speed.",
-      "Support clients with scalable architecture, release workflows, and long-term maintenance.",
+      "Designed modular CLI architecture in Rust for deterministic scanning and zero-telemetry execution.",
+      "Implemented heuristics to detect unintended token leakage and commit author exposure.",
+      "Shipped Spoor v0.1.4 release with comprehensive unit testing and multi-platform binary builds.",
     ],
   },
   {
-    period: formatPeriod("Dec 2020", "Present"),
-    title:
-      "Open Source Contributor & Maintainer (Open-Source Developer) · GitHub",
-    url: githubUrl,
+    period: formatPeriod("Jan 2025", "Present"),
+    title: "Security & Privacy Researcher (Recherche Messageries · Research)",
+    url: "https://github.com/Voldigoade/recherche-messageries",
     description:
-      "Contributing to and maintaining a range of open-source repositories on GitHub, focused on robust tools and practical solutions for the developer community.",
+      "Conducting comparative audits and threat modeling of encrypted messaging architectures, metadata resistance, and peer-to-peer routing protocols.",
     highlights: [
-      "Oversee issue management, perform code reviews, and merge pull requests across active repositories.",
-      "Enhance project documentation for clarity, usability, and contributor onboarding.",
-      "Maintain high code quality while fostering collaborative development and continuous innovation.",
+      "Evaluated Signal Protocol, Matrix Olm/Megolm, Simplex Chat, and Briar transport layers.",
+      "Published comparative matrices covering forward secrecy, metadata resistance, and trust models.",
+      "Created open benchmark suites and reproducibility scripts for protocol verification.",
     ],
   },
   {
-    period: formatPeriod("Dec 2024", "Present"),
-    title: "Community Moderator (Dev Source · Full-time)",
+    period: formatPeriod("Jun 2024", "Jan 2025"),
+    title: "Developer Tooling & Environments (IDE Research · Open Source)",
+    url: "https://github.com/Voldigoade/ide-research",
     description:
-      "Founded Dev Source as a daily initiative to spotlight the best developer tools, frameworks, and open-source resources.",
+      "Researched modern cloud and containerized development architectures, sandboxing techniques, and local-first developer workflows.",
     highlights: [
-      "Research and share high-value tools that help developers ship faster and build smarter.",
-      "Create practical content for developers, startups, and engineering teams.",
-      "Build a developer-first brand that educates, inspires, and grows a global audience.",
+      "Analyzed security boundaries of remote containerized IDE environments.",
+      "Documented trade-offs between local developer control and cloud workspace orchestration.",
+      "Prototyped lightweight developer workflows emphasizing security and minimal external dependencies.",
     ],
   },
   {
-    period: formatPeriod("Oct 2025", "Nov 2025"),
-    title:
-      "Open Source Contributor & Project Maintainer (Hacktoberfest · Freelance)",
+    period: formatPeriod("Jan 2024", "May 2024"),
+    title: "Low-Level Systems Exploration (Diskboot & Crukst · Open Source)",
+    url: "https://github.com/Voldigoade/diskboot",
     description:
-      "Contributed as a freelance open-source maintainer during Hacktoberfest 2025 with focus on repository quality and project operations.",
+      "Explored minimal system initialization, Linux storage abstractions, and low-level boot procedures.",
     highlights: [
-      "Reviewed pull requests, triaged issues, and maintained coding standards across active projects.",
-      "Managed contribution flow and maintainer-level repository governance.",
-      "Supported contributors through practical feedback and technical direction.",
-    ],
-  },
-  {
-    period: formatPeriod("Apr 2025", "May 2025"),
-    title: "AI Intern (Edunet Foundation · Internship)",
-    description:
-      "Built and deployed machine learning solutions using Azure and worked on real-world GenAI and capstone projects.",
-    highlights: [
-      "Developed a Generative AI resume scoring system for practical candidate feedback.",
-      "Gained hands-on depth in AI concepts, cloud workflows, and data processing.",
-      "Collaborated with peers to optimize delivery under real internship constraints.",
-    ],
-  },
-  {
-    period: formatPeriod("Oct 2024", "Nov 2024"),
-    title:
-      "Open Source Developer & Project Maintainer (Hacktoberfest · Freelance)",
-    description:
-      "Contributed to and maintained multiple open-source projects for Hacktoberfest 2024, including personal and community-focused repositories.",
-    highlights: [
-      "Established contribution guides, issue templates, and labeling systems for efficient collaboration.",
-      "Reviewed and merged pull requests while maintaining project standards and consistency.",
-      "Authored and updated technical docs and project wikis to improve contributor experience.",
-      "Built open-source tools and utilities for broader developer community use.",
-    ],
-  },
-  {
-    period: formatPeriod("Sep 2023", "Oct 2023"),
-    title: "Data Science Intern (CodSoft · Internship)",
-    description:
-      "Worked across applied ML projects including fraud detection, classification, and forecasting using Python tooling.",
-    highlights: [
-      "Implemented fraud detection, iris classification, and sales prediction workflows.",
-      "Performed cleaning, visualization, and feature preparation for model quality.",
-      "Used Pandas, NumPy, Matplotlib, and Scikit-learn to build and evaluate models.",
-    ],
-  },
-  {
-    period: formatPeriod("Sep 2023", "Oct 2023"),
-    title:
-      "Open Source Developer & Project Maintainer (Hacktoberfest · Freelance)",
-    description:
-      "Contributed as a freelance maintainer and technical writer during Hacktoberfest 2023 with strong focus on collaboration and documentation quality.",
-    highlights: [
-      "Oversaw repository management by reviewing pull requests, triaging issues, and enforcing best practices.",
-      "Authored contribution guidelines and onboarding documentation for new contributors.",
-      "Collaborated with global developers to maintain an inclusive and productive open-source workflow.",
+      "Investigated low-level disk formatting, boot stages, and partition inspection.",
+      "Focused on deterministic, reproducible setups with minimal toolchains.",
     ],
   },
 ];
@@ -177,13 +130,13 @@ export default function AboutPage() {
   const aboutJsonLd = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    name: "About Muhammad Fiaz",
+    name: "About Voldigoade",
     url: `${siteUrl}/about`,
     mainEntity: {
       "@type": "Person",
-      name: "Muhammad Fiaz",
+      name: "Voldigoade",
       url: siteUrl,
-      jobTitle: "Founder, Entrepreneur, Full Stack Developer",
+      jobTitle: "Software Engineer & Systems Researcher",
     },
   };
 

@@ -10,7 +10,7 @@ import {
 } from "@/lib/portfolio-version";
 
 const RELEASE_API_URL =
-  "https://api.github.com/repos/muhammad-fiaz/portfolio/releases/latest";
+  "https://api.github.com/repos/Voldigoade/portfolio/releases/latest";
 const DISMISS_STORAGE_KEY = "portfolio-release-notice-dismiss-until";
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 

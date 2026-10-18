@@ -3,24 +3,12 @@
 import { animate } from "animejs";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import {
-  Github,
-  Link2,
-  Linkedin,
-  Twitter,
-  Youtube,
-} from "@/components/retroui/icons";
+import { Github, Link2, Linkedin, Twitter } from "@/components/retroui/icons";
 import {
   CURRENT_PORTFOLIO_VERSION,
   PORTFOLIO_REPO_URL,
 } from "@/lib/portfolio-version";
-import {
-  githubUrl,
-  linkedinUrl,
-  linkHubUrl,
-  xUrl,
-  youtubeUrl,
-} from "@/lib/site-config";
+import { githubUrl, linkedinUrl, linkHubUrl, xUrl } from "@/lib/site-config";
 
 export function Footer() {
   const footerRef = useRef<HTMLElement>(null);
@@ -84,7 +72,7 @@ export function Footer() {
             className="inline-flex border-4 border-black bg-[#111827] px-3 py-2 text-xs font-black uppercase text-white shadow-retro-sm sm:text-sm"
             data-footer-policy
           >
-            Copyright {currentYear} Muhammad Fiaz
+            Copyright {currentYear} Voldigoade
           </p>
         </div>
 
@@ -121,16 +109,6 @@ export function Footer() {
               <Linkedin className="h-4 w-4" />
             </Link>
             <Link
-              href={youtubeUrl}
-              className="retro-social-icon"
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label="YouTube"
-              data-footer-social
-            >
-              <Youtube className="h-4 w-4" />
-            </Link>
-            <Link
               href={linkHubUrl}
               className="retro-social-icon"
               target="_blank"
@@ -149,6 +127,9 @@ export function Footer() {
             <Link href="/sitemap.xml" className="retro-link" data-footer-policy>
               Sitemap
             </Link>
+            <Link href="/rss.xml" className="retro-link" data-footer-policy>
+              RSS
+            </Link>
             <Link
               href="/privacy-policy"
               className="retro-link"
@@ -157,25 +138,11 @@ export function Footer() {
               Privacy
             </Link>
             <Link
-              href="/refund-policy"
-              className="retro-link"
-              data-footer-policy
-            >
-              Refund
-            </Link>
-            <Link
               href="/terms-of-service"
               className="retro-link"
               data-footer-policy
             >
               Terms
-            </Link>
-            <Link
-              href="/delivery-policy"
-              className="retro-link"
-              data-footer-policy
-            >
-              Delivery
             </Link>
             <Link
               href="/cookies-policy"

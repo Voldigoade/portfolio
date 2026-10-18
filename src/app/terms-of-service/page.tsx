@@ -6,21 +6,22 @@ const termsOgImageUrl = `${siteUrl}/terms-of-service/opengraph-image`;
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Professional Terms of Service for services by Muhammad Fiaz.",
+  description:
+    "Terms of Service and open-source usage guidelines for voldigoade.xyz.",
   alternates: { canonical: "/terms-of-service" },
   openGraph: {
-    title: "Terms of Service | Muhammad Fiaz",
+    title: "Terms of Service | Voldigoade",
     description:
-      "Service terms, client obligations, delivery standards, and legal conditions.",
+      "Usage terms, open-source code licenses, and security research guidelines for voldigoade.xyz.",
     url: `${siteUrl}/terms-of-service`,
     type: "website",
     images: [termsOgImageUrl],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Terms of Service | Muhammad Fiaz",
+    title: "Terms of Service | Voldigoade",
     description:
-      "Service terms, client obligations, delivery standards, and legal conditions.",
+      "Usage terms, open-source code licenses, and security research guidelines for voldigoade.xyz.",
     images: [termsOgImageUrl],
   },
 };
@@ -29,63 +30,39 @@ export default function TermsOfServicePage() {
   return (
     <PolicyPageClient
       pageTitle="Terms of Service"
-      intro="These Terms of Service govern access to muhammadfiaz.com and all consulting, engineering, automation, and product delivery services provided by Muhammad Fiaz."
+      intro="These Terms of Service govern access to voldigoade.xyz, including its open-source project documentation, technical writing, benchmarks, and research materials."
       sections={[
         {
-          title: "Service Scope",
+          title: "Open Source Code & Content",
           content: [
-            "Services may include software development, product engineering, AI automation, integration setup, consulting, and technical support.",
-            "Final scope, milestones, timelines, and deliverables are defined by direct agreement, proposal, or documented project communication.",
+            "Source code repositories linked from this site (such as Spoor, Recherche Messageries, etc.) are distributed under their respective open-source licenses (typically MIT or Apache 2.0).",
+            "Technical articles, architectural write-ups, and documentation published on this website are provided for educational and technical research purposes.",
           ],
         },
         {
-          title: "Client Responsibilities",
+          title: "Responsible Security Research",
           content: [
-            "Clients are responsible for providing accurate requirements, timely approvals, and access credentials required for delivery.",
-            "Delays caused by missing inputs, late responses, or third-party account limitations may affect delivery schedules.",
+            "Tools, scripts, and footprint auditing utilities (including Spoor) are intended for defensive assessment, personal exposure auditing, and authorized security verification.",
+            "Users are solely responsible for ensuring their use of any published tools complies with applicable legal frameworks and authorized testing boundaries.",
           ],
         },
         {
-          title: "Payments and Billing",
+          title: "Disclaimer of Warranties",
           content: [
-            "Project work begins after payment confirmation according to agreed terms. Milestone-based or fixed-scope billing may apply.",
-            "All fees are due as agreed in writing. Late payments may pause delivery until settlement.",
+            "All content, benchmarks, code samples, and utilities on this site are provided 'AS IS' without warranty of any kind, express or implied.",
+            "While substantial care is taken to verify technical accuracy and reproducible benchmarks, Voldigoade does not guarantee that code samples are completely bug-free or suitable for every production environment.",
           ],
         },
         {
-          title: "Intellectual Property",
+          title: "Limitation of Liability",
           content: [
-            "Upon full payment, clients receive rights to agreed deliverables unless otherwise stated for third-party assets, open-source licenses, or prebuilt internal utilities.",
-            "Pre-existing frameworks, templates, and reusable modules remain the intellectual property of their original owners where applicable.",
+            "To the maximum extent permitted by applicable law, in no event shall Voldigoade be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use materials on this site.",
           ],
         },
         {
-          title: "Confidentiality",
+          title: "Vulnerability Disclosure",
           content: [
-            "Project-sensitive information shared by clients is treated as confidential and used only for delivery, support, and agreed operational needs.",
-            "Clients are responsible for avoiding transmission of highly sensitive credentials through insecure channels unless explicitly required and protected.",
-          ],
-        },
-        {
-          title: "Warranties and Liability",
-          content: [
-            "Services are delivered with professional care, but no absolute guarantee is made for uninterrupted operation of third-party tools, hosting providers, or external APIs.",
-            "To the maximum extent permitted by law, liability is limited to the amount paid for the specific service in dispute.",
-          ],
-        },
-        {
-          title: "Termination",
-          content: [
-            "Either party may terminate collaboration in writing. Completed work and billable milestones remain payable.",
-            "Ongoing access, support, or delivery obligations may stop upon termination unless separately agreed.",
-          ],
-        },
-        {
-          title: "Contact and Governing Terms",
-          content: [
-            "Questions regarding these terms can be sent to contact@muhammadfiaz.com.",
-            "These terms are interpreted under applicable laws and may be updated periodically to reflect service and legal changes.",
-            "Continued use of this website or services after updates constitutes acceptance of revised terms.",
+            "If you discover a security vulnerability in any project maintained by Voldigoade, please report it privately via GitHub Security Advisories or through the contact form prior to public disclosure.",
           ],
         },
       ]}

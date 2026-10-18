@@ -9,7 +9,7 @@ const notFoundOgImageUrl = `${siteUrl}/404/opengraph-image`;
 export const metadata: Metadata = {
   title: "404 | Route Not Found",
   description:
-    "The requested route was not found. Continue browsing Muhammad Fiaz Portfolio v5.",
+    "The requested route was not found. Continue browsing Voldigoade Portfolio.",
   alternates: {
     canonical: "/404",
   },
@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     follow: true,
   },
   openGraph: {
-    title: "404 | Muhammad Fiaz Portfolio",
+    title: "404 | Voldigoade Portfolio",
     description:
-      "The requested route is not available in this release. Use retro navigation to continue.",
+      "The requested route is not available. Use retro navigation to continue.",
     url: `${siteUrl}/404`,
     type: "website",
     images: [
@@ -28,15 +28,15 @@ export const metadata: Metadata = {
         url: notFoundOgImageUrl,
         width: 1200,
         height: 630,
-        alt: "404 page for Muhammad Fiaz Portfolio v5",
+        alt: "404 page for Voldigoade Portfolio",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "404 | Muhammad Fiaz Portfolio",
+    title: "404 | Voldigoade Portfolio",
     description:
-      "The requested route is not available in this release. Use retro navigation to continue.",
+      "The requested route is not available. Use retro navigation to continue.",
     images: [notFoundOgImageUrl],
   },
 };
@@ -53,10 +53,10 @@ export default function NotFoundPage() {
     url: `${siteUrl}/404`,
     isPartOf: {
       "@type": "WebSite",
-      name: "Muhammad Fiaz Portfolio",
+      name: "Voldigoade Portfolio",
       url: siteUrl,
     },
-    description: "Custom route-not-found page for Muhammad Fiaz Portfolio v5.",
+    description: "Custom route-not-found page for Voldigoade Portfolio.",
   };
 
   return (

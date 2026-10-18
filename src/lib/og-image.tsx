@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { siteHost } from "@/lib/site-config";
 
 export const ogSize = {
   width: 1200,
@@ -113,7 +114,7 @@ export function buildOgImage({
             fontWeight: 800,
           }}
         >
-          muhammadfiaz.com
+          {siteHost}
         </div>
       </div>
     </div>,

@@ -183,6 +183,12 @@ export const RefreshCw = createIcon(
 export const Rocket = createIcon("Rocket", "Rocket01Icon");
 
 export const Search = createIcon("Search", "Search01Icon");
+export const Shield = createIcon(
+  "Shield",
+  "ShieldIcon",
+  "SecurityCheckIcon",
+  "Security01Icon",
+);
 export const Sun = createIcon("Sun", "Sun01Icon");
 
 export const Twitter = createIcon("Twitter", "TwitterIcon", "NewTwitterIcon");

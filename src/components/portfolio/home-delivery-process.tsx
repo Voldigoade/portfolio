@@ -4,24 +4,24 @@ import { Card } from "@/components/retroui/Card";
 
 const processSteps = [
   {
-    title: "Discover",
+    title: "Threat Model",
     description:
-      "Align on goals, constraints, and success metrics so every technical decision maps to business value.",
+      "Examine problem boundaries, trust assumptions, and operational constraints before committing to code.",
   },
   {
-    title: "Build",
+    title: "Investigate",
     description:
-      "Ship in focused iterations with clean architecture, practical UX, and production-safe engineering standards.",
+      "Cross-check primary documentation, network traces, and public source code to expose the underlying mechanics.",
   },
   {
-    title: "Launch",
+    title: "Build Minimal",
     description:
-      "Release with observability, performance checks, and rollback-aware workflows for stable go-live execution.",
+      "Implement focused, lightweight tools in Rust, Python, or TypeScript with deliberate dependency boundaries.",
   },
   {
-    title: "Scale",
+    title: "Verify",
     description:
-      "Improve reliability, automate repetitive tasks, and evolve the system based on product and user signals.",
+      "Validate through automated test suites, structured output verification, and transparent evidence registers.",
   },
 ] as const;
 
@@ -29,7 +29,7 @@ export function HomeDeliveryProcess() {
   return (
     <section className="space-y-4">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        Delivery Process
+        Engineering Workflow
       </h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {processSteps.map((step, index) => (
@@ -39,7 +39,7 @@ export function HomeDeliveryProcess() {
           >
             <Card.Header>
               <p className="retro-badge w-max text-[10px] sm:text-xs">
-                Step {index + 1}
+                Phase {index + 1}
               </p>
               <Card.Title className="mt-2 font-display text-2xl uppercase">
                 {step.title}

@@ -7,20 +7,21 @@ const contactOgImageUrl = `${siteUrl}/contact/opengraph-image`;
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Contact Muhammad Fiaz for projects, consulting, and collaborations.",
+    "Contact Voldigoade for systems engineering, security research, and collaborations.",
   alternates: {
     canonical: "/contact",
   },
   keywords: [
-    "contact muhammad fiaz",
-    "hire full stack developer",
-    "project inquiry",
-    "software consulting",
+    "contact voldigoade",
+    "systems engineering",
+    "security research",
+    "open source",
+    "inquiry",
   ],
   openGraph: {
-    title: "Contact Muhammad Fiaz",
+    title: "Contact Voldigoade",
     description:
-      "Send project goals and timelines for software execution, consulting, and delivery.",
+      "Send technical inquiries, security research questions, or collaboration proposals.",
     url: `${siteUrl}/contact`,
     type: "website",
     images: [
@@ -28,15 +29,15 @@ export const metadata: Metadata = {
         url: contactOgImageUrl,
         width: 1200,
         height: 630,
-        alt: "Contact Muhammad Fiaz",
+        alt: "Contact Voldigoade",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Contact Muhammad Fiaz",
+    title: "Contact Voldigoade",
     description:
-      "Send project goals and timelines for software execution, consulting, and delivery.",
+      "Send technical inquiries, security research questions, or collaboration proposals.",
     images: [contactOgImageUrl],
   },
 };
@@ -49,10 +50,10 @@ export default function ContactPage() {
   const contactJsonLd = {
     "@context": "https://schema.org",
     "@type": "ContactPage",
-    name: "Contact Muhammad Fiaz",
+    name: "Contact Voldigoade",
     url: `${siteUrl}/contact`,
     description:
-      "Contact page for project collaboration and software services.",
+      "Contact page for systems engineering, security research, and open source collaboration.",
   };
 
   return (

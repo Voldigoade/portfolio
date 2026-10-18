@@ -10,8 +10,8 @@ import {
 } from "@/components/portfolio/about-timeline";
 import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
-import { Github, Linkedin, Twitter, Youtube } from "@/components/retroui/icons";
-import { githubUrl, linkedinUrl, xUrl, youtubeUrl } from "@/lib/site-config";
+import { Github, Linkedin, Twitter } from "@/components/retroui/icons";
+import { githubUrl, linkedinUrl, xUrl } from "@/lib/site-config";
 
 type AboutPageClientProps = {
   timelineItems: TimelineItem[];
@@ -67,8 +67,8 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
           <div className="mx-auto w-full max-w-xs border-4 border-black bg-primary p-3 shadow-retro-md">
             <div className="border-4 border-black bg-card p-0">
               <Image
-                src="https://avatars.githubusercontent.com/u/75434191?v=4"
-                alt="Muhammad Fiaz"
+                src="/images/avatar.png"
+                alt="Voldigoade"
                 width={420}
                 height={420}
                 className="block h-full w-full object-cover"
@@ -102,15 +102,6 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
               >
                 <Linkedin className="h-4 w-4" />
               </Link>
-              <Link
-                href={youtubeUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="retro-social-icon"
-                aria-label="YouTube profile"
-              >
-                <Youtube className="h-4 w-4" />
-              </Link>
             </div>
           </div>
 
@@ -120,22 +111,19 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
             </h1>
             <div className="mt-5 space-y-4 text-sm font-medium leading-relaxed sm:text-base md:text-lg">
               <p>
-                Hey there, I&apos;m Muhammad Fiaz, a self-taught full stack
-                developer, founder, entrepreneur, freelancer, and open-source
-                builder. I have been coding since childhood, and that early
-                curiosity became a long-term focus on building useful products
-                that solve real business problems.
+                Hey there, I&apos;m Voldigoade, a software engineer and systems
+                researcher focused on security, privacy, memory safety, and
+                open-source tooling.
               </p>
               <p>
-                I help startups and businesses scale with developer-first tools,
-                robust product systems, and practical architecture that stays
-                reliable, maintainable, and outcome-driven as teams grow.
+                I build auditable software with minimal attack surfaces, threat
+                model communication protocols, and design developer-first
+                utilities that prioritize user sovereignty.
               </p>
               <p>
-                I work across frontend, backend, and automation layers, explore
-                AI and machine learning in production-focused use cases, and
-                ship in public because measurable progress matters more than
-                hidden drafts.
+                My primary work revolves around Rust, Linux internals, defensive
+                architecture, and local-first systems. I believe in public code
+                verification, reproducible builds, and transparency.
               </p>
             </div>
 
@@ -151,9 +139,7 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
                 variant="secondary"
                 className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
               >
-                <Link href="mailto:contact@muhammadfiaz.com">
-                  Business Inquiries
-                </Link>
+                <Link href="/contact">Get In Touch</Link>
               </Button>
             </div>
           </div>
@@ -167,19 +153,19 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[
             {
-              title: "Product Engineering",
+              title: "Systems Programming",
               detail:
-                "Deliver end-to-end product execution from architecture to launch without sacrificing code quality.",
+                "Low-level, memory-safe utilities and backend systems in Rust and Linux engineered for predictability.",
             },
             {
-              title: "AI Automation",
+              title: "Security & Threat Research",
               detail:
-                "Design and implement practical AI workflows that reduce repetitive operations and speed up teams.",
+                "Deep auditing of metadata leakage, credential isolation, and cryptographic protocol trade-offs.",
             },
             {
-              title: "Client Delivery",
+              title: "Open Source Tooling",
               detail:
-                "Translate goals into milestones, clear communication, and measurable outcomes with reliable iteration.",
+                "Transparent, inspectable tools like Spoor designed with zero telemetry and permissive licenses.",
             },
           ].map((item) => (
             <Card
@@ -208,10 +194,10 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {[
-            "Builder at heart: I design developer-first tools and reliable software systems that scale with confidence.",
-            "AI focused: I use ML and AI where they create practical value, not presentation-only hype.",
-            "Collaboration ready: open-source is my default mode and teamwork is my multiplier.",
-            "Tech versatile: I work with Python, JavaScript, Rust, and the stack your roadmap needs next.",
+            "Defensive by default: I design software under the assumption of hostile network environments and credential exposure.",
+            "Systems & Rust: Memory safety and zero-cost abstractions allow building fast, auditable tools without garbage collection overhead.",
+            "Local-first & sovereignty: User data should remain encrypted, local, and under direct user control whenever possible.",
+            "Inspectable engineering: Open-source code, reproducible builds, and explicit dependencies over opaque black boxes.",
           ].map((point) => (
             <Card
               key={point}
@@ -232,9 +218,9 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[
-            "Start with clarity: define outcomes, constraints, and technical trade-offs early.",
-            "Build iteratively: ship in small reliable increments with measurable progress.",
-            "Document and transfer: leave systems maintainable so teams can move fast after handoff.",
+            "Threat model first: define attack surfaces, trust boundaries, and data flows before writing code.",
+            "Build iteratively: ship minimal, auditable increments with verifiable tests and clear invariants.",
+            "Document and benchmark: leave systems thoroughly documented with reproducible benchmarks and zero hidden surprises.",
           ].map((item) => (
             <Card
               key={item}
@@ -262,8 +248,8 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
             variant="secondary"
             className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
           >
-            <Link href={linkedinUrl} target="_blank" rel="noreferrer noopener">
-              View it on Linkedin
+            <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
+              View on GitHub
             </Link>
           </Button>
         </div>

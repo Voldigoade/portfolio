@@ -6,33 +6,33 @@ import { Card } from "@/components/retroui/Card";
 
 const models = [
   {
-    title: "Sprint Execution",
+    title: "Systems & CLI Tools",
     summary:
-      "Fast delivery for focused features, migrations, and product improvements.",
+      "Terminal-first tooling, low-level services, and system utilities built in Rust.",
     bullets: [
-      "1-2 week delivery windows",
-      "Clear scope and milestone tracking",
-      "Weekly progress demos",
+      "Fast native binary execution",
+      "HTTP and Server-Sent Event streaming APIs",
+      "Structured machine-readable JSON exports",
     ],
   },
   {
-    title: "Embedded Partner",
+    title: "Security & Threat Research",
     summary:
-      "Hands-on engineering support integrated into your product and release cycle.",
+      "Source-driven comparative analysis of privacy, cryptography, and network protocols.",
     bullets: [
-      "Architecture and implementation ownership",
-      "Collaborative planning with your team",
-      "Long-term maintainability focus",
+      "Threat model and boundary evaluation",
+      "Network exposure and metadata auditing",
+      "Evidence registers with primary source citations",
     ],
   },
   {
-    title: "AI Automation",
+    title: "Local-First & Tooling",
     summary:
-      "Automation systems that reduce manual work across product and operations.",
+      "Software designed to run locally, keep state deterministic, and respect privacy.",
     bullets: [
-      "API and workflow integrations",
-      "n8n and Zapier orchestration",
-      "Monitoring and optimization loops",
+      "Local-first data persistence",
+      "Automation and agent workflow integrations",
+      "Zero unnecessary telemetry or tracking",
     ],
   },
 ] as const;
@@ -42,14 +42,14 @@ export function HomeEngagementModel() {
     <section className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Engagement Model
+          Technical Focus Areas
         </h2>
         <Button
           asChild
           variant="secondary"
           className="w-full sm:w-auto uppercase"
         >
-          <Link href="/contact">Start a Project Discussion</Link>
+          <Link href="/project">Explore All Projects</Link>
         </Button>
       </div>
 

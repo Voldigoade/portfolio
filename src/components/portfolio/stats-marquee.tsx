@@ -3,9 +3,12 @@
 import { motion } from "framer-motion";
 
 const items = [
-  "25+ HAPPY CLIENTS WORLDWIDE",
-  "99.9% DELIVERY",
-  "BASED IN INDIA",
+  "OPEN SOURCE",
+  "RUST",
+  "LINUX & SYSTEMS",
+  "DEV TOOLS",
+  "SECURITY RESEARCH",
+  "PRIVACY & NETWORKING",
 ];
 
 export function StatsMarquee() {

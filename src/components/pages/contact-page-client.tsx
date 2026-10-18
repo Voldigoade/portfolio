@@ -6,19 +6,19 @@ import { useEffect, useRef } from "react";
 import { ContactForm } from "@/components/portfolio/contact-form";
 import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
-import { Mail, MessageSquare, Users } from "@/components/retroui/icons";
-import { linkedinUrl } from "@/lib/site-config";
+import { Github, MessageSquare, Shield } from "@/components/retroui/icons";
+import { githubUrl, linkedinUrl } from "@/lib/site-config";
 
 const contactFaqItems = [
   {
     question: "How long will it take for you to respond?",
     answer:
-      "I usually respond within 1-3 days. If I am handling another active delivery window, it can take a little longer, but I always reply with a clear next step.",
+      "I generally respond within 24 to 48 hours for technical inquiries, research collaboration, and security reports.",
   },
   {
     question: "How will I receive your response?",
     answer:
-      "You will receive my response by email. If needed, I can also continue discussion through LinkedIn for collaboration and follow-ups.",
+      "You will receive a response directly at the email address provided in the form. If you prefer GitHub, you can also open an issue or discussion on one of my repositories.",
   },
 ] as const;
 
@@ -52,14 +52,13 @@ export function ContactPageClient() {
             Contact
           </h1>
           <span className="inline-block w-fit px-3 py-1.5 bg-primary text-primary-foreground font-black uppercase text-sm sm:text-base border-2 border-black rotate-[-2deg] shadow-retro-sm">
-            20% Off Limited Time Summer Offer
+            Open For Research & Systems Collaboration
           </span>
         </div>
         <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed sm:text-base">
-          Ready to build something valuable? Submit your inquiry with complete
-          details: name, email, country, business inquiry topic, project
-          requirements, and optional phone/start/end dates so I can reply with a
-          clear execution plan.
+          Have a question about Spoor, security research, systems architecture,
+          or open-source collaboration? Submit your details below or reach out
+          directly via GitHub.
         </p>
       </section>
 
@@ -69,22 +68,22 @@ export function ContactPageClient() {
       >
         {[
           {
-            icon: Mail,
-            title: "Clear Communication",
+            icon: Shield,
+            title: "Security & Threat Audits",
             description:
-              "You receive transparent updates, delivery checkpoints, and concrete next steps at every stage.",
+              "Evaluating attack surfaces, analyzing credential exposure, and auditing cryptographic invariants.",
           },
           {
             icon: MessageSquare,
-            title: "Execution-First Planning",
+            title: "Technical Discussions",
             description:
-              "I focus on actionable scope, realistic timelines, and technical decisions that support business outcomes.",
+              "Collaborating on low-level systems programming, Linux internals, Rust libraries, and CLI tooling.",
           },
           {
-            icon: Users,
-            title: "Collaboration Ready",
+            icon: Github,
+            title: "Open Source Collaboration",
             description:
-              "I can work directly with founders, product teams, or engineering teams with minimal onboarding overhead.",
+              "Contributing to inspectable tools, reproducible benchmarks, and community security tooling.",
           },
         ].map((item) => (
           <Card
@@ -122,8 +121,8 @@ export function ContactPageClient() {
             variant="secondary"
             className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
           >
-            <Link href={linkedinUrl} target="_blank" rel="noreferrer noopener">
-              Connect on LinkedIn
+            <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
+              GitHub Profile
             </Link>
           </Button>
         </div>
@@ -131,32 +130,38 @@ export function ContactPageClient() {
           <Card className="border-4 border-black bg-card shadow-retro-md">
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                Email Collaboration
+                GitHub Discussions & Issues
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-3">
               <p className="font-medium leading-relaxed">
-                For project briefs, product requirements, and delivery
-                discussions, email is the fastest structured channel.
+                For tool feedback, bug reports, and research discussions on
+                Spoor or other projects, GitHub is the primary public channel.
               </p>
               <Button
                 asChild
                 className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
               >
-                <Link href="mailto:contact@muhammadfiaz.com">Email Now</Link>
+                <Link
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  Open GitHub
+                </Link>
               </Button>
             </Card.Content>
           </Card>
           <Card className="border-4 border-black bg-card shadow-retro-md">
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                LinkedIn Networking
+                Professional Network
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-3">
               <p className="font-medium leading-relaxed">
-                For strategic collaboration, partnerships, and long-term product
-                opportunities, LinkedIn works great.
+                For research collaboration and professional networking, connect
+                directly via LinkedIn.
               </p>
               <Button
                 asChild

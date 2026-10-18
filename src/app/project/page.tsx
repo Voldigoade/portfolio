@@ -8,20 +8,22 @@ const projectOgImageUrl = `${siteUrl}/project/opengraph-image`;
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "SSR-fetched GitHub projects by Muhammad Fiaz with filtering and search.",
+    "Curated open-source systems, security research, and developer tooling by Voldigoade.",
   alternates: {
     canonical: "/project",
   },
   keywords: [
     "github projects",
-    "full stack projects",
+    "systems engineering",
+    "security research",
+    "spoor",
     "open source repositories",
-    "startup product builds",
+    "rust tooling",
   ],
   openGraph: {
-    title: "Projects by Muhammad Fiaz",
+    title: "Projects | Voldigoade",
     description:
-      "Explore top-starred and recently updated projects with filters and search.",
+      "Explore open-source systems, security auditing tools, and research repositories with topic filters and search.",
     url: `${siteUrl}/project`,
     type: "website",
     images: [
@@ -29,15 +31,15 @@ export const metadata: Metadata = {
         url: projectOgImageUrl,
         width: 1200,
         height: 630,
-        alt: "Muhammad Fiaz Projects",
+        alt: "Voldigoade Projects",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Projects by Muhammad Fiaz",
+    title: "Projects | Voldigoade",
     description:
-      "Explore top-starred and recently updated projects with filters and search.",
+      "Explore open-source systems, security auditing tools, and research repositories with topic filters and search.",
     images: [projectOgImageUrl],
   },
 };
@@ -60,9 +62,10 @@ export default async function ProjectPage() {
   const projectsJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Projects by Muhammad Fiaz",
+    name: "Projects by Voldigoade",
     url: `${siteUrl}/project`,
-    description: "GitHub repositories and product engineering work.",
+    description:
+      "Curated open-source repositories and systems engineering work.",
     mainEntity: {
       "@type": "ItemList",
       itemListElement: repos.map((repo, index) => ({
@@ -77,12 +80,12 @@ export default async function ProjectPage() {
           programmingLanguage: repo.language ?? "Mixed",
           author: {
             "@type": "Person",
-            name: "Muhammad Fiaz",
+            name: "Voldigoade",
             url: siteUrl,
           },
           publisher: {
             "@type": "Person",
-            name: "Muhammad Fiaz",
+            name: "Voldigoade",
             url: siteUrl,
           },
           keywords: (repo.topics ?? []).join(", "),
@@ -124,8 +127,8 @@ export default async function ProjectPage() {
           Projects
         </h1>
         <p className="mt-3 max-w-3xl text-sm font-medium leading-relaxed sm:text-base">
-          Booting shipped products across full stack apps, AI tooling, and
-          open-source libraries. Filter by language and search by domain.
+          Curated open-source systems, footprint auditing utilities, and
+          research repositories. Filter by topic and search across projects.
         </p>
       </section>
 
@@ -134,8 +137,8 @@ export default async function ProjectPage() {
           Browse Project Index
         </h2>
         <p className="text-sm font-medium leading-relaxed sm:text-base">
-          Filter by topic, sort by stars or recency, and open repositories or
-          live deployments.
+          Filter by topic, inspect star activity or recency, and open source
+          repositories or live documentation.
         </p>
       </section>
 

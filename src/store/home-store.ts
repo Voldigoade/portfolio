@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type HomeFocus = "All" | "Product" | "Open Source" | "AI" | "Services";
+type HomeFocus = "All" | "Systems" | "Security" | "Open Source" | "Tooling";
 
 type HomeState = {
   focus: HomeFocus;

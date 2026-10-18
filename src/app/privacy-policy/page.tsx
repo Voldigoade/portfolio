@@ -7,21 +7,21 @@ const privacyPolicyOgImageUrl = `${siteUrl}/privacy-policy/opengraph-image`;
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Privacy Policy for muhammadfiaz.com services and communications.",
+    "Privacy Policy for voldigoade.xyz: privacy-first architecture, consent gating, and zero fingerprinting.",
   alternates: { canonical: "/privacy-policy" },
   openGraph: {
-    title: "Privacy Policy | Muhammad Fiaz",
+    title: "Privacy Policy | Voldigoade",
     description:
-      "How data is collected, used, and protected on muhammadfiaz.com.",
+      "How data is protected on voldigoade.xyz with privacy-preserving telemetry and strict consent gating.",
     url: `${siteUrl}/privacy-policy`,
     type: "website",
     images: [privacyPolicyOgImageUrl],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Privacy Policy | Muhammad Fiaz",
+    title: "Privacy Policy | Voldigoade",
     description:
-      "How data is collected, used, and protected on muhammadfiaz.com.",
+      "How data is protected on voldigoade.xyz with privacy-preserving telemetry and strict consent gating.",
     images: [privacyPolicyOgImageUrl],
   },
 };
@@ -30,49 +30,48 @@ export default function PrivacyPolicyPage() {
   return (
     <PolicyPageClient
       pageTitle="Privacy Policy"
-      intro="This Privacy Policy explains how Muhammad Fiaz collects, uses, and protects information when you use muhammadfiaz.com and related services."
+      intro="This Privacy Policy outlines how Voldigoade protects your privacy when visiting voldigoade.xyz. Privacy, data minimization, and transparency are core design principles of this site."
       sections={[
         {
-          title: "Information Collected",
+          title: "Core Privacy Principles",
           content: [
-            "I may collect contact information you submit, including name, email address, and project details through forms or direct communication.",
-            "Technical usage data such as browser type, device type, and page interactions may be collected through analytics tools to improve performance and user experience.",
+            "This site is designed with data minimization as a primary invariant: no intrusive tracking, no canvas fingerprinting, and no sale of personal information.",
+            "Static content, open-source articles, and project documentation are freely accessible without accounts or paywalls.",
           ],
         },
         {
-          title: "How Information Is Used",
+          title: "Analytics & Telemetry",
           content: [
-            "Information is used to respond to inquiries, deliver services, manage project communication, and provide support.",
-            "Data may also be used to improve website performance, service quality, and product delivery workflows.",
-            "Where legally required, data processing is based on consent, contractual necessity, legitimate interest, or compliance obligations.",
+            "Cloudflare Web Analytics: We use Cloudflare Web Analytics for non-invasive, privacy-preserving aggregated traffic analysis. It does not use cookies, does not track individual IP addresses across sites, and does not profile visitors.",
+            "Google Analytics / Tag Manager: Optional analytics are strictly consent-gated. If consent is not explicitly granted via the Cookie Notice, Google Analytics scripts are completely prevented from loading or running.",
           ],
         },
         {
-          title: "Data Sharing",
+          title: "Contact Form Submissions",
           content: [
-            "Your personal information is not sold. Data may be shared only with trusted service providers when needed to deliver services or comply with legal obligations.",
-            "Third-party integrations used for service delivery may process limited required information under their own policies.",
+            "If you submit an inquiry through the Contact page, the information you provide (name, email, topic, project scope) is processed securely via HTTPS solely to reply to your message.",
+            "Form input is not stored in plain-text browser local storage, nor is it ever shared with advertisers or third-party marketers.",
           ],
         },
         {
-          title: "Data Security",
+          title: "Cookies & Local Storage",
           content: [
-            "Reasonable technical and organizational safeguards are used to protect information against unauthorized access, misuse, or disclosure.",
-            "No online system is completely risk-free, but security practices are continuously maintained and improved.",
+            "Local storage is used strictly for client-side user preferences: theme selection (dark/light) and your cookie consent preference (voldigoade_cookie_consent).",
+            "No advertising or cross-site tracking cookies are set by this website.",
           ],
         },
         {
-          title: "Data Retention",
+          title: "Data Security & Hygiene",
           content: [
-            "Information is retained only as long as necessary for service delivery, legal compliance, dispute resolution, and operational records.",
-            "When data is no longer required, reasonable steps are taken to delete or anonymize it.",
+            "All connections are enforced via TLS/HTTPS with modern cipher suites.",
+            "Third-party integrations are kept to a strict minimum to reduce external attack surface.",
           ],
         },
         {
-          title: "Your Rights and Contact",
+          title: "Contact & Data Rights",
           content: [
-            "You may request correction or deletion of your personal information where legally applicable.",
-            "For privacy questions, contact: contact@muhammadfiaz.com.",
+            "You have the right to request deletion or clarification regarding any communications sent through the contact form.",
+            "For any inquiries regarding this policy, reach out via the Contact page or directly on GitHub: https://github.com/Voldigoade.",
           ],
         },
       ]}

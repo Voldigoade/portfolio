@@ -43,7 +43,7 @@ async function getSystemTips(mode: "not-found" | "error") {
 
 async function createIncidentTicket() {
   await new Promise((resolve) => setTimeout(resolve, 250));
-  return `MF-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  return `VG-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 }
 
 export function SystemStatusPanel({

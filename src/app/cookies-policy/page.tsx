@@ -6,21 +6,21 @@ const cookiesPolicyOgImageUrl = `${siteUrl}/cookies-policy/opengraph-image`;
 
 export const metadata: Metadata = {
   title: "Cookies Policy",
-  description: "Cookies and tracking technologies policy for muhammadfiaz.com.",
+  description: "Cookies and local storage policy for voldigoade.xyz.",
   alternates: { canonical: "/cookies-policy" },
   openGraph: {
-    title: "Cookies Policy | Muhammad Fiaz",
+    title: "Cookies Policy | Voldigoade",
     description:
-      "How cookies and analytics technologies are used on muhammadfiaz.com.",
+      "How cookies, local storage, and consent preferences are managed on voldigoade.xyz.",
     url: `${siteUrl}/cookies-policy`,
     type: "website",
     images: [cookiesPolicyOgImageUrl],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cookies Policy | Muhammad Fiaz",
+    title: "Cookies Policy | Voldigoade",
     description:
-      "How cookies and analytics technologies are used on muhammadfiaz.com.",
+      "How cookies, local storage, and consent preferences are managed on voldigoade.xyz.",
     images: [cookiesPolicyOgImageUrl],
   },
 };
@@ -28,35 +28,41 @@ export const metadata: Metadata = {
 export default function CookiesPolicyPage() {
   return (
     <PolicyPageClient
-      pageTitle="Cookies Policy"
-      intro="This Cookies Policy explains how cookies and related tracking technologies are used on muhammadfiaz.com."
+      pageTitle="Cookies & Storage Policy"
+      intro="This policy explains how voldigoade.xyz utilizes cookies and browser local storage to maintain functionality and respect user choices."
       sections={[
         {
-          title: "What Are Cookies",
+          title: "Our Approach to Cookies",
           content: [
-            "Cookies are small text files stored on your device to improve browsing experience, functionality, and analytics reporting.",
-            "Some cookies are essential for core site behavior while others help analyze usage patterns and engagement.",
+            "voldigoade.xyz minimizes cookie usage to the greatest extent possible. We do not use third-party advertising cookies or cross-site tracking beacons.",
+            "Default browsing and navigation of all projects, articles, and documentation does not require tracking cookies.",
           ],
         },
         {
-          title: "How Cookies Are Used",
+          title: "Consent Gating & Storage",
           content: [
-            "Cookies may be used to remember preferences, improve page performance, and support analytics insights.",
-            "Analytics and marketing tools, including Google Analytics and Google Tag Manager, may set or read cookies based on your interaction with the site.",
+            "voldigoade_cookie_consent: When you interact with the Cookie Notice banner, your choice ('accepted' or 'rejected') is stored locally in your browser's localStorage so you are not prompted repeatedly.",
+            "If you decline or dismiss consent, all optional analytics tools (including Google Analytics / Tag Manager) remain completely disabled and inert.",
           ],
         },
         {
-          title: "Managing Cookies",
+          title: "Functional Local Storage",
           content: [
-            "You can control or disable cookies in your browser settings at any time.",
-            "Disabling certain cookies may impact website functionality or user experience in specific features.",
+            "theme: Stores your dark mode or light mode appearance preference.",
+            "blog-store / home-store: Stores filter preferences (such as selected writing tag or technical focus area) within your current session.",
+            "No sensitive personal identification data or plain-text credentials are ever placed in local storage.",
           ],
         },
         {
-          title: "Consent",
+          title: "Cookieless Analytics",
           content: [
-            "By using this website and accepting the cookie notice, you consent to cookie usage as described in this policy.",
-            "For policy questions, contact: contact@muhammadfiaz.com.",
+            "We employ Cloudflare Web Analytics, a privacy-first measurement beacon that operates without setting cookies, tracking personal identifiable information, or fingerprinting browser devices.",
+          ],
+        },
+        {
+          title: "How to Revoke or Clear",
+          content: [
+            "You can reset your consent preference or theme at any time by clearing your browser's local storage for voldigoade.xyz, which will immediately re-trigger the default consent-gated state.",
           ],
         },
       ]}

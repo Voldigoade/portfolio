@@ -4,19 +4,19 @@ import { motion } from "framer-motion";
 
 const floatingBadges = [
   {
-    text: "Founder",
+    text: "Systems & Rust",
     className:
       "-top-5 left-2 rotate-[-10deg] bg-accent text-accent-foreground md:-left-8",
     animate: { y: [0, -6, 0], x: [0, 2, 0] },
   },
   {
-    text: "Entrepreneur",
+    text: "Security & Privacy",
     className:
       "right-2 top-14 rotate-[6deg] bg-secondary text-secondary-foreground md:right-3 md:top-16",
     animate: { y: [0, 6, 0], x: [0, -2, 0] },
   },
   {
-    text: "Open-Sourcerer",
+    text: "Open Source",
     className:
       "-bottom-5 left-8 rotate-[6deg] bg-primary text-primary-foreground md:-left-6",
     animate: { y: [0, -4, 0], x: [0, 3, 0] },

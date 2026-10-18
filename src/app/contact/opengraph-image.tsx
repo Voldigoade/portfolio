@@ -1,14 +1,14 @@
 import { buildOgImage, ogContentType, ogSize } from "@/lib/og-image";
 
-export const alt = "Contact Muhammad Fiaz";
+export const alt = "Contact Voldigoade";
 export const size = ogSize;
 export const contentType = ogContentType;
 
 export default function Image() {
   return buildOgImage({
-    eyebrow: "Contact Me For Enquiry",
-    title: "Let's Build Together",
-    subtitle: "Projects | Consulting | Collaboration",
+    eyebrow: "Contact",
+    title: "Get In Touch",
+    subtitle: "Systems | Security Auditing | Open Source",
     accent: "primary",
   });
 }
