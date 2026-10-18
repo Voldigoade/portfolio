@@ -144,6 +144,14 @@ export async function renderMarkdownToHtml(markdown: string): Promise<string> {
         const placeholder = `__SHIKI_CODE_BLOCK_${blockIndex++}__`;
         return placeholder;
       },
+      html({ text }) {
+        return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      },
     },
   });
 
@@ -183,11 +191,6 @@ export async function renderMarkdownToHtml(markdown: string): Promise<string> {
   highlightedBlocks.forEach((html, i) => {
     parsed = parsed.replace(`__SHIKI_CODE_BLOCK_${i}__`, html);
   });
-
-  // Strip unsafe raw script/iframe tags
-  parsed = parsed
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "");
 
   return parsed;
 }
