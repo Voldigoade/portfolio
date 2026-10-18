@@ -3,6 +3,7 @@ export interface GithubRepo {
   name: string;
   full_name: string;
   description: string | null;
+  description_en?: string | null;
   language: string | null;
   private?: boolean;
   fork?: boolean;

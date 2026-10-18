@@ -28,8 +28,7 @@ export const githubUrl = "https://github.com/Voldigoade";
 export const spoorUrl = "https://github.com/Voldigoade/spoor";
 export const rechercheMessageriesUrl =
   "https://github.com/Voldigoade/recherche-messageries";
-export const ideResearchUrl = "https://github.com/Voldigoade/ide-research";
-export const crukstUrl = "https://github.com/Voldigoade/crukst";
+export const cruckswareUrl = "https://github.com/Voldigoade/crucksware";
 
 // Public profile destination for the link hub
 export const linkHubUrl = githubUrl;

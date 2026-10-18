@@ -56,9 +56,8 @@ describe("public portfolio boundary", () => {
     const repos = await getGithubRepos();
     expect(repos.map((repo) => repo.name)).toEqual([
       "spoor",
+      "crucksware",
       "recherche-messageries",
-      "ide-research",
-      "crukst",
     ]);
     expect(spoor(repos).stargazers_count).toBe(3);
     expect(spoor(repos).updated_at).toBe("2026-10-17T10:20:30Z");
@@ -69,7 +68,7 @@ describe("public portfolio boundary", () => {
     for (const payload of [{ message: "PRIVATE ERROR DETAIL" }, null]) {
       respond(payload, 503);
       const repos = await getGithubRepos();
-      expect(repos).toHaveLength(4);
+      expect(repos).toHaveLength(3);
       for (const repo of repos) {
         expect(repo.stargazers_count).toBeUndefined();
         expect(repo.forks_count).toBeUndefined();
@@ -83,7 +82,7 @@ describe("public portfolio boundary", () => {
   it("network failures and malformed arrays preserve safe static projects", async () => {
     for (const payload of [null, {}, [null, { name: 3 }, "secret"]]) {
       respond(payload);
-      expect(await getGithubRepos()).toHaveLength(4);
+      expect(await getGithubRepos()).toHaveLength(3);
     }
     globalThis.fetch = mock(async () => {
       throw new Error("SECRET");
@@ -158,7 +157,7 @@ describe("public portfolio boundary", () => {
     ]);
     const body = await response.json();
     expect(response.status).toBe(200);
-    expect(body).toHaveLength(4);
+    expect(body).toHaveLength(3);
     expect(JSON.stringify(body)).not.toContain("PRIVATE UPSTREAM ERROR");
     expect(calls.every((url) => url.includes("/users/Voldigoade/repos?"))).toBe(
       true,
@@ -214,9 +213,8 @@ describe("public portfolio boundary", () => {
     expect(result?.username).toBe("Voldigoade");
     expect(result?.projects.map((repo) => repo.name)).toEqual([
       "spoor",
+      "crucksware",
       "recherche-messageries",
-      "ide-research",
-      "crukst",
     ]);
     expect(result?.commitHistory).toEqual([]);
     expect(result?.monthlyActivity).toEqual([]);

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { generateStaticParams as generateFrStaticParams } from "../src/app/blog/[slug]/page";
+import { generateStaticParams as generateFrStaticParams } from "../src/app/(fr)/blog/[slug]/page";
 import { generateStaticParams as generateEnStaticParams } from "../src/app/en/blog/[slug]/page";
 import {
   getAllArticles,

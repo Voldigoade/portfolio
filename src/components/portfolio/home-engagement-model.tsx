@@ -1,75 +1,51 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
+import { getCopy, type Locale } from "@/lib/site-copy";
 
-const models = [
-  {
-    title: "Systèmes & Outils CLI",
-    summary:
-      "Spoor propose une interface terminal et un service HTTP pour l'inspection de l'empreinte publique sur GitHub.",
-    bullets: [
-      "Implémentation en ligne de commande en Rust",
-      "Requêtes HTTP avec suivi de progression en temps réel",
-      "Export JSON et rapports d'audit lisibles",
-    ],
-  },
-  {
-    title: "Sécurité & Modélisation de menaces",
-    summary:
-      "Recherche Messageries analyse les applications de messagerie sécurisée à partir de sources publiques et de critères vérifiables.",
-    bullets: [
-      "Comparatifs selon les modèles de menaces",
-      "Analyse des métadonnées et de l'exposition réseau",
-      "Registre des preuves et traçabilité documentaire",
-    ],
-  },
-  {
-    title: "Environnements de développement",
-    summary:
-      "IDE Research étudie les architectures d'environnements de travail et leurs compromis opérationnels.",
-    bullets: [
-      "Flux locaux, distants et conteneurisés",
-      "Intégration d'outils et d'agents de développement",
-      "Confidentialité, licences et souveraineté logicielle",
-    ],
-  },
-] as const;
+export function HomeEngagementModel({ locale }: { locale?: Locale }) {
+  const pathname = usePathname() || "/";
+  const currentLocale: Locale =
+    pathname === "/en" || pathname.startsWith("/en/") ? "en" : locale || "fr";
 
-export function HomeEngagementModel() {
+  const copy = getCopy(currentLocale).home.domains;
+  const allProjectsHref = currentLocale === "en" ? "/en/project" : "/project";
+
   return (
     <section className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Domaines de recherche & outillage
+          {copy.title}
         </h2>
         <Button
           asChild
           variant="secondary"
           className="w-full sm:w-auto uppercase"
         >
-          <Link href="/project">Explorer tous les projets</Link>
+          <Link href={allProjectsHref}>{copy.viewAll}</Link>
         </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {models.map((model) => (
+        {copy.items.map((item) => (
           <Card
-            key={model.title}
-            className="h-full border-4 border-black bg-card shadow-retro-md"
+            key={item.title}
+            className="flex h-full flex-col border-4 border-black bg-card shadow-retro-md"
           >
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                {model.title}
+                {item.title}
               </Card.Title>
               <Card.Description className="text-sm leading-relaxed sm:text-base">
-                {model.summary}
+                {item.summary}
               </Card.Description>
             </Card.Header>
-            <Card.Content>
+            <Card.Content className="flex flex-1 flex-col justify-between gap-4">
               <ul className="space-y-2">
-                {model.bullets.map((bullet) => (
+                {item.bullets.map((bullet) => (
                   <li
                     key={bullet}
                     className="border-l-4 border-black pl-3 text-sm font-medium leading-relaxed"
@@ -78,6 +54,23 @@ export function HomeEngagementModel() {
                   </li>
                 ))}
               </ul>
+              <div className="pt-2">
+                <Button
+                  asChild
+                  variant="secondary"
+                  className="w-full border-4 border-black font-black uppercase shadow-retro-sm"
+                >
+                  <Link
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    {currentLocale === "en"
+                      ? "View on GitHub"
+                      : "Voir sur GitHub"}
+                  </Link>
+                </Button>
+              </div>
             </Card.Content>
           </Card>
         ))}

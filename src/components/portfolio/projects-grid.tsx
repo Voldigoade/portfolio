@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
   normalizeTag,
@@ -13,6 +14,7 @@ import { Input } from "@/components/retroui/Input";
 import { Search } from "@/components/retroui/icons";
 import { usePortfolioReposQuery } from "@/lib/client/portfolio-queries";
 import type { GithubRepo } from "@/lib/portfolio-types";
+import { getCopy, type Locale } from "@/lib/site-copy";
 import { useProjectsStore } from "@/store/projects-store";
 
 const PROJECTS_SKELETON_KEYS = ["p1", "p2", "p3", "p4", "p5", "p6"] as const;
@@ -50,13 +52,22 @@ type ProjectsGridProps = {
   compact?: boolean;
   limit?: number;
   initialRepos?: GithubRepo[];
+  locale?: Locale;
 };
 
 export function ProjectsGrid({
   compact = false,
   limit = 3,
   initialRepos,
+  locale,
 }: ProjectsGridProps) {
+  const pathname = usePathname() || "/";
+  const currentLocale: Locale =
+    pathname === "/en" || pathname.startsWith("/en/") ? "en" : locale || "fr";
+
+  const copy = getCopy(currentLocale).projects;
+  const isFrench = currentLocale === "fr";
+
   const PAGE_SIZE = 9;
   const {
     data: repos = [],
@@ -111,9 +122,14 @@ export function ProjectsGrid({
         selectedTag === "All" ||
         normalizedTopics.includes(selectedTag);
 
+      const desc =
+        currentLocale === "en"
+          ? (repo.description_en ?? repo.description ?? "")
+          : (repo.description ?? "");
+
       const haystack = [
         repo.name,
-        repo.description ?? "",
+        desc,
         repo.language ?? "",
         ...(repo.topics ?? []),
       ]
@@ -138,7 +154,7 @@ export function ProjectsGrid({
         new Date(a.updated_at ?? 0).getTime()
       );
     });
-  }, [repos, query, selectedTag, sortBy, compact]);
+  }, [repos, query, selectedTag, sortBy, compact, currentLocale]);
 
   const visible = compact ? filtered.slice(0, limit) : filtered;
   const [currentPage, setCurrentPage] = useState(1);
@@ -176,8 +192,8 @@ export function ProjectsGrid({
             <Input
               value={query}
               onChange={(event) => handleSearchChange(event.target.value)}
-              placeholder="Rechercher par nom, description, tag..."
-              aria-label="Rechercher des projets"
+              placeholder={copy.searchPlaceholder}
+              aria-label={copy.searchAria}
               className="w-full border-4 border-black bg-card py-3 pl-11 font-bold shadow-retro"
             />
           </div>
@@ -203,12 +219,12 @@ export function ProjectsGrid({
                   )
                 }
                 className="h-11 w-full border-4 border-black bg-card px-3 font-black uppercase shadow-retro"
-                aria-label="Trier les projets"
+                aria-label={copy.sortAria}
               >
-                <option value="recent">Plus récents d&apos;abord</option>
-                <option value="stars-desc">Étoiles: décroissant</option>
-                <option value="stars-asc">Étoiles: croissant</option>
-                <option value="name-asc">Nom: A-Z</option>
+                <option value="recent">{copy.sortRecent}</option>
+                <option value="stars-desc">{copy.sortStarsDesc}</option>
+                <option value="stars-asc">{copy.sortStarsAsc}</option>
+                <option value="name-asc">{copy.sortNameAsc}</option>
               </select>
             </div>
           </div>
@@ -219,7 +235,7 @@ export function ProjectsGrid({
 
       {isError ? (
         <div className="border-4 border-black bg-destructive p-5 font-black uppercase text-destructive-foreground shadow-retro-md">
-          Impossible de charger les données des projets actuellement.
+          {copy.errorState}
         </div>
       ) : null}
 
@@ -229,81 +245,124 @@ export function ProjectsGrid({
             className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
             layout
           >
-            {paginated.map((repo, index) => (
-              <motion.div
-                key={repo.id}
-                layout
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 18 }}
-                transition={{ delay: index * 0.03 }}
-              >
-                <Card className="flex h-full w-full flex-col border-4 border-black shadow-retro-md hover:translate-x-1 hover:translate-y-1 hover:shadow-none">
-                  <Card.Header
-                    className={
-                      compact ? "min-h-0 flex-1" : "min-h-40 flex-1 sm:min-h-44"
-                    }
-                  >
-                    <Card.Title className="break-all font-display text-xl uppercase">
-                      {repo.name}
-                    </Card.Title>
-                    <Card.Description
+            {paginated.map((repo, index) => {
+              const description =
+                currentLocale === "en"
+                  ? (repo.description_en ??
+                    repo.description ??
+                    copy.noDescription)
+                  : (repo.description ?? copy.noDescription);
+
+              return (
+                <motion.div
+                  key={repo.id}
+                  layout
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 18 }}
+                  transition={{ delay: index * 0.03 }}
+                >
+                  <Card className="flex h-full w-full flex-col border-4 border-black shadow-retro-md hover:translate-x-1 hover:translate-y-1 hover:shadow-none">
+                    <Card.Header
                       className={
                         compact
-                          ? "mt-2 text-sm leading-relaxed line-clamp-3"
-                          : "mt-2 text-sm leading-relaxed sm:text-base line-clamp-4"
+                          ? "min-h-0 flex-1"
+                          : "min-h-40 flex-1 sm:min-h-44"
                       }
                     >
-                      {repo.description ?? "Pas de description fournie."}
-                    </Card.Description>
-                  </Card.Header>
-                  <Card.Content className="mt-auto flex flex-col gap-4 pt-0">
-                    <div className="flex flex-wrap gap-2">
-                      {(repo.topics ?? [])
-                        .slice(0, compact ? 4 : 8)
-                        .map((topic) => (
-                          <span
-                            key={topic}
-                            title={topic}
-                            className="retro-badge max-w-full truncate text-[10px] sm:text-xs"
-                          >
-                            {topic}
+                      <Card.Title className="break-all font-display text-xl uppercase">
+                        {repo.name}
+                      </Card.Title>
+                      <Card.Description
+                        className={
+                          compact
+                            ? "mt-2 text-sm leading-relaxed line-clamp-3"
+                            : "mt-2 text-sm leading-relaxed sm:text-base line-clamp-4"
+                        }
+                      >
+                        {description}
+                      </Card.Description>
+                    </Card.Header>
+                    <Card.Content className="mt-auto flex flex-col gap-4 pt-0">
+                      <div className="flex flex-wrap gap-2">
+                        {(repo.topics ?? [])
+                          .slice(0, compact ? 4 : 8)
+                          .map((topic) => (
+                            <span
+                              key={topic}
+                              title={topic}
+                              className="retro-badge max-w-full truncate text-[10px] sm:text-xs"
+                            >
+                              {topic}
+                            </span>
+                          ))}
+                        {(repo.topics ?? []).length > (compact ? 4 : 8) ? (
+                          <span className="retro-badge text-[10px] sm:text-xs">
+                            +{(repo.topics ?? []).length - (compact ? 4 : 8)}
                           </span>
-                        ))}
-                      {(repo.topics ?? []).length > (compact ? 4 : 8) ? (
-                        <span className="retro-badge text-[10px] sm:text-xs">
-                          +{(repo.topics ?? []).length - (compact ? 4 : 8)}
+                        ) : null}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-[10px] font-black uppercase sm:grid-cols-4">
+                        <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
+                          <span className="block truncate">
+                            {isFrench ? "Langage" : "Language"}
+                          </span>
+                          <span className="block truncate text-[11px]">
+                            {repo.language ?? (isFrench ? "Mixte" : "Mixed")}
+                          </span>
                         </span>
-                      ) : null}
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-[10px] font-black uppercase sm:grid-cols-4">
-                      <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
-                        <span className="block truncate">Langage</span>
-                        <span className="block truncate text-[11px]">
-                          {repo.language ?? "Mixte"}
+                        <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
+                          <span className="block truncate">
+                            {isFrench ? "Étoiles" : "Stars"}
+                          </span>
+                          <span className="block truncate text-[11px]">
+                            {repo.stargazers_count ?? "N/D"}
+                          </span>
                         </span>
-                      </span>
-                      <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
-                        <span className="block truncate">Étoiles</span>
-                        <span className="block truncate text-[11px]">
-                          {repo.stargazers_count ?? "N/D"}
+                        <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
+                          <span className="block truncate">Forks</span>
+                          <span className="block truncate text-[11px]">
+                            {repo.forks_count ?? "N/D"}
+                          </span>
                         </span>
-                      </span>
-                      <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
-                        <span className="block truncate">Forks</span>
-                        <span className="block truncate text-[11px]">
-                          {repo.forks_count ?? "N/D"}
+                        <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
+                          <span className="block truncate">
+                            {isFrench ? "Suivis" : "Watchers"}
+                          </span>
+                          <span className="block truncate text-[11px]">
+                            {repo.watchers_count ?? "N/D"}
+                          </span>
                         </span>
-                      </span>
-                      <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
-                        <span className="block truncate">Suivis</span>
-                        <span className="block truncate text-[11px]">
-                          {repo.watchers_count ?? "N/D"}
-                        </span>
-                      </span>
-                    </div>
-                    {repo.homepage ? (
-                      <div className="grid grid-cols-1 gap-2">
+                      </div>
+                      {repo.homepage ? (
+                        <div className="grid grid-cols-1 gap-2">
+                          <Button
+                            asChild
+                            className="w-full justify-center border-4 border-black shadow-retro-sm uppercase"
+                          >
+                            <Link
+                              href={repo.html_url}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              {copy.viewRepo}
+                            </Link>
+                          </Button>
+                          <Button
+                            asChild
+                            variant="secondary"
+                            className="w-full justify-center border-4 border-black shadow-retro-sm uppercase"
+                          >
+                            <Link
+                              href={repo.homepage}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              {isFrench ? "Consulter le site" : "Visit website"}
+                            </Link>
+                          </Button>
+                        </div>
+                      ) : (
                         <Button
                           asChild
                           className="w-full justify-center border-4 border-black shadow-retro-sm uppercase"
@@ -313,48 +372,22 @@ export function ProjectsGrid({
                             target="_blank"
                             rel="noreferrer noopener"
                           >
-                            Voir le dépôt
+                            {copy.viewRepo}
                           </Link>
                         </Button>
-                        <Button
-                          asChild
-                          variant="secondary"
-                          className="w-full justify-center border-4 border-black shadow-retro-sm uppercase"
-                        >
-                          <Link
-                            href={repo.homepage}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                          >
-                            Consulter le site
-                          </Link>
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button
-                        asChild
-                        className="w-full justify-center border-4 border-black shadow-retro-sm uppercase"
-                      >
-                        <Link
-                          href={repo.html_url}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                        >
-                          Voir le dépôt
-                        </Link>
-                      </Button>
-                    )}
-                  </Card.Content>
-                </Card>
-              </motion.div>
-            ))}
+                      )}
+                    </Card.Content>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </AnimatePresence>
       ) : null}
 
       {!isLoading && !isFetching && visible.length === 0 ? (
         <div className="border-4 border-black bg-muted p-6 text-center font-black uppercase shadow-retro">
-          Aucun projet trouvé pour cette recherche ou ce filtre.
+          {copy.emptyState}
         </div>
       ) : null}
 
@@ -366,7 +399,7 @@ export function ProjectsGrid({
             disabled={currentPage <= 1}
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
           >
-            Précédent
+            {isFrench ? "Précédent" : "Previous"}
           </Button>
 
           <span className="min-w-28 border-2 border-black bg-muted px-3 py-2 text-center text-xs font-black uppercase">
@@ -381,7 +414,7 @@ export function ProjectsGrid({
               setCurrentPage((prev) => Math.min(totalPages, prev + 1))
             }
           >
-            Suivant
+            {isFrench ? "Suivant" : "Next"}
           </Button>
         </div>
       ) : null}

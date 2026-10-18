@@ -8,16 +8,67 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}`,
       changeFrequency: "weekly",
       priority: 1.0,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}`,
+          en: `${siteUrl}/en`,
+        },
+      },
+    },
+    {
+      url: `${siteUrl}/en`,
+      changeFrequency: "weekly",
+      priority: 0.9,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}`,
+          en: `${siteUrl}/en`,
+        },
+      },
     },
     {
       url: `${siteUrl}/about`,
       changeFrequency: "monthly",
       priority: 0.8,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}/about`,
+          en: `${siteUrl}/en/about`,
+        },
+      },
+    },
+    {
+      url: `${siteUrl}/en/about`,
+      changeFrequency: "monthly",
+      priority: 0.8,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}/about`,
+          en: `${siteUrl}/en/about`,
+        },
+      },
     },
     {
       url: `${siteUrl}/project`,
       changeFrequency: "weekly",
       priority: 0.9,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}/project`,
+          en: `${siteUrl}/en/project`,
+        },
+      },
+    },
+    {
+      url: `${siteUrl}/en/project`,
+      changeFrequency: "weekly",
+      priority: 0.9,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}/project`,
+          en: `${siteUrl}/en/project`,
+        },
+      },
     },
     {
       url: `${siteUrl}/blog`,
@@ -45,6 +96,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}/privacy-policy`,
       changeFrequency: "yearly",
       priority: 0.3,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}/privacy-policy`,
+          en: `${siteUrl}/en/privacy-policy`,
+        },
+      },
+    },
+    {
+      url: `${siteUrl}/en/privacy-policy`,
+      changeFrequency: "yearly",
+      priority: 0.3,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}/privacy-policy`,
+          en: `${siteUrl}/en/privacy-policy`,
+        },
+      },
     },
   ];
 

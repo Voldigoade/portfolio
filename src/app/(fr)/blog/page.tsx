@@ -6,28 +6,29 @@ import { siteName, siteUrl } from "@/lib/site-config";
 const blogOgImageUrl = `${siteUrl}/blog/opengraph-image`;
 
 export const metadata: Metadata = {
-  title: "Blog & Publications",
+  title: "Blog",
   description:
-    "Articles techniques, retours d'expérience, notes de recherche sur les systèmes et la sécurité par Voldigoade.",
+    "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et l'outillage par Voldigoade.",
   alternates: {
     canonical: "/blog",
     languages: {
       fr: "/blog",
       en: "/en/blog",
+      "x-default": "/blog",
     },
   },
   keywords: [
     "Voldigoade blog",
     "articles techniques",
     "recherche sécurité",
-    "ingénierie systèmes",
-    "articles Rust",
-    "notes Linux",
+    "systèmes",
+    "Rust",
+    "Linux",
   ],
   openGraph: {
-    title: "Blog & Publications | Voldigoade",
+    title: "Blog | Voldigoade",
     description:
-      "Articles, notes de recherche et retours d'expérience sur les systèmes, la sécurité et la confidentialité.",
+      "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et l'outillage.",
     url: `${siteUrl}/blog`,
     type: "website",
     locale: "fr_FR",
@@ -42,9 +43,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Blog & Publications | Voldigoade",
+    title: "Blog | Voldigoade",
     description:
-      "Articles, notes de recherche et retours d'expérience sur les systèmes, la sécurité et la confidentialité.",
+      "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et l'outillage.",
     images: [blogOgImageUrl],
   },
 };
@@ -67,11 +68,11 @@ export default async function BlogPage() {
   const blogJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Blog & Publications",
+    name: "Blog",
     url: `${siteUrl}/blog`,
     inLanguage: "fr",
     description:
-      "Articles techniques, notes de recherche et retours d'expérience d'ingénierie logicielle.",
+      "Notes techniques, write-ups et retours d'expérience par Voldigoade.",
     mainEntity: {
       "@type": "ItemList",
       itemListElement: posts.map((post, index) => ({
@@ -133,11 +134,11 @@ export default async function BlogPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-pixel text-3xl uppercase sm:text-4xl md:text-5xl">
-              Blog & Publications
+              Blog
             </h1>
             <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-muted-foreground sm:text-base">
-              Articles techniques originaux, retours d'expérience
-              d'architecture, notes de recherche et journaux de développement.
+              Notes techniques, write-ups et retours d'expérience sur les
+              systèmes, la sécurité et l'outillage.
             </p>
           </div>
         </div>

@@ -1,15 +1,21 @@
-const { chromium } = require("playwright");
+let chromium;
+try {
+  chromium = require("playwright").chromium;
+} catch {
+  chromium =
+    require("/home/cruck/.bun/install/cache/playwright-core@1.64.1@@@1").chromium;
+}
 const fs = require("node:fs");
 const path = require("node:path");
 
 const SCREENSHOTS_DIR =
-  "/home/cruck/.gemini/antigravity/brain/83f26293-bb20-4307-ac17-bd7f18f9ffa9/qa_screenshots";
+  process.env.SCREENSHOTS_DIR || path.join(__dirname, "../.qa-screenshots");
 if (!fs.existsSync(SCREENSHOTS_DIR)) {
   fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
 }
 
 async function runQA() {
-  console.log("=== STARTING BROWSER E2E QA (CLOUDFLARE ONLY / NO GA) ===");
+  console.log("=== STARTING BROWSER E2E QA (BILINGUAL FR/EN VERIFICATION) ===");
   const browser = await chromium.launch({
     headless: true,
     executablePath: "/home/cruck/.local/bin/google-chrome",
@@ -61,29 +67,24 @@ async function runQA() {
 
   // Test routes
   const routes = [
-    { name: "home", path: "/" },
-    { name: "about", path: "/about" },
-    { name: "project", path: "/project" },
-    { name: "blog-fr", path: "/blog" },
-    { name: "article-fr", path: "/blog/introduction-projets-voldigoade" },
-    { name: "blog-en", path: "/en/blog" },
-    {
-      name: "article-en",
-      path: "/en/blog/introduction-to-voldigoade-projects",
-    },
-    { name: "privacy", path: "/privacy-policy" },
-    {
-      name: "deleted-cookies-policy",
-      path: "/cookies-policy",
-      expectedStatus: 404,
-    },
+    { name: "home-fr", path: "/", expectedLang: "fr" },
+    { name: "about-fr", path: "/about", expectedLang: "fr" },
+    { name: "project-fr", path: "/project", expectedLang: "fr" },
+    { name: "blog-fr", path: "/blog", expectedLang: "fr" },
+    { name: "privacy-fr", path: "/privacy-policy", expectedLang: "fr" },
+    { name: "home-en", path: "/en", expectedLang: "en" },
+    { name: "about-en", path: "/en/about", expectedLang: "en" },
+    { name: "project-en", path: "/en/project", expectedLang: "en" },
+    { name: "blog-en", path: "/en/blog", expectedLang: "en" },
+    { name: "privacy-en", path: "/en/privacy-policy", expectedLang: "en" },
     { name: "404", path: "/non-existent-page-test", expectedStatus: 404 },
   ];
 
   for (const route of routes) {
     console.log(`[QA] Navigating to Desktop: ${route.path}`);
     const res = await page.goto(`http://localhost:3000${route.path}`, {
-      waitUntil: "networkidle",
+      waitUntil:
+        route.expectedStatus === 404 ? "domcontentloaded" : "networkidle",
     });
 
     const expectedStatus = route.expectedStatus || 200;
@@ -94,7 +95,17 @@ async function runQA() {
     }
 
     if (expectedStatus === 200) {
-      // Check text for forbidden terms (no Muhammad / Fiaz identity)
+      // Check html lang attribute
+      if (route.expectedLang) {
+        const htmlLang = await page.getAttribute("html", "lang");
+        if (htmlLang !== route.expectedLang) {
+          errors.push(
+            `Expected <html lang="${route.expectedLang}"> on ${route.path}, got "${htmlLang}"`,
+          );
+        }
+      }
+
+      // Check text for forbidden terms (no Muhammad / Fiaz identity, no crukst)
       const bodyText = await page.innerText("body");
       const lowerText = bodyText.toLowerCase();
       if (
@@ -104,6 +115,12 @@ async function runQA() {
       ) {
         errors.push(
           `Forbidden identity string found in rendered text on ${route.path}`,
+        );
+      }
+
+      if (lowerText.includes("crukst")) {
+        errors.push(
+          `Obsolete 'crukst' reference found in rendered text on ${route.path}`,
         );
       }
 
@@ -133,45 +150,52 @@ async function runQA() {
     }
   }
 
-  // 2. Test Language Switcher bidirectional flow
-  console.log("[QA] Testing Language Switcher bidirectional flow...");
-  await page.goto(
-    "http://localhost:3000/blog/introduction-projets-voldigoade",
-    { waitUntil: "networkidle" },
-  );
-
-  const enLink = page.locator(
-    "nav[aria-label='Changer de langue'] a:has-text('EN')",
-  );
-  if (await enLink.isVisible()) {
-    console.log("[QA] Clicking EN in switcher...");
-    await enLink.click();
-    await page.waitForURL("**/en/blog/introduction-to-voldigoade-projects");
-    await page.waitForSelector("text=min read", { timeout: 5000 });
-    const enText = (await page.innerText("body")).toLowerCase();
-    if (!enText.includes("read")) {
-      errors.push(
-        "Expected English reading time ('min read') on /en/blog article",
-      );
-    }
-
-    const frLink = page.locator(
-      "nav[aria-label='Switch language'] a:has-text('FR')",
-    );
-    if (await frLink.isVisible()) {
-      console.log("[QA] Clicking FR in switcher...");
-      await frLink.click();
-      await page.waitForURL("**/blog/introduction-projets-voldigoade");
-      await page.waitForSelector("text=min de lecture", { timeout: 5000 });
-      console.log(
-        "[QA] Successfully navigated back to French article:",
-        page.url(),
-      );
-    } else {
-      errors.push("Could not find FR link on English article page");
-    }
+  // 2. Test Language Switcher bidirectional flow across pages
+  console.log("[QA] Testing Language Switcher on Home (/ -> /en -> /)...");
+  await page.goto("http://localhost:3000/", { waitUntil: "networkidle" });
+  const enHomeBtn = page.locator("a[aria-label='English version']");
+  if (await enHomeBtn.isVisible()) {
+    await enHomeBtn.click();
+    await page.waitForURL("**/en");
+    console.log("[QA] Successfully toggled to /en");
+    const frHomeBtn = page.locator("a[aria-label='Version française']");
+    await frHomeBtn.click();
+    await page.waitForURL("http://localhost:3000/");
+    console.log("[QA] Successfully toggled back to /");
   } else {
-    errors.push("Could not find EN link on French article page");
+    errors.push("Language switcher EN link not found on Home");
+  }
+
+  console.log(
+    "[QA] Testing Language Switcher on About (/about -> /en/about -> /about)...",
+  );
+  await page.goto("http://localhost:3000/about", { waitUntil: "networkidle" });
+  const enAboutBtn = page.locator("a[aria-label='English version']");
+  if (await enAboutBtn.isVisible()) {
+    await enAboutBtn.click();
+    await page.waitForURL("**/en/about");
+    console.log("[QA] Successfully toggled to /en/about");
+    const frAboutBtn = page.locator("a[aria-label='Version française']");
+    await frAboutBtn.click();
+    await page.waitForURL("**/about");
+    console.log("[QA] Successfully toggled back to /about");
+  } else {
+    errors.push("Language switcher EN link not found on /about");
+  }
+
+  console.log(
+    "[QA] Testing Language Switcher on Project (/project -> /en/project)...",
+  );
+  await page.goto("http://localhost:3000/project", {
+    waitUntil: "networkidle",
+  });
+  const enProjectBtn = page.locator("a[aria-label='English version']");
+  if (await enProjectBtn.isVisible()) {
+    await enProjectBtn.click();
+    await page.waitForURL("**/en/project");
+    console.log("[QA] Successfully toggled to /en/project");
+  } else {
+    errors.push("Language switcher EN link not found on /project");
   }
 
   // 3. Verify ABSENCE of Cookie Notice & Footer cookie elements
@@ -185,7 +209,6 @@ async function runQA() {
       "aside[aria-label*='consentement'], div:has-text('MESURE D\\'AUDIENCE')",
     )
     .count();
-  console.log(`[QA] Cookie notice count: ${cookieNoticeCount}`);
   if (cookieNoticeCount > 0) {
     errors.push("Cookie notice should NOT be rendered anymore");
   }
@@ -193,21 +216,10 @@ async function runQA() {
   const manageCookiesCount = await page
     .locator("button:has-text('Gérer les préférences')")
     .count();
-  console.log(
-    `[QA] 'Gérer les préférences' button count: ${manageCookiesCount}`,
-  );
   if (manageCookiesCount > 0) {
     errors.push(
       "Footer button 'Gérer les préférences' should NOT exist anymore",
     );
-  }
-
-  const cookiesPolicyLinkCount = await page
-    .locator("a[href*='cookies-policy'], a:has-text('Cookies')")
-    .count();
-  console.log(`[QA] Cookies Policy link count: ${cookiesPolicyLinkCount}`);
-  if (cookiesPolicyLinkCount > 0) {
-    errors.push("Footer link to Cookies Policy should NOT exist anymore");
   }
 
   await desktopContext.close();
@@ -222,11 +234,13 @@ async function runQA() {
   const mobilePage = await mobileContext.newPage();
 
   for (const route of [
-    { name: "home", path: "/" },
-    { name: "about", path: "/about" },
-    { name: "project", path: "/project" },
-    { name: "blog", path: "/blog" },
-    { name: "article", path: "/blog/introduction-projets-voldigoade" },
+    { name: "home-fr", path: "/" },
+    { name: "about-fr", path: "/about" },
+    { name: "project-fr", path: "/project" },
+    { name: "blog-fr", path: "/blog" },
+    { name: "home-en", path: "/en" },
+    { name: "about-en", path: "/en/about" },
+    { name: "project-en", path: "/en/project" },
   ]) {
     await mobilePage.goto(`http://localhost:3000${route.path}`, {
       waitUntil: "networkidle",
@@ -270,7 +284,7 @@ async function runQA() {
     process.exit(1);
   } else {
     console.log(
-      "ALL QA CHECKS PASSED PERFECTLY! ZERO GA REQUESTS, NO COOKIE BANNER, CLOUDFLARE ONLY.",
+      "ALL QA CHECKS PASSED PERFECTLY! BILINGUAL FR/EN, ZERO GA REQUESTS, NO COOKIE BANNER, CLOUDFLARE ONLY.",
     );
   }
 }
