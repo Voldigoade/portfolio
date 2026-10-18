@@ -9,36 +9,41 @@ import { githubUrl, ogImageUrl, siteName, siteUrl } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Voldigoade | Systèmes, Logiciels, Sécurité & Confidentialité",
+    absolute: "Voldigoade | Systems, Software, Security & Privacy",
   },
   description:
-    "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et les outils développeur par Voldigoade.",
+    "Open-source software projects and documented technical research on systems, security, privacy and developer tooling by Voldigoade.",
   alternates: {
-    canonical: "/",
+    canonical: "/en",
+    languages: {
+      fr: "/",
+      en: "/en",
+      "x-default": "/",
+    },
   },
   keywords: [
     "Voldigoade",
     "voldigoade.xyz",
-    "développeur systèmes",
+    "systems developer",
     "Rust",
     "Linux",
-    "recherche sécurité",
-    "confidentialité numérique",
+    "security research",
+    "digital privacy",
     "open source",
   ],
   openGraph: {
-    title: "Voldigoade | Systèmes, Logiciels, Sécurité & Confidentialité",
+    title: "Voldigoade | Systems, Software, Security & Privacy",
     description:
-      "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et les outils développeur.",
-    url: siteUrl,
+      "Open-source software projects and documented technical research on systems, security, privacy and developer tooling.",
+    url: `${siteUrl}/en`,
     type: "website",
-    locale: "fr_FR",
+    locale: "en_US",
     images: [
       {
         url: ogImageUrl,
         width: 1200,
         height: 630,
-        alt: "Voldigoade Portfolio Accueil",
+        alt: "Voldigoade Portfolio Home",
       },
     ],
   },
@@ -46,7 +51,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Voldigoade",
     description:
-      "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et les outils développeur.",
+      "Open-source software projects and documented technical research on systems, security, privacy and developer tooling.",
     images: [ogImageUrl],
   },
 };
@@ -63,11 +68,11 @@ async function safeFetch<T>(fallback: T, fn: () => Promise<T>): Promise<T> {
   }
 }
 
-export default async function HomePage() {
+export default async function EnglishHomePage() {
   const [initialRepos, initialPosts, initialGitHubOverview] = await Promise.all(
     [
-      safeFetch([], () => getGithubRepos()),
-      safeFetch([], () => getBlogPosts("fr")),
+      safeFetch([], () => getGithubRepos("en")),
+      safeFetch([], () => getBlogPosts("en")),
       safeFetch(null, () => getGithubOverview()),
     ],
   );
@@ -75,11 +80,11 @@ export default async function HomePage() {
   const homepageJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Portfolio Voldigoade",
-    url: siteUrl,
-    inLanguage: "fr",
+    name: "Voldigoade Portfolio",
+    url: `${siteUrl}/en`,
+    inLanguage: "en",
     description:
-      "Portfolio de logiciels, systèmes, sécurité et confidentialité de Voldigoade.",
+      "Software, systems, security and privacy portfolio by Voldigoade.",
     mainEntity: {
       "@type": "Person",
       name: siteName,
@@ -92,9 +97,9 @@ export default async function HomePage() {
     ? {
         "@context": "https://schema.org",
         "@type": "Dataset",
-        name: "Statistiques GitHub Voldigoade",
+        name: "Voldigoade GitHub Statistics",
         description:
-          "Métriques publiques des dépôts GitHub, étoiles, forks et langages.",
+          "Public metrics for GitHub repositories, stars, forks and languages.",
         creator: {
           "@type": "Person",
           name: siteName,
@@ -114,8 +119,8 @@ export default async function HomePage() {
       {
         "@type": "ListItem",
         position: 1,
-        name: "Accueil",
-        item: siteUrl,
+        name: "Home",
+        item: `${siteUrl}/en`,
       },
     ],
   };
@@ -142,6 +147,7 @@ export default async function HomePage() {
         initialRepos={initialRepos}
         initialPosts={initialPosts}
         initialGitHubOverview={initialGitHubOverview}
+        locale="en"
       />
     </>
   );

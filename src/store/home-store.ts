@@ -3,11 +3,15 @@ import { persist } from "zustand/middleware";
 
 export type HomeFocus =
   | "Tous"
+  | "Rust & CLI"
+  | "OSINT"
+  | "Firmware"
+  | "Local-First"
+  | "All"
   | "Systèmes"
   | "Sécurité"
   | "Open Source"
   | "Outillage"
-  | "All"
   | "Systems"
   | "Security"
   | "Tooling";

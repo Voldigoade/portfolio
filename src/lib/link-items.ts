@@ -22,20 +22,14 @@ export const links: LinkItem[] = [
       "Terminal-first GitHub public-footprint inspection tool in Rust",
   },
   {
+    href: "https://github.com/Voldigoade/crucksware",
+    name: "Crucksware",
+    description: "Semantic firmware diff and triage in Rust",
+  },
+  {
     href: "https://github.com/Voldigoade/recherche-messageries",
     name: "Recherche Messageries",
     description:
-      "Source-driven comparative research into secure messaging architectures",
-  },
-  {
-    href: "https://github.com/Voldigoade/ide-research",
-    name: "IDE Research",
-    description:
-      "Comparison of developer environments, AI tooling and architectures",
-  },
-  {
-    href: "https://github.com/Voldigoade/crukst",
-    name: "Crukst",
-    description: "Experimental Rust foundation for planned firmware comparison",
+      "Source-based research comparing secure messaging architectures",
   },
 ];

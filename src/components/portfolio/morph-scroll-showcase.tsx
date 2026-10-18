@@ -1,14 +1,20 @@
 "use client";
 
 import { animate } from "animejs";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Card } from "@/components/retroui/Card";
+import { getCopy, type Locale } from "@/lib/site-copy";
 
-const words = ["Build", "Read", "Compare", "Explore", "Learn"];
+export function MorphScrollShowcase({ locale }: { locale?: Locale }) {
+  const pathname = usePathname() || "/";
+  const currentLocale: Locale =
+    pathname === "/en" || pathname.startsWith("/en/") ? "en" : locale || "fr";
 
-export function MorphScrollShowcase() {
+  const copy = getCopy(currentLocale).home.morph;
   const wordRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const revealRef = useRef<HTMLDivElement>(null);
+  const words = copy.words;
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -30,29 +36,33 @@ export function MorphScrollShowcase() {
       const current = nodes[index % nodes.length];
       const next = nodes[(index + 1) % nodes.length];
 
-      animate(current, {
-        opacity: [1, 0],
-        translateY: [0, -12],
-        duration: 320,
-        ease: "inQuad",
-      });
+      if (current && next) {
+        animate(current, {
+          opacity: [1, 0],
+          translateY: [0, -12],
+          duration: 320,
+          ease: "inQuad",
+        });
 
-      animate(next, {
-        opacity: [0, 1],
-        translateY: [12, 0],
-        duration: 360,
-        ease: "outCubic",
-      });
+        animate(next, {
+          opacity: [0, 1],
+          translateY: [12, 0],
+          duration: 360,
+          ease: "outCubic",
+        });
+      }
 
       index += 1;
     }, 1800);
 
-    animate(nodes[0], {
-      opacity: [0, 1],
-      translateY: [12, 0],
-      duration: 450,
-      ease: "outCubic",
-    });
+    if (nodes[0]) {
+      animate(nodes[0], {
+        opacity: [0, 1],
+        translateY: [12, 0],
+        duration: 450,
+        ease: "outCubic",
+      });
+    }
 
     return () => {
       window.clearInterval(interval);
@@ -107,13 +117,13 @@ export function MorphScrollShowcase() {
   return (
     <section className="space-y-4" ref={revealRef} data-anim="item">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        Questions Into Projects
+        {copy.title}
       </h2>
       <Card className="border-4 border-black bg-card shadow-retro-md">
         <Card.Content className="space-y-4">
           <p className="font-display text-2xl uppercase sm:text-3xl">
-            I Work to
-            <span className="relative ml-3 inline-flex h-9 min-w-36 align-middle sm:h-10 sm:min-w-40">
+            {copy.prefix}
+            <span className="relative ml-3 inline-flex h-9 min-w-44 align-middle sm:h-10 sm:min-w-48">
               {words.map((word, idx) => (
                 <span
                   key={word}
@@ -128,14 +138,10 @@ export function MorphScrollShowcase() {
             </span>
           </p>
           <p data-reveal className="font-medium leading-relaxed">
-            I&apos;m exploring systems and privacy through Rust tools and
-            source-linked research. Public repositories show the questions,
-            implementation choices, and limits of each project.
+            {copy.p1}
           </p>
           <p data-reveal className="font-medium leading-relaxed">
-            Browse a project, follow its evidence, or share a question.
-            Experimental ideas and planned features are identified in the
-            repository documentation.
+            {copy.p2}
           </p>
         </Card.Content>
       </Card>

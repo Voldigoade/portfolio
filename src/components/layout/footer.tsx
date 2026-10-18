@@ -2,6 +2,7 @@
 
 import { animate } from "animejs";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Github, Link2 } from "@/components/retroui/icons";
 import {
@@ -9,10 +10,20 @@ import {
   PORTFOLIO_REPO_URL,
 } from "@/lib/portfolio-version";
 import { githubUrl } from "@/lib/site-config";
+import { getCopy, type Locale } from "@/lib/site-copy";
 
-export function Footer() {
+export function Footer({ locale }: { locale?: Locale }) {
+  const pathname = usePathname() || "/";
   const footerRef = useRef<HTMLElement>(null);
   const currentYear = new Date().getFullYear();
+
+  const currentLocale: Locale =
+    pathname === "/en" || pathname.startsWith("/en/") ? "en" : locale || "fr";
+
+  const copy = getCopy(currentLocale);
+
+  const projectsHref = currentLocale === "en" ? "/en/project" : "/project";
+  const blogHref = currentLocale === "en" ? "/en/blog" : "/blog";
 
   useEffect(() => {
     const root = footerRef.current;
@@ -64,7 +75,7 @@ export function Footer() {
               rel="noreferrer noopener"
               className="inline-flex items-center justify-center border-4 border-black bg-primary px-3 py-1.5 text-xs font-black uppercase text-primary-foreground shadow-retro-sm transition hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
             >
-              Source v{CURRENT_PORTFOLIO_VERSION}
+              {copy.footer.source} v{CURRENT_PORTFOLIO_VERSION}
             </Link>
           </div>
 
@@ -72,7 +83,7 @@ export function Footer() {
             className="inline-flex border-4 border-black bg-[#111827] px-3 py-2 text-xs font-black uppercase text-white shadow-retro-sm sm:text-sm"
             data-footer-policy
           >
-            Copyright {currentYear} Voldigoade
+            Copyright {currentYear} {copy.footer.copyright}
           </p>
         </div>
 
@@ -83,23 +94,23 @@ export function Footer() {
               className="retro-social-icon"
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="Profil GitHub de Voldigoade"
+              aria-label={copy.footer.githubAria}
               data-footer-social
             >
               <Github className="h-4 w-4" />
             </Link>
             <Link
-              href="/project"
+              href={projectsHref}
               className="retro-social-icon"
-              aria-label="Explorer les projets"
+              aria-label={copy.footer.projectsAria}
               data-footer-social
             >
               <Link2 className="h-4 w-4" />
             </Link>
             <Link
-              href="/blog"
+              href={blogHref}
               className="retro-social-icon"
-              aria-label="Lire les articles et notes de recherche"
+              aria-label={copy.footer.blogAria}
               data-footer-social
             >
               <Link2 className="h-4 w-4" />
@@ -107,22 +118,16 @@ export function Footer() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-end text-xs font-bold uppercase">
-            <Link href="/robots.txt" className="retro-link" data-footer-policy>
-              Robots
-            </Link>
-            <Link href="/sitemap.xml" className="retro-link" data-footer-policy>
-              Plan du site
-            </Link>
-            <Link href="/rss.xml" className="retro-link" data-footer-policy>
-              RSS
-            </Link>
-            <Link
-              href="/privacy-policy"
-              className="retro-link"
-              data-footer-policy
-            >
-              Confidentialité
-            </Link>
+            {copy.footer.links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="retro-link"
+                data-footer-policy
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

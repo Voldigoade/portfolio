@@ -1,78 +1,107 @@
 "use client";
 
 import { animate } from "animejs";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
 import {
   AnimatedSpan,
   Terminal,
   TypingAnimation,
 } from "@/components/retroui/terminal";
+import { getCopy, type Locale } from "@/lib/site-copy";
 
-const stepLines = [
+const spoorLines = [
   {
     kind: "type",
-    text: "$ spoor inspect Voldigoade --format json",
+    text: "$ spoor repo Voldigoade/spoor",
     className: "text-[#ff8d3b]",
   },
   {
     kind: "line",
-    text: "[+] Scanning public repositories for Voldigoade...",
+    text: "[init] Voldigoade/spoor in fast",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "[+] Resolving public commit signatures and SSH keys...",
+    text: "[resolve] target type: repository",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: '{"observed": {"repos": 4, "keys": "ed25519"}, "inferences": []}',
-    className: "text-[#64cbff]",
-  },
-  {
-    kind: "type",
-    text: "$ spoor diff --target Voldigoade/spoor",
-    className: "text-[#ff8d3b]",
-  },
-  {
-    kind: "line",
-    text: "[+] Checking audit trail and boundary constraints...",
+    text: "[query] GitHub REST: Fetching repository 'Voldigoade/spoor'",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "[✓] Boundary audit complete: 0 leaks, 0 private exposures.",
-    className: "text-[#84ff6f]",
-  },
-  {
-    kind: "line",
-    text: "# Les limites d'analyse et la fraîcheur du cache conditionnent les résultats.",
-    className: "text-[#ffc96b]",
-  },
-  {
-    kind: "line",
-    text: "$ spoor export report.json --format pdf -o report.pdf",
+    text: "[ok] GitHub REST: Repository metadata retrieved for 'Voldigoade/spoor'",
     className: "text-[#64cbff]",
   },
   {
     kind: "line",
-    text: "# Les identités publiques ne présument pas de la propriété durable.",
+    text: "[scan] [1/1] Inspecting recent commits in Voldigoade/spoor",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "# Cette animation est une illustration pédagogique sans exécution réelle.",
+    text: "[done] completed in 1.05s",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "------------------------------------------------------------",
+    className: "text-[#64cbff]",
+  },
+  {
+    kind: "line",
+    text: "Target: Voldigoade/spoor (Rust CLI / inspection)",
     className: "text-[#ffc96b]",
+  },
+  {
+    kind: "line",
+    text: "Visibility: public | Default branch: main",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "Commit signers observed:",
+    className: "text-[#64cbff]",
+  },
+  {
+    kind: "line",
+    text: "  - 245930475+Voldigoade@users.noreply.github.com",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "  - noreply@github.com (GitHub Web Flow)",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "  - dependabot[bot]@users.noreply.github.com",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "Status: clean | Cache: SQLite local | 0 leaks detected",
+    className: "text-[#64cbff]",
   },
 ];
 
 type LogEntry = {
   id: number;
-  item: (typeof stepLines)[number];
+  item: (typeof spoorLines)[number];
 };
 
-export function RetroTerminalSection() {
+export function RetroTerminalSection({ locale }: { locale?: Locale }) {
+  const pathname = usePathname() || "/";
+  const currentLocale: Locale =
+    pathname === "/en" || pathname.startsWith("/en/") ? "en" : locale || "fr";
+
+  const copy = getCopy(currentLocale).home.terminal;
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -80,12 +109,12 @@ export function RetroTerminalSection() {
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
-      if (index >= stepLines.length) {
+      if (index >= spoorLines.length) {
         clearInterval(interval);
         return;
       }
 
-      const item = stepLines[index];
+      const item = spoorLines[index];
       if (!item) {
         clearInterval(interval);
         return;
@@ -93,7 +122,7 @@ export function RetroTerminalSection() {
 
       setEntries((prev) => [...prev, { id: index, item }]);
       index += 1;
-    }, 450);
+    }, 380);
 
     return () => clearInterval(interval);
   }, []);
@@ -130,32 +159,35 @@ export function RetroTerminalSection() {
   return (
     <section ref={sectionRef} className="space-y-4" data-anim="item">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        Console d&apos;outillage Terminal
+        {copy.title}
       </h2>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card className="border-4 border-black bg-card shadow-retro-md">
           <Card.Header>
             <Card.Title className="font-display text-2xl uppercase">
-              Aperçu de Spoor
+              {copy.cardTitle}
             </Card.Title>
           </Card.Header>
           <Card.Content className="space-y-3">
-            <p className="font-medium leading-relaxed">
-              Spoor est un outil en Rust conçu pour auditer les profils publics
-              GitHub, dépôts, identités de commit et clés publiques depuis un
-              terminal ou un service HTTP.
-            </p>
-            <p className="font-medium leading-relaxed">
-              Le terminal ci-contre illustre les commandes documentées dans le
-              README public. Il s&apos;agit d&apos;une simulation d&apos;usage
-              sans exécution distante de code.
-            </p>
-            <p className="font-medium leading-relaxed">
-              Consultez la documentation du dépôt avant utilisation. Les
-              résultats dépendent des quotas d&apos;API, du cache local et de la
-              disponibilité des données en ligne.
-            </p>
+            <p className="font-medium leading-relaxed">{copy.p1}</p>
+            <p className="font-medium leading-relaxed">{copy.p2}</p>
+            <p className="font-medium leading-relaxed">{copy.p3}</p>
+            <div className="pt-2">
+              <Button
+                asChild
+                variant="secondary"
+                className="border-4 border-black font-black uppercase shadow-retro-sm"
+              >
+                <Link
+                  href="https://github.com/Voldigoade/spoor"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {copy.docLink}
+                </Link>
+              </Button>
+            </div>
           </Card.Content>
         </Card>
 
@@ -179,60 +211,28 @@ export function RetroTerminalSection() {
       </div>
 
       <h3 className="font-display text-2xl uppercase sm:text-3xl">
-        Interprétation des résultats
+        {copy.resultsTitle}
       </h3>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <Card
-          className="flex h-full flex-col border-4 border-black bg-card shadow-retro-md"
-          data-support-card
-        >
-          <Card.Header>
-            <Card.Title className="font-display text-xl uppercase">
-              Données Observées
-            </Card.Title>
-          </Card.Header>
-          <Card.Content className="flex-1">
-            <p className="font-medium leading-relaxed">
-              Les métadonnées publiques constituent des faits vérifiables dotés
-              d&apos;une source et d&apos;une date précise. Une adresse dans un
-              ancien commit peut être historique.
-            </p>
-          </Card.Content>
-        </Card>
-        <Card
-          className="flex h-full flex-col border-4 border-black bg-card shadow-retro-md"
-          data-support-card
-        >
-          <Card.Header>
-            <Card.Title className="font-display text-xl uppercase">
-              Valeurs Dérivées
-            </Card.Title>
-          </Card.Header>
-          <Card.Content className="flex-1">
-            <p className="font-medium leading-relaxed">
-              Les métriques agrégées et résumés calculés dépendent strictement
-              des bornes d&apos;analyse et de la fraîcheur du cache de requêtes.
-            </p>
-          </Card.Content>
-        </Card>
-        <Card
-          className="flex h-full flex-col border-4 border-black bg-card shadow-retro-md sm:col-span-2 xl:col-span-1"
-          data-support-card
-        >
-          <Card.Header>
-            <Card.Title className="font-display text-xl uppercase">
-              Inférences Prudentes
-            </Card.Title>
-          </Card.Header>
-          <Card.Content className="flex-1">
-            <p className="font-medium leading-relaxed">
-              Les hypothèses et corrélations d&apos;outillage ne valent jamais
-              preuve formelle. Elles doivent être corroborées par des éléments
-              tiers.
-            </p>
-          </Card.Content>
-        </Card>
+        {copy.cards.map((c, i) => (
+          <Card
+            key={c.title}
+            className={`flex h-full flex-col border-4 border-black bg-card shadow-retro-md ${
+              i === 2 ? "sm:col-span-2 xl:col-span-1" : ""
+            }`}
+            data-support-card
+          >
+            <Card.Header>
+              <Card.Title className="font-display text-xl uppercase">
+                {c.title}
+              </Card.Title>
+            </Card.Header>
+            <Card.Content className="flex-1">
+              <p className="font-medium leading-relaxed">{c.text}</p>
+            </Card.Content>
+          </Card>
+        ))}
       </div>
     </section>
   );

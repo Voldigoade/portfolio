@@ -1,52 +1,24 @@
 "use client";
 
 import { animate } from "animejs";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { MatrixBinaryText } from "@/components/portfolio/matrix-binary-text";
 import { TypingRevealText } from "@/components/portfolio/typing-reveal-text";
 import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
+import { getCopy, type Locale } from "@/lib/site-copy";
 import { useShowcaseStore } from "@/store/showcase-store";
 
 const snippetOrder = ["next", "query", "store"] as const;
 
-const stackItems = [
-  {
-    title: "Inspect",
-    body: "Spoor reports public GitHub metadata and records source references and inference limits.",
-  },
-  {
-    title: "Compare",
-    body: "The research sites compare messaging systems and development environments using linked sources.",
-  },
-  {
-    title: "Explore",
-    body: "Crukst is an experimental Rust foundation; firmware comparison remains planned.",
-  },
-];
+export function RetroCodeShowcase({ locale }: { locale?: Locale }) {
+  const pathname = usePathname() || "/";
+  const currentLocale: Locale =
+    pathname === "/en" || pathname.startsWith("/en/") ? "en" : locale || "fr";
 
-const snippets = {
-  next: `// Spoor: public GitHub inspection\nRust command-line tool + HTTP service\nProfiles, repositories, commit identities, keys\nObserved data, derived values, and inferences`,
-  query: `// Source-linked research\nMessaging systems + developer environments\nThreat models, metadata, workflows, licensing\nConditional comparisons with explicit limits`,
-  store: `// This portfolio\nNext.js + React + TypeScript\nPublic projects and first-party writing\nRetro components with light and dark themes`,
-} as const;
+  const matrixCopy = getCopy(currentLocale).home.matrix;
 
-const flipCards = [
-  {
-    front: "Integrity",
-    back: "Keep sources visible and distinguish evidence from assumptions.",
-  },
-  {
-    front: "Security",
-    back: "Ask what a tool exposes and which threats it can actually address.",
-  },
-  {
-    front: "Efficiency",
-    back: "Prefer a focused scope and state unfinished behavior clearly.",
-  },
-] as const;
-
-export function RetroCodeShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
   const codeRef = useRef<HTMLDivElement>(null);
   const activeStack = useShowcaseStore((state) => state.activeStack);
@@ -55,6 +27,10 @@ export function RetroCodeShowcase() {
   const setActiveSnippet = useShowcaseStore((state) => state.setActiveSnippet);
   const flippedCard = useShowcaseStore((state) => state.flippedCard);
   const setFlippedCard = useShowcaseStore((state) => state.setFlippedCard);
+
+  const stackItems = matrixCopy.stack;
+  const flipCards = matrixCopy.flipCards;
+  const snippets = matrixCopy.snippets;
 
   const orderedStack = [0, 1, 2].map(
     (offset) => stackItems[(activeStack + offset) % stackItems.length],
@@ -80,7 +56,7 @@ export function RetroCodeShowcase() {
     return () => {
       window.clearInterval(interval);
     };
-  }, [setActiveStack]);
+  }, [setActiveStack, stackItems.length]);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -118,7 +94,7 @@ export function RetroCodeShowcase() {
     return () => {
       window.clearInterval(interval);
     };
-  }, [flippedCard, setFlippedCard]);
+  }, [flippedCard, setFlippedCard, flipCards.length]);
 
   useEffect(() => {
     const root = sectionRef.current;
@@ -219,11 +195,11 @@ export function RetroCodeShowcase() {
   return (
     <section className="space-y-4" ref={sectionRef} data-anim="item">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        <MatrixBinaryText text="Project & Technology Matrix" />
+        <MatrixBinaryText text={matrixCopy.title} />
       </h2>
 
       <p className="font-pixel text-sm uppercase text-muted-foreground">
-        <TypingRevealText text="A closer look at the tools and research linked from this portfolio." />
+        <TypingRevealText text={matrixCopy.subtitle} />
       </p>
 
       <div
@@ -236,7 +212,7 @@ export function RetroCodeShowcase() {
         >
           <Card.Header>
             <Card.Title className="font-display text-2xl uppercase">
-              Project Directions
+              {matrixCopy.directionTitle}
             </Card.Title>
           </Card.Header>
           <Card.Content className="relative h-48">
@@ -264,11 +240,10 @@ export function RetroCodeShowcase() {
         >
           <Card.Header>
             <Card.Title className="font-display text-2xl uppercase">
-              Tools & Project Context
+              {matrixCopy.contextTitle}
             </Card.Title>
             <Card.Description className="font-bold uppercase">
-              These summaries describe public repositories and this site;
-              implementation details live in their source.
+              {matrixCopy.contextSubtitle}
             </Card.Description>
           </Card.Header>
           <Card.Content className="space-y-4">
@@ -280,7 +255,7 @@ export function RetroCodeShowcase() {
                 data-snippet-tab="next"
                 aria-pressed={activeSnippet === "next"}
               >
-                Rust Tooling
+                {matrixCopy.tabRust}
               </Button>
               <Button
                 variant={activeSnippet === "query" ? "default" : "secondary"}
@@ -289,7 +264,7 @@ export function RetroCodeShowcase() {
                 data-snippet-tab="query"
                 aria-pressed={activeSnippet === "query"}
               >
-                Research
+                {matrixCopy.tabResearch}
               </Button>
               <Button
                 variant={activeSnippet === "store" ? "default" : "secondary"}
@@ -298,7 +273,7 @@ export function RetroCodeShowcase() {
                 data-snippet-tab="store"
                 aria-pressed={activeSnippet === "store"}
               >
-                Portfolio
+                {matrixCopy.tabPortfolio}
               </Button>
             </div>
 

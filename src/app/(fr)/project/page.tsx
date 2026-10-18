@@ -8,22 +8,30 @@ const projectOgImageUrl = `${siteUrl}/project/opengraph-image`;
 export const metadata: Metadata = {
   title: "Projets",
   description:
-    "Sélection de systèmes open-source, outils de sécurité et dépôts de recherche par Voldigoade.",
+    "Outils open-source, CLI en Rust et travaux de recherche publiés par Voldigoade.",
   alternates: {
     canonical: "/project",
+    languages: {
+      fr: "/project",
+      en: "/en/project",
+      "x-default": "/project",
+    },
   },
   keywords: [
     "projets github",
-    "ingénierie systèmes",
-    "recherche sécurité",
+    "rust",
+    "linux",
+    "cli",
+    "osint",
+    "sécurité",
     "spoor",
-    "dépôts open source",
-    "outillage rust",
+    "crucksware",
+    "open source",
   ],
   openGraph: {
     title: "Projets | Voldigoade",
     description:
-      "Explorer les systèmes open-source, outils d'audit d'empreinte et dépôts de recherche.",
+      "Explorer les outils open-source en Rust, l'inspection d'empreinte et les dépôts de recherche.",
     url: `${siteUrl}/project`,
     type: "website",
     locale: "fr_FR",
@@ -40,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Projets | Voldigoade",
     description:
-      "Explorer les systèmes open-source, outils d'audit d'empreinte et dépôts de recherche.",
+      "Explorer les outils open-source en Rust, l'inspection d'empreinte et les dépôts de recherche.",
     images: [projectOgImageUrl],
   },
 };
@@ -58,7 +66,7 @@ async function safeFetch<T>(fallback: T, fn: () => Promise<T>): Promise<T> {
 }
 
 export default async function ProjectPage() {
-  const repos = await safeFetch([], () => getGithubRepos());
+  const repos = await safeFetch([], () => getGithubRepos("fr"));
 
   const projectsJsonLd = {
     "@context": "https://schema.org",
@@ -67,7 +75,7 @@ export default async function ProjectPage() {
     url: `${siteUrl}/project`,
     inLanguage: "fr",
     description:
-      "Sélection de dépôts open-source et travaux d'ingénierie des systèmes.",
+      "Sélection de dépôts open source, outils CLI en Rust et travaux de recherche.",
     mainEntity: {
       "@type": "ItemList",
       itemListElement: repos.map((repo, index) => ({
@@ -131,9 +139,8 @@ export default async function ProjectPage() {
           Projets
         </h1>
         <p className="mt-3 max-w-3xl text-sm font-medium leading-relaxed sm:text-base">
-          Sélection de systèmes open-source, outils d&apos;inspection
-          d&apos;empreinte numérique et dépôts de recherche. Filtrez par tag et
-          recherchez parmi les dépôts.
+          Outils open source, CLI en Rust et travaux de recherche publiés par
+          Voldigoade. Filtrez par tag et explorez le code source directement.
         </p>
       </section>
 
@@ -142,12 +149,12 @@ export default async function ProjectPage() {
           Index des Projets
         </h2>
         <p className="text-sm font-medium leading-relaxed sm:text-base">
-          Filtrez par thématique, inspectez les étoiles et l&apos;activité
-          récente, et accédez au code source ou à la documentation en ligne.
+          Filtrez par thématique, inspectez les étoiles et accédez aux dépôts
+          GitHub correspondants.
         </p>
       </section>
 
-      <ProjectPageClient initialRepos={repos} />
+      <ProjectPageClient initialRepos={repos} locale="fr" />
     </div>
   );
 }

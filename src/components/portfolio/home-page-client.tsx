@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { BlogGrid } from "@/components/portfolio/blog-grid";
 import { GithubOverviewBento } from "@/components/portfolio/github-overview-bento";
 import { HeroFloatingBadges } from "@/components/portfolio/hero-floating-badges";
@@ -24,118 +25,58 @@ import type {
   GithubRepo,
 } from "@/lib/portfolio-types";
 import { githubUrl, linkHubUrl } from "@/lib/site-config";
-import { useHomeStore } from "@/store/home-store";
-
-const traits = [
-  {
-    title: "Systèmes & Sécurité",
-    text: "Comprendre le comportement intime des logiciels, ce qu'ils exposent, et expliciter leurs hypothèses sous-jacentes.",
-  },
-  {
-    title: "Rust & Outillage CLI",
-    text: "Concevoir des outils rapides et résilients en ligne de commande en apprenant de leur implémentation et de leurs limites.",
-  },
-  {
-    title: "Local-First & Confidentialité",
-    text: "Privilégier le contrôle local, évaluer les compromis d'exposition et minimiser la dépendance aux services tiers.",
-  },
-  {
-    title: "Ingénierie Open Source",
-    text: "Partager le code et des comparatifs sourcés pour permettre à chacun de vérifier les preuves et le périmètre d'action.",
-  },
-];
-
-const focusFilters = [
-  "Tous",
-  "Systèmes",
-  "Sécurité",
-  "Open Source",
-  "Outillage",
-] as const;
-
-type FaqItem = {
-  question: string;
-  answer: string;
-  ctaHref?: string;
-  ctaLabel?: string;
-};
-
-const faqItems: readonly FaqItem[] = [
-  {
-    question: "Sur quoi travaillez-vous ?",
-    answer:
-      "Je développe des outils d'inspection en Rust et mène des recherches comparatives sur les messageries sécurisées et les environnements de travail. Les dépôts publics présentent le périmètre et les limites réelles de chaque projet.",
-  },
-  {
-    question: "Qu'est-ce que Spoor ?",
-    answer:
-      "Spoor est un outil en ligne de commande permettant d'auditer les profils publics GitHub, les dépôts, les identités de commit et les clés de signature. Ses rapports distinguent données observées, valeurs dérivées et inférences.",
-    ctaHref: "https://github.com/Voldigoade/spoor",
-    ctaLabel: "Voir Spoor",
-  },
-  {
-    question: "Quelles technologies composent vos projets ?",
-    answer:
-      "Spoor est écrit en Rust avec cache SQLite. Les travaux de recherche exploitent Python et l'outillage web moderne. Ce portfolio utilise Next.js, React et TypeScript.",
-  },
-  {
-    question: "Vos projets sont-ils open source ?",
-    answer:
-      "Les projets présentés disposent de dépôts publics vérifiables. Consultez la licence de chaque dépôt sur GitHub : code, données et documentation font l'objet de termes explicites.",
-    ctaHref: githubUrl,
-    ctaLabel: "Profil GitHub",
-  },
-  {
-    question: "Comment poser une question technique ou contribuer ?",
-    answer:
-      "Pour toute question technique, suggestion ou signalement, ouvrez une issue ou une discussion directement sur le dépôt GitHub correspondant.",
-    ctaHref: "/project",
-    ctaLabel: "Explorer les projets",
-  },
-  {
-    question: "Publiez-vous des analyses techniques ?",
-    answer:
-      "La section Blog regroupe des articles approfondis, des retours d'expérience d'ingénierie et des notes de recherche accessibles en français et en anglais.",
-    ctaHref: "/blog",
-    ctaLabel: "Lire le blog",
-  },
-] as const;
+import { getCopy, type Locale } from "@/lib/site-copy";
+import { type HomeFocus, useHomeStore } from "@/store/home-store";
 
 type HomePageClientProps = {
   initialRepos?: GithubRepo[];
   initialPosts?: BlogPost[];
   initialGitHubOverview?: GitHubOverviewPayload | null;
+  locale?: Locale;
 };
 
 export function HomePageClient({
   initialRepos,
   initialPosts,
   initialGitHubOverview,
+  locale,
 }: HomePageClientProps) {
+  const pathname = usePathname() || "/";
+  const currentLocale: Locale =
+    pathname === "/en" || pathname.startsWith("/en/") ? "en" : locale || "fr";
+
+  const copy = getCopy(currentLocale);
+  const homeCopy = copy.home;
+  const isFrench = currentLocale === "fr";
+
   const githubOverview = initialGitHubOverview ?? null;
   const focus = useHomeStore((state) => state.focus);
   const setFocus = useHomeStore((state) => state.setFocus);
 
+  const focusFilters: readonly HomeFocus[] = isFrench
+    ? (["Tous", "Rust & CLI", "OSINT", "Firmware", "Local-First"] as const)
+    : (["All", "Rust & CLI", "OSINT", "Firmware", "Local-First"] as const);
+
   const focusItems = [
     {
-      key: "Systèmes",
-      title: "Systèmes & Infrastructure",
-      body: "Développement d'outils CLI performants en Rust, incluant Spoor et la fondation expérimentale du projet Crukst.",
+      key: isFrench ? "Rust & CLI" : "Rust & CLI",
+      title: homeCopy.quickFocus.items[0]?.title ?? "Rust & CLI",
+      body: homeCopy.quickFocus.items[0]?.text ?? "",
     },
     {
-      key: "Sécurité",
-      title: "Sécurité & Analyse de Menaces",
-      body: "Comparaison rigoureuse des messageries chiffrées selon les modèles de menaces, l'exposition des métadonnées et les limites documentées.",
+      key: isFrench ? "OSINT" : "OSINT",
+      title: homeCopy.quickFocus.items[1]?.title ?? "OSINT & Footprint",
+      body: homeCopy.quickFocus.items[1]?.text ?? "",
     },
     {
-      key: "Open Source",
-      title: "Recherche Ouverte & Vérifiable",
-      body: "Documentation publique avec références primaires, registres de preuves et critères d'évaluation transparents.",
+      key: isFrench ? "Firmware" : "Firmware",
+      title: homeCopy.quickFocus.items[2]?.title ?? "Firmware & Rootfs",
+      body: homeCopy.quickFocus.items[2]?.text ?? "",
     },
     {
-      key: "Outillage",
-      title: "Environnements Développeur",
-      body: "Étude critique des flux d'ingénierie : intégration d'agents, télémétrie, contraintes de licence et contrôle local.",
+      key: isFrench ? "Local-First" : "Local-First",
+      title: homeCopy.quickFocus.items[3]?.title ?? "Local-First & Privacy",
+      body: homeCopy.quickFocus.items[3]?.text ?? "",
     },
   ];
 
@@ -145,10 +86,14 @@ export function HomePageClient({
       : focusItems.filter(
           (item) =>
             item.key === focus ||
-            (focus === "Systems" && item.key === "Systèmes") ||
-            (focus === "Security" && item.key === "Sécurité") ||
-            (focus === "Tooling" && item.key === "Outillage"),
+            (focus === "Rust & CLI" && item.key.includes("Rust")) ||
+            (focus === "OSINT" && item.key.includes("OSINT")) ||
+            (focus === "Firmware" && item.key.includes("Firmware")) ||
+            (focus === "Local-First" && item.key.includes("Local")),
         );
+
+  const projectsHref = isFrench ? "/project" : "/en/project";
+  const blogHref = isFrench ? "/blog" : "/en/blog";
 
   return (
     <div className="space-y-12 pb-16">
@@ -158,7 +103,7 @@ export function HomePageClient({
         <div className="relative border-4 border-black bg-card shadow-retro-lg">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b-4 border-black bg-muted px-4 py-3">
             <span className="font-pixel text-xs uppercase sm:text-sm">
-              workspace://voldigoade
+              {homeCopy.hero.workspace}
             </span>
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 border-2 border-black bg-[#ff5f56]" />
@@ -171,7 +116,7 @@ export function HomePageClient({
             <div className="order-2 space-y-4 md:order-1 md:space-y-6">
               <h1 className="font-display uppercase leading-[1.1]">
                 <span className="block text-[clamp(0.95rem,6vw,2.5rem)] sm:text-[clamp(1.7rem,5.2vw,3.8rem)]">
-                  BONJOUR, JE SUIS
+                  {homeCopy.hero.greeting}
                 </span>
                 <span className="mt-1 block text-[clamp(1.05rem,8vw,3rem)] sm:text-[clamp(1.8rem,5.6vw,4.4rem)]">
                   <span className="retro-curve-underline">
@@ -180,9 +125,7 @@ export function HomePageClient({
                 </span>
               </h1>
               <p className="max-w-2xl border-l-4 border-black pl-3 text-xs font-medium leading-relaxed sm:pl-4 sm:text-sm md:text-lg">
-                Ingénierie logicielle et recherche appliquée sur les systèmes,
-                la sécurité, la confidentialité numérique et les outils pour
-                développeurs.
+                {homeCopy.hero.tagline}
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
@@ -190,7 +133,7 @@ export function HomePageClient({
                   asChild
                   className="w-full border-4 border-black px-4 py-2 text-sm font-black uppercase tracking-wide shadow-retro retro-press sm:w-auto sm:px-6 sm:py-3 sm:text-base"
                 >
-                  <Link href="/project">Voir les projets</Link>
+                  <Link href={projectsHref}>{homeCopy.hero.projectsCta}</Link>
                 </Button>
                 <Button
                   variant="secondary"
@@ -198,7 +141,7 @@ export function HomePageClient({
                   asChild
                   className="w-full border-4 border-black px-4 py-2 text-sm font-black uppercase tracking-wide shadow-retro retro-press sm:w-auto sm:px-6 sm:py-3 sm:text-base"
                 >
-                  <Link href="/blog">Voir le blog</Link>
+                  <Link href={blogHref}>{homeCopy.hero.blogCta}</Link>
                 </Button>
               </div>
             </div>
@@ -224,21 +167,21 @@ export function HomePageClient({
                   target="_blank"
                   rel="noreferrer noopener"
                   className="retro-social-icon"
-                  aria-label="Profil GitHub"
+                  aria-label="GitHub"
                 >
                   <Github className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/project"
+                  href={projectsHref}
                   className="retro-social-icon"
-                  aria-label="Explorer les projets"
+                  aria-label={copy.footer.projectsAria}
                 >
                   <Link2 className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/blog"
+                  href={blogHref}
                   className="retro-social-icon"
-                  aria-label="Lire le blog"
+                  aria-label={copy.footer.blogAria}
                 >
                   <Link2 className="h-4 w-4" />
                 </Link>
@@ -250,46 +193,55 @@ export function HomePageClient({
 
       <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Centre de contrôle
+          {isFrench ? "Aperçu Technique" : "Technical Overview"}
         </h2>
         <BentoGrid>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase sm:text-2xl">
-              Projets Rust & Systèmes
+              {isFrench
+                ? "Spoor — Empreinte GitHub"
+                : "Spoor — GitHub Footprint"}
             </p>
             <p className="mt-2 text-sm font-medium">
-              Spoor inspecte les profils publics GitHub, dépôts, identités de
-              commit et clés de signature. Les rapports séparent rigoureusement
-              faits observés et inférences.
+              {isFrench
+                ? "CLI Rust pour auditer ce qu'un profil ou repo GitHub expose publiquement : commits, clés et métadonnées réelles."
+                : "Rust CLI inspecting public GitHub metadata: commit identities, SSH keys, and structured reports."}
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Confidentialité & Contrôle Local
+              {isFrench
+                ? "Crucksware — Rootfs Diff"
+                : "Crucksware — Rootfs Diff"}
             </p>
             <p className="mt-2 text-sm font-medium">
-              Analyse de l&apos;impact des choix d&apos;architecture sur
-              l&apos;exposition des métadonnées, la dépendance aux plateformes
-              cloud et le contrôle des données en local.
+              {isFrench
+                ? "Prototype en Rust pour comparer deux rootfs de firmware Linux extraits avec sortie texte et JSON déterministe."
+                : "Rust prototype for diffing extracted Linux firmware rootfs trees with deterministic text and JSON output."}
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Environnements de Développement
+              {isFrench
+                ? "Messageries Sécurisées"
+                : "Secure Messaging Research"}
             </p>
             <p className="mt-2 text-sm font-medium">
-              IDE Research compare les outils de développement sur plusieurs
-              dimensions : flux distants, agents IA, souveraineté des données et
-              licences logicielles.
+              {isFrench
+                ? "Étude comparative sourcée de Signal, SimpleX, Session, Olvid, Threema et Briar selon les threat models et métadonnées réseau."
+                : "Source-linked comparison of Signal, SimpleX, Session, Olvid, Threema and Briar across threat models and metadata exposure."}
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Publications & Recherche
+              {isFrench
+                ? "Local-First & Transparence"
+                : "Local-First & Transparency"}
             </p>
             <p className="mt-2 text-sm font-medium">
-              Articles techniques originaux et documentation structurée publiés
-              avec traçabilité des sources.
+              {isFrench
+                ? "Priorité au traitement local des données, zéro cookie sur ce site, pas de télémétrie invasive et code sous licence open source."
+                : "Focus on local execution, zero cookies on this site, no tracking telemetry, and open-source licensed tools."}
             </p>
           </BentoCard>
         </BentoGrid>
@@ -297,10 +249,10 @@ export function HomePageClient({
 
       <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Principes Clés
+          {homeCopy.quickFocus.title}
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {traits.map((trait) => (
+          {homeCopy.quickFocus.items.map((trait) => (
             <Card
               key={trait.title}
               className="w-full border-4 border-black bg-card shadow-retro-md retro-press"
@@ -319,7 +271,7 @@ export function HomePageClient({
       </section>
 
       <div data-home-reveal>
-        <HomeDeliveryProcess />
+        <HomeDeliveryProcess locale={currentLocale} />
       </div>
 
       <section className="space-y-4" data-home-reveal>
@@ -336,7 +288,7 @@ export function HomePageClient({
             </Button>
           ))}
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {visibleFocusItems.map((item) => (
             <Card
               key={item.key}
@@ -356,45 +308,55 @@ export function HomePageClient({
       </section>
 
       <div data-home-reveal>
-        <HomeEngagementModel />
+        <HomeEngagementModel locale={currentLocale} />
       </div>
 
       <section className="space-y-4" data-home-reveal>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            Projets en vedette
+            {homeCopy.featuredProjects.title}
           </h2>
           <Button
             asChild
             variant="secondary"
             className="w-full sm:w-auto uppercase"
           >
-            <Link href="/project">Voir tous les projets</Link>
+            <Link href={projectsHref}>{homeCopy.featuredProjects.viewAll}</Link>
           </Button>
         </div>
-        <ProjectsGrid compact limit={3} initialRepos={initialRepos} />
+        <ProjectsGrid
+          compact
+          limit={3}
+          initialRepos={initialRepos}
+          locale={currentLocale}
+        />
       </section>
 
       <section className="space-y-4" data-home-reveal>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            Dernières publications
+            {homeCopy.recentWriting.title}
           </h2>
           <Button
             asChild
             variant="secondary"
             className="w-full sm:w-auto uppercase"
           >
-            <Link href="/blog">Voir tout le blog</Link>
+            <Link href={blogHref}>{homeCopy.recentWriting.viewAll}</Link>
           </Button>
         </div>
-        <BlogGrid compact limit={3} initialPosts={initialPosts} locale="fr" />
+        <BlogGrid
+          compact
+          limit={3}
+          initialPosts={initialPosts}
+          locale={currentLocale}
+        />
       </section>
 
       <section className="space-y-4" data-home-reveal>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            Statistiques GitHub
+            {homeCopy.githubOverview.title}
           </h2>
           <Button
             asChild
@@ -402,34 +364,41 @@ export function HomePageClient({
             className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
           >
             <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
-              Voir le profil GitHub
+              {homeCopy.githubOverview.profileCta}
             </Link>
           </Button>
         </div>
         <p className="font-bold uppercase text-muted-foreground">
-          Abonnés, abonnements, étoiles, forks, dépôts et activités publiques
-          sur GitHub.
+          {homeCopy.githubOverview.subtitle}
         </p>
         <GithubOverviewBento stats={githubOverview ?? null} />
       </section>
 
       <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Questions de recherche
+          {isFrench ? "Axes de Recherche" : "Research Topics"}
         </h2>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           {[
             {
-              body: "Que révèlent concrètement les métadonnées publiques GitHub, et où s'arrêtent les faits vérifiés face aux déductions ?",
-              title: "Empreinte Publique",
+              body: isFrench
+                ? "Que révèlent concrètement les métadonnées publiques GitHub, et où s'arrêtent les faits vérifiés face aux déductions ?"
+                : "What do public GitHub metadata actually expose in practice, and where do verified facts end and inferences begin?",
+              title: isFrench ? "Empreinte Publique" : "Public Footprint",
             },
             {
-              body: "Quelle application de messagerie répond à un modèle de menace spécifique, et quelles métadonnées demeurent exposées ?",
-              title: "Compromis de Messagerie",
+              body: isFrench
+                ? "Quelle application de messagerie répond à un modèle de menace spécifique, et quelles métadonnées demeurent exposées ?"
+                : "Which messaging app satisfies a specific threat model, and what network metadata remains exposed?",
+              title: isFrench
+                ? "Compromis de Messagerie"
+                : "Messaging Trade-offs",
             },
             {
-              body: "Comment les environnements de développement se distinguent-ils sur le travail distant, l'outillage IA et la vie privée ?",
-              title: "Flux de Travail Développeur",
+              body: isFrench
+                ? "Comment diff et trier efficacement des rootfs de firmware Linux sans fausses alertes ni bruit ?"
+                : "How to effectively diff and triage extracted Linux firmware rootfs trees with minimal noise?",
+              title: isFrench ? "Diff Firmware" : "Firmware Diffing",
             },
           ].map((item) => (
             <Card
@@ -449,19 +418,20 @@ export function HomePageClient({
 
       <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Explorer & Vérifier
+          {isFrench ? "Explorer & Vérifier" : "Explore & Verify"}
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Card className="w-full border-4 border-black bg-card shadow-retro-md retro-press">
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                Explorer le Code Source
+                {isFrench ? "Explorer le Code Source" : "Explore Source Code"}
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-4">
               <p className="font-medium">
-                Parcourez les dépôts publics, consultez leur documentation
-                technique et examinez les implémentations effectives.
+                {isFrench
+                  ? "Parcourez les dépôts publics sur GitHub, inspectez les commits et testez les outils en local."
+                  : "Browse public repositories on GitHub, inspect commit histories, and run the tools locally."}
               </p>
               <Button asChild className="w-full sm:w-auto uppercase">
                 <Link
@@ -469,7 +439,7 @@ export function HomePageClient({
                   target="_blank"
                   rel="noreferrer noopener"
                 >
-                  Voir les dépôts publics
+                  {isFrench ? "Dépôts publics" : "Public Repositories"}
                 </Link>
               </Button>
             </Card.Content>
@@ -478,20 +448,23 @@ export function HomePageClient({
           <Card className="w-full border-4 border-black bg-card shadow-retro-md retro-press">
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                Lire les Recherches
+                {isFrench ? "Lire les Articles" : "Read Articles"}
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-4">
               <p className="font-medium">
-                Consultez les articles techniques, comparatifs méthodologiques
-                et analyses d&apos;architecture sur le blog.
+                {isFrench
+                  ? "Consultez les notes techniques, write-ups et comparatifs méthodologiques sur le blog."
+                  : "Check technical notes, write-ups, and methodological comparisons on the blog."}
               </p>
               <Button
                 asChild
                 variant="secondary"
                 className="w-full sm:w-auto uppercase"
               >
-                <Link href="/blog">Consulter le blog</Link>
+                <Link href={blogHref}>
+                  {isFrench ? "Consulter le blog" : "Browse blog"}
+                </Link>
               </Button>
             </Card.Content>
           </Card>
@@ -501,7 +474,7 @@ export function HomePageClient({
       <section className="space-y-4" data-home-reveal>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            Ressources & Liens
+            {isFrench ? "Ressources & Liens" : "Resources & Links"}
           </h2>
           <Button
             asChild
@@ -509,7 +482,7 @@ export function HomePageClient({
             className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
           >
             <Link href={linkHubUrl} target="_blank" rel="noreferrer noopener">
-              Profil GitHub
+              GitHub
             </Link>
           </Button>
         </div>
@@ -537,7 +510,7 @@ export function HomePageClient({
                     target="_blank"
                     rel="noreferrer noopener"
                   >
-                    Ouvrir le lien
+                    {isFrench ? "Ouvrir le lien" : "Open link"}
                   </Link>
                 </Button>
               </Card.Content>
@@ -553,12 +526,12 @@ export function HomePageClient({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-3">
             <h2 className="font-display text-3xl uppercase text-primary-foreground sm:text-4xl md:text-5xl">
-              Projets & Publications
+              {isFrench ? "Projets & Publications" : "Projects & Publications"}
             </h2>
             <p className="max-w-xl text-sm font-medium leading-relaxed text-primary-foreground/90 sm:text-base">
-              Une question technique ou une suggestion sur un projet public ?
-              Consultez les dépôts correspondants sur GitHub ou découvrez les
-              articles sur le blog.
+              {isFrench
+                ? "Une question technique ou une suggestion sur un projet public ? Consultez les dépôts correspondants sur GitHub ou découvrez les articles sur le blog."
+                : "Have a technical question or suggestion on a public repo? Check out the repositories on GitHub or read write-ups on the blog."}
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -567,7 +540,9 @@ export function HomePageClient({
               asChild
               className="w-full border-4 border-black bg-card text-card-foreground px-6 py-3 font-black uppercase shadow-retro retro-press sm:w-auto"
             >
-              <Link href="/blog">Voir le blog</Link>
+              <Link href={blogHref}>
+                {isFrench ? "Voir le blog" : "View blog"}
+              </Link>
             </Button>
             <Button
               size="lg"
@@ -584,9 +559,11 @@ export function HomePageClient({
       </section>
 
       <section className="space-y-4" data-home-reveal>
-        <h2 className="font-display text-3xl uppercase sm:text-4xl">FAQ</h2>
+        <h2 className="font-display text-3xl uppercase sm:text-4xl">
+          {homeCopy.faq.title}
+        </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {faqItems.map((item) => (
+          {homeCopy.faq.items.map((item) => (
             <Card
               key={item.question}
               className="flex h-full w-full flex-col border-4 border-black bg-card shadow-retro-md retro-press"
@@ -613,15 +590,15 @@ export function HomePageClient({
       </section>
 
       <div data-home-reveal>
-        <MorphScrollShowcase />
+        <MorphScrollShowcase locale={currentLocale} />
       </div>
 
       <div data-home-reveal>
-        <RetroCodeShowcase />
+        <RetroCodeShowcase locale={currentLocale} />
       </div>
 
       <div data-home-reveal>
-        <RetroTerminalSection />
+        <RetroTerminalSection locale={currentLocale} />
       </div>
     </div>
   );
