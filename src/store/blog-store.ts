@@ -1,15 +1,16 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { WritingType } from "@/lib/portfolio-types";
 
-type BlogSource = "All" | "Hashnode" | "Dev.to" | "Medium";
+export type BlogFilterType = "All" | WritingType;
 
 type BlogState = {
   query: string;
-  source: BlogSource;
+  source: BlogFilterType;
   selectedTag: string;
   sortBy: "newest" | "oldest" | "read-desc" | "read-asc" | "title-asc";
   setQuery: (query: string) => void;
-  setSource: (source: BlogSource) => void;
+  setSource: (source: BlogFilterType) => void;
   setSelectedTag: (selectedTag: string) => void;
   setSortBy: (sortBy: BlogState["sortBy"]) => void;
 };
@@ -27,7 +28,7 @@ export const useBlogStore = create<BlogState>()(
       setSortBy: (sortBy) => set({ sortBy }),
     }),
     {
-      name: "blog-store",
+      name: "voldigoade-blog-store",
       partialize: (state) => ({
         query: state.query,
         source: state.source,

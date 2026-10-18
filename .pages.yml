@@ -1,0 +1,66 @@
+media:
+  input: public/images/writing
+  output: /images/writing
+  categories:
+    - image
+  extensions:
+    - png
+    - jpg
+    - jpeg
+    - webp
+    - avif
+
+content:
+  - name: writing
+    label: Writing
+    type: collection
+    path: content/writing
+    format: md
+    filename: "{fields.slug}.md"
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: slug
+        label: Slug
+        type: string
+        required: true
+      - name: summary
+        label: Summary
+        type: text
+        required: true
+      - name: type
+        label: Type
+        type: select
+        required: true
+        options:
+          - Article
+          - Write-up
+          - Research
+          - Note
+          - Project Log
+      - name: tags
+        label: Tags
+        type: list
+        required: true
+      - name: publishedAt
+        label: Published Date
+        type: date
+        required: true
+      - name: updatedAt
+        label: Updated Date
+        type: date
+      - name: draft
+        label: Draft
+        type: boolean
+        default: false
+      - name: cover
+        label: Cover Image
+        type: image
+      - name: canonical
+        label: Canonical URL
+        type: string
+      - name: body
+        label: Body
+        type: rich-text

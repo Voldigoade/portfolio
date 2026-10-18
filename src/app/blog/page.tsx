@@ -1,27 +1,29 @@
 import type { Metadata } from "next";
 import { BlogPageClient } from "@/components/pages/blog-page-client";
 import { getBlogPosts } from "@/lib/server/portfolio-data";
-import { siteUrl } from "@/lib/site-config";
+import { siteName, siteUrl } from "@/lib/site-config";
 
 const blogOgImageUrl = `${siteUrl}/blog/opengraph-image`;
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Writing",
   description:
-    "Aggregated blog posts from Hashnode, Dev.to, and Medium via SSR.",
+    "Technical articles, security write-ups, research notes and project logs by Voldigoade.",
   alternates: {
     canonical: "/blog",
   },
   keywords: [
-    "developer blog",
-    "engineering articles",
-    "next.js articles",
-    "open source writing",
+    "Voldigoade writing",
+    "technical write-ups",
+    "security research",
+    "systems engineering",
+    "Rust articles",
+    "Linux notes",
   ],
   openGraph: {
-    title: "Blog by Muhammad Fiaz",
+    title: "Writing & Research | Voldigoade",
     description:
-      "Engineering, product, and open-source articles aggregated from multiple platforms.",
+      "Articles, research notes and project logs on software systems, security and privacy.",
     url: `${siteUrl}/blog`,
     type: "website",
     images: [
@@ -29,15 +31,15 @@ export const metadata: Metadata = {
         url: blogOgImageUrl,
         width: 1200,
         height: 630,
-        alt: "Muhammad Fiaz Blog",
+        alt: "Voldigoade Writing",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Blog by Muhammad Fiaz",
+    title: "Writing & Research | Voldigoade",
     description:
-      "Engineering, product, and open-source articles aggregated from multiple platforms.",
+      "Articles, research notes and project logs on software systems, security and privacy.",
     images: [blogOgImageUrl],
   },
 };
@@ -60,16 +62,16 @@ export default async function BlogPage() {
   const blogJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Blog",
+    name: "Writing & Research",
     url: `${siteUrl}/blog`,
     description:
-      "Developer writing across product engineering and open source.",
+      "Technical writing, security research notes and systems project logs.",
     mainEntity: {
       "@type": "ItemList",
       itemListElement: posts.map((post, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        url: post.url,
+        url: `${siteUrl}${post.url}`,
         item: {
           "@type": "BlogPosting",
           headline: post.title,
@@ -77,12 +79,12 @@ export default async function BlogPage() {
           datePublished: post.publishedAt,
           author: {
             "@type": "Person",
-            name: "Muhammad Fiaz",
+            name: siteName,
             url: siteUrl,
           },
           publisher: {
             "@type": "Person",
-            name: "Muhammad Fiaz",
+            name: siteName,
             url: siteUrl,
           },
           keywords: post.tags.join(", "),
@@ -112,27 +114,21 @@ export default async function BlogPage() {
 
   return (
     <div className="space-y-6 pb-16">
-      <script type="application/ld+json">{serializeJsonLd(blogJsonLd)}</script>
-      <script type="application/ld+json">
-        {serializeJsonLd(breadcrumbJsonLd)}
-      </script>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(blogJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+      />
       <section className="border-4 border-black bg-card p-4 shadow-retro-lg sm:p-6 md:p-8">
         <h1 className="font-pixel text-3xl uppercase sm:text-4xl md:text-5xl">
-          Blog
+          Writing & Research
         </h1>
-        <p className="mt-3 max-w-3xl text-sm font-medium leading-relaxed sm:text-base">
-          Debug logs from product engineering, full stack architecture,
-          open-source, and practical AI experiments.
-        </p>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="font-display text-2xl uppercase sm:text-3xl">
-          Browse Writing Index
-        </h2>
-        <p className="text-sm font-medium leading-relaxed sm:text-base">
-          Search by topic, filter by source and tag, then sort by publish date
-          or reading time.
+        <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-muted-foreground sm:text-base">
+          First-party technical articles, research write-ups, architecture
+          notes, and project engineering logs.
         </p>
       </section>
 

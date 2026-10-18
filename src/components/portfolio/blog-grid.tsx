@@ -12,10 +12,17 @@ import { Card } from "@/components/retroui/Card";
 import { Input } from "@/components/retroui/Input";
 import { Search } from "@/components/retroui/icons";
 import { usePortfolioPostsQuery } from "@/lib/client/portfolio-queries";
-import type { BlogPost } from "@/lib/portfolio-types";
-import { useBlogStore } from "@/store/blog-store";
+import type { BlogPost, WritingType } from "@/lib/portfolio-types";
+import { type BlogFilterType, useBlogStore } from "@/store/blog-store";
 
-const SOURCES = ["All", "Hashnode", "Dev.to", "Medium"] as const;
+const WRITING_TYPES: BlogFilterType[] = [
+  "All",
+  "Article",
+  "Write-up",
+  "Research",
+  "Note",
+  "Project Log",
+];
 const BLOG_SKELETON_KEYS = ["b1", "b2", "b3", "b4", "b5", "b6"] as const;
 const BLOG_TAG_SKELETON_KEYS = ["t1", "t2", "t3"] as const;
 
@@ -108,18 +115,18 @@ export function BlogGrid({
   const filtered = useMemo(() => {
     const text = query.trim().toLowerCase();
     const filteredPosts = posts.filter((post) => {
-      const bySource = compact
-        ? true
-        : source === "All" || post.source === source;
+      const byType =
+        compact || source === "All" || post.type === (source as WritingType);
       const normalizedTags = post.tags.map((tag) =>
         normalizeTag(tag).toUpperCase(),
       );
-      const byTag = compact
-        ? true
-        : selectedTag === "All" || normalizedTags.includes(selectedTag);
+      const byTag =
+        compact ||
+        selectedTag === "All" ||
+        normalizedTags.includes(selectedTag);
       const haystack =
         `${post.title} ${post.excerpt} ${post.tags.join(" ")}`.toLowerCase();
-      return bySource && byTag && (compact || haystack.includes(text));
+      return byType && byTag && (compact || haystack.includes(text));
     });
 
     return [...filteredPosts].sort((a, b) => {
@@ -141,7 +148,7 @@ export function BlogGrid({
     setQuery(value);
   };
 
-  const handleSourceChange = (value: (typeof SOURCES)[number]) => {
+  const handleTypeChange = (value: BlogFilterType) => {
     setCurrentPage(1);
     setSource(value);
   };
@@ -174,7 +181,7 @@ export function BlogGrid({
             <Input
               value={query}
               onChange={(event) => handleSearchChange(event.target.value)}
-              placeholder="Search by title, tags, article description..."
+              placeholder="Search by title, tags, description..."
               className="w-full border-4 border-black bg-card py-3 pl-11 font-bold shadow-retro"
             />
           </div>
@@ -212,11 +219,11 @@ export function BlogGrid({
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {SOURCES.map((item) => (
+              {WRITING_TYPES.map((item) => (
                 <Button
                   key={item}
                   variant={source === item ? "default" : "secondary"}
-                  onClick={() => handleSourceChange(item)}
+                  onClick={() => handleTypeChange(item)}
                   className="border-4 border-black shadow-retro-sm uppercase"
                 >
                   {item}
@@ -231,7 +238,7 @@ export function BlogGrid({
 
       {isError ? (
         <div className="border-4 border-black bg-destructive p-5 font-black uppercase text-destructive-foreground shadow-retro-md">
-          Failed to load blog feed right now.
+          Failed to load writing feed right now.
         </div>
       ) : null}
 
@@ -271,7 +278,9 @@ export function BlogGrid({
                   </Card.Header>
                   <Card.Content className="mt-auto flex flex-col gap-4 pt-0">
                     <div className="flex items-center justify-between text-xs font-black uppercase">
-                      <span>{post.source}</span>
+                      <span className="border-2 border-black bg-accent px-2 py-0.5 text-accent-foreground">
+                        {post.type}
+                      </span>
                       <span>{post.readingMinutes} min read</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -294,13 +303,7 @@ export function BlogGrid({
                       asChild
                       className="mt-auto w-full justify-center border-4 border-black shadow-retro-sm uppercase"
                     >
-                      <Link
-                        href={post.url}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                      >
-                        Read Article
-                      </Link>
+                      <Link href={post.url}>Read {post.type}</Link>
                     </Button>
                   </Card.Content>
                 </Card>
@@ -310,37 +313,29 @@ export function BlogGrid({
         </AnimatePresence>
       ) : null}
 
-      {!isLoading && !isFetching && visible.length === 0 ? (
-        <div className="border-4 border-black bg-muted p-6 text-center font-black uppercase shadow-retro">
-          No blog posts found for this filter.
-        </div>
-      ) : null}
-
-      {!compact && !isLoading && !isFetching && visible.length > 0 ? (
-        <div className="flex flex-wrap items-center justify-center gap-2 border-4 border-black bg-card p-3 shadow-retro-sm">
-          <Button
-            variant="secondary"
-            className="border-4 border-black uppercase"
-            disabled={currentPage <= 1}
-            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-          >
-            Prev
-          </Button>
-
-          <span className="min-w-28 border-2 border-black bg-muted px-3 py-2 text-center text-xs font-black uppercase">
-            Page {currentPage} / {totalPages}
-          </span>
-
-          <Button
-            variant="secondary"
-            className="border-4 border-black uppercase"
-            disabled={currentPage >= totalPages}
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-            }
-          >
-            Next
-          </Button>
+      {!compact && totalPages > 1 ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-4 border-black bg-card p-3 shadow-retro-sm">
+          <p className="text-xs font-black uppercase text-muted-foreground sm:text-sm">
+            Page {currentPage} of {totalPages}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              className="border-2 border-black shadow-retro-xs uppercase"
+            >
+              Previous
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              className="border-2 border-black shadow-retro-xs uppercase"
+            >
+              Next
+            </Button>
+          </div>
         </div>
       ) : null}
     </section>
