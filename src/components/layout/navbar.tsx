@@ -29,7 +29,7 @@ export function Navbar() {
           href="/"
           className="border-4 border-black bg-accent px-3 py-2 text-sm font-black text-accent-foreground tracking-wide shadow-retro sm:text-base"
         >
-          ~/ Muhammad Fiaz
+          ~/ Voldigoade
         </Link>
 
         <nav className="hidden items-center gap-2 md:flex">

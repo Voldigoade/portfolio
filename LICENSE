@@ -19,3 +19,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+### Upstream Provenance & Adaptation Notice
+
+This codebase is adapted from the open-source portfolio by Muhammad Fiaz:
+- Upstream Repository: https://github.com/muhammad-fiaz/portfolio
+- Audited Baseline Commit: 32aa93ec8ed0323da5d46be264898084c7fa634b
+- Upstream License: MIT License (Copyright (c) 2023 Muhammad Fiaz)
+
+Adapted for Voldigoade (https://github.com/Voldigoade, https://voldigoade.xyz).
+All upstream code reuse retains the original MIT license terms. Personal branding,
+biography, assets, and identity belong to their respective owners.

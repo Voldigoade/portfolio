@@ -28,7 +28,7 @@ export function InitialLoader() {
     <div className="fixed inset-0 z-70 flex items-center justify-center bg-background/95 px-4">
       <div className="w-full max-w-lg border-4 border-black bg-card p-4 shadow-retro-lg sm:p-6">
         <p className="font-pixel text-2xl uppercase text-foreground sm:text-3xl">
-          Muhammad Fiaz
+          Voldigoade
         </p>
         <p className="mt-2 text-sm font-black uppercase text-muted-foreground sm:text-base">
           Loading Workspace

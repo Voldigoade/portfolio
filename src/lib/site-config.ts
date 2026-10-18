@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://muhammadfiaz.com";
+export const DEFAULT_SITE_URL = "https://voldigoade.xyz";
 
 function normalizeSiteUrl(rawUrl: string): string {
   const normalized = rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`;
@@ -20,18 +20,25 @@ export const siteUrl = normalizeSiteUrl(
 
 export const siteHost = new URL(`${siteUrl}/`).host;
 
-export const fiazDevUrl = "https://fiaztechnologies.github.io";
-export const linkHubUrl = "https://links.muhammadfiaz.com";
-export const githubUrl = "https://github.com/muhammad-fiaz";
+export const siteName = "Voldigoade";
+export const githubUser = "Voldigoade";
+export const githubUrl = "https://github.com/Voldigoade";
 export const githubSnakeGraphUrl =
-  "https://raw.githubusercontent.com/muhammad-fiaz/muhammad-fiaz/output/github-contribution-grid-snake.svg";
-export const linkedinUrl = "https://www.linkedin.com/in/muhammad-fiaz-";
-export const xUrl = "https://x.com/muhammadfiaz_";
-export const youtubeUrl = "https://www.youtube.com/@muhammad_fiaz";
-export const hackatimeUrl =
-  process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER === "hackatime"
-    ? "https://heatmap.shymike.dev/?id=30609&timezone=UTC"
-    : "https://wakatime.com/@muhammadfiaz";
-export const sponsorUrl = "https://github.com/sponsors/muhammad-fiaz/";
-export const donationUrl = "https://pay.muhammadfiaz.com/";
+  "https://raw.githubusercontent.com/Voldigoade/voldigoade/output/github-contribution-grid-snake.svg";
+
+// Technical project references
+export const spoorUrl = "https://github.com/Voldigoade/spoor";
+export const rechercheMessageriesUrl =
+  "https://github.com/Voldigoade/recherche-messageries";
+export const ideResearchUrl = "https://github.com/Voldigoade/ide-research";
+export const crukstUrl = "https://github.com/Voldigoade/crukst";
+
+// Compatibility exports safely mapped to Voldigoade resources
+export const linkHubUrl = githubUrl;
+export const linkedinUrl = "";
+export const xUrl = "";
+export const youtubeUrl = "";
+export const hackatimeUrl = "";
+export const sponsorUrl = "";
+export const donationUrl = "";
 export const ogImageUrl = `${siteUrl}/opengraph-image`;

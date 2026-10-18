@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Muhammad Fiaz Portfolio",
-    short_name: "Muhammad Fiaz",
+    name: "Voldigoade Portfolio",
+    short_name: "Voldigoade",
     description:
-      "Founder, Entrepreneur, Full Stack Developer, Freelancer and Full-Time Open-Sourcerer.",
+      "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript.",
     start_url: "/",
     display: "standalone",
     background_color: "#fff5e6",
@@ -15,6 +15,11 @@ export default function manifest(): MetadataRoute.Manifest {
         src: "/favicon.ico",
         sizes: "48x48",
         type: "image/x-icon",
+      },
+      {
+        src: "/favicon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
       },
     ],
   };

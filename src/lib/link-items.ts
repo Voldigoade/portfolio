@@ -6,69 +6,36 @@ export interface LinkItem {
 
 export const links: LinkItem[] = [
   {
-    href: "https://github.com/muhammad-fiaz",
+    href: "https://github.com/Voldigoade",
     name: "GitHub",
-    description: "Open source projects and contributions",
+    description: "Open source projects, research and systems software",
   },
   {
-    href: "https://www.linkedin.com/in/muhammad-fiaz-",
-    name: "LinkedIn",
-    description: "Connect with me professionally",
-  },
-  {
-    href:
-      process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER === "hackatime"
-        ? "https://heatmap.shymike.dev/?id=30609&timezone=UTC"
-        : "https://wakatime.com/@muhammadfiaz",
-    name:
-      process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER === "hackatime"
-        ? "Hackatime Activity"
-        : "Wakatime Activity",
-    description: "Check my coding activity",
-  },
-  {
-    href: "https://muhammadfiaz.com",
+    href: "https://voldigoade.xyz",
     name: "Portfolio",
-    description: "Visit my main website",
+    description: "Main portfolio, writing and project documentation",
   },
   {
-    href: "https://x.com/muhammadfiaz_",
-    name: "X (Twitter)",
-    description: "Follow me for updates",
+    href: "https://github.com/Voldigoade/spoor",
+    name: "Spoor",
+    description:
+      "Terminal-first GitHub public-footprint inspection tool in Rust",
   },
   {
-    href: "https://www.youtube.com/@muhammad_fiaz",
-    name: "YouTube",
-    description: "Subscribe to my channel for tech content",
+    href: "https://github.com/Voldigoade/recherche-messageries",
+    name: "Recherche Messageries",
+    description:
+      "Source-driven comparative research into secure messaging architectures",
   },
   {
-    href: "https://dribbble.com/muhammadfiaz",
-    name: "Dribbble",
-    description: "My design work and shots",
+    href: "https://github.com/Voldigoade/ide-research",
+    name: "IDE Research",
+    description:
+      "Comparison of developer environments, AI tooling and architectures",
   },
   {
-    href: "mailto:contact@muhammadfiaz.com",
-    name: "Contact Me",
-    description: "Get in touch via email",
-  },
-  {
-    href: "https://orcid.org/0009-0001-5935-7878",
-    name: "ORCID",
-    description: "My ORCID researcher profile",
-  },
-  {
-    href: "https://dly.to/LQm0vGkFCsi",
-    name: "daily.dev Community",
-    description: "AI tools, resources, and developer updates",
-  },
-  {
-    href: "https://app.daily.dev/muhammadfiaz",
-    name: "daily.dev Profile",
-    description: "My daily.dev developer profile",
-  },
-  {
-    href: "https://fiaztechnologies.github.io",
-    name: "Fiaz Technologies",
-    description: "Developer-first next-generation solutions",
+    href: "https://github.com/Voldigoade/crukst",
+    name: "Crukst",
+    description: "Semantic firmware diff and triage built in Rust",
   },
 ];
