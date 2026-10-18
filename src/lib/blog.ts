@@ -264,10 +264,7 @@ function isWritingImage(value: string): boolean {
 function isSafeLink(value: string): boolean {
   if (UNSAFE_URL_CHARACTERS.test(value)) return false;
   return (
-    isHttpUrl(value) ||
-    /^mailto:[^<>"\s]+$/i.test(value) ||
-    /^\/(?![/%&])/.test(value) ||
-    value.startsWith("#")
+    isHttpUrl(value) || /^\/(?![/%&])/.test(value) || value.startsWith("#")
   );
 }
 

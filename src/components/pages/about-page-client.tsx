@@ -191,7 +191,7 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
 
       <section className="space-y-4" data-about-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          ADN d&apos;ingénierie
+          Principes de conception
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {[
@@ -242,7 +242,7 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase text-primary-foreground sm:text-4xl">
-            Carte des Projets Publics
+            Dépôts publics
           </h2>
           <Button
             asChild

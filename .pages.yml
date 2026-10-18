@@ -13,7 +13,7 @@ media:
 
 content:
   - name: writing_fr
-    label: "ARTICLES — FRANÇAIS"
+    label: "ARTICLES FRANCAIS"
     type: collection
     path: content/writing/fr
     format: yaml-frontmatter
@@ -75,7 +75,7 @@ content:
           extensions: [png, jpg, jpeg, webp, avif]
 
   - name: writing_en
-    label: "ARTICLES — ENGLISH"
+    label: "ARTICLES ENGLISH"
     type: collection
     path: content/writing/en
     format: yaml-frontmatter

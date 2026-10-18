@@ -1,4 +1,4 @@
-# Voldigoade — Portfolio
+# Voldigoade: Portfolio
 
 A personal portfolio for public projects and first-party technical writing, built with Next.js 16, React 19, TypeScript and Bun. Canonical site: [voldigoade.xyz](https://voldigoade.xyz).
 
@@ -31,45 +31,47 @@ bun run start
 
 ## Writing and Pages CMS
 
-Articles live directly in `content/writing/<slug>.md` with **YAML frontmatter and a Markdown body**. The application currently has no public articles. The single internal test article remains `draft: true` and returns 404 publicly. Only published static article parameters are routable; publication triggers a new build. Standard Next.js rendering is used because Cache Components partial streams caused hydration errors during production QA.
+Articles live in `content/writing/fr/<slug>.md` and `content/writing/en/<slug>.md` with **YAML frontmatter and a Markdown body**. The site is French-first with an English section. Articles support bidirectional translation linking via the optional `frenchVersion` or `englishVersion` frontmatter fields (or matching slugs). The single internal test articles remain `draft: true` and return 404 publicly. Only published static article parameters are routable; publication triggers a new build. Standard Next.js rendering is used because Cache Components partial streams caused hydration errors during production QA.
 
 | Field | Required | Format |
 | --- | --- | --- |
 | `title` | yes | Nonempty string |
 | `slug` | yes | Lowercase letters/numbers separated by hyphens; exactly matches filename |
 | `summary` | yes | Nonempty string |
-| `type` | yes | `Article`, `Write-up`, `Research`, `Note`, or `Project Log` |
+| `category` | no | Nonempty string (`Systèmes` or `Systems` default by locale) |
 | `tags` | yes | At least one nonempty string; trimmed and deduplicated |
 | `publishedAt` | yes | `YYYY-MM-DD` or UTC ISO timestamp |
 | `updatedAt` | no | Same date format; empty means absent |
 | `draft` | yes | Boolean; CMS defaults to `true` |
 | `cover` | no | Local `/images/writing/` raster image |
 | `canonical` | no | Absolute HTTP(S) URL |
+| `frenchVersion` | no | Slug of corresponding French article (English collection) |
+| `englishVersion` | no | Slug of corresponding English article (French collection) |
 | `body` | Markdown body | Content after the closing `---` delimiter |
 
 YAML date values are normalized to ISO strings. Invalid frontmatter, filename mismatches and duplicate slugs fail collection validation. Only complete YAML delimiters are accepted: executable frontmatter engines are rejected before parsing.
 
 ```markdown
 ---
-title: "Internal example"
-slug: "internal-example"
-summary: "A draft used to check the editor."
-type: "Note"
-tags: ["internal-test"]
+title: "Article de test"
+slug: "article-de-test"
+summary: "Brouillon pour tester le rendu."
+category: "Systèmes"
+tags: ["test"]
 publishedAt: "2026-10-18"
 draft: true
 ---
 
-Internal Markdown content.
+Contenu Markdown.
 ```
 
-`.pages.yml` uses the documented `yaml-frontmatter` collection format, `string` with `list: true` for tags, `select.options.values` for writing types, and `rich-text.options.format: markdown`. Media upload paths are `public/images/writing` → `/images/writing`; allowed extensions are png, jpg, jpeg, webp and avif, with safe upload filenames. SVG uploads are excluded. See the official [content schema](https://pagescms.org/docs/configuration/content/), [select](https://pagescms.org/docs/configuration/fields/select/), [rich text](https://pagescms.org/docs/configuration/fields/rich-text/), and [media](https://pagescms.org/docs/configuration/media/) documentation.
+`.pages.yml` defines two collections: `writing_fr` (`content/writing/fr`) and `writing_en` (`content/writing/en`) using the documented `yaml-frontmatter` format, `string` with `list: true` for tags, and `rich-text.options.format: markdown`. Media upload paths map `public/images/writing` to `/images/writing`; allowed extensions are png, jpg, jpeg, webp and avif, with safe upload filenames. SVG uploads are excluded. See the official [content schema](https://pagescms.org/docs/configuration/content/), [select](https://pagescms.org/docs/configuration/fields/select/), [rich text](https://pagescms.org/docs/configuration/fields/rich-text/), and [media](https://pagescms.org/docs/configuration/media/) documentation.
 
 To use the hosted editor, authorize the Pages CMS GitHub App for this repository, select the intended branch and inspect the generated diff before publishing. GitHub App authorization and a real hosted-editor save must be performed by the repository owner; local schema verification does not prove the hosted connection is configured.
 
-Raw HTML renders as text. Links allow HTTP(S), mailto, root-relative paths and anchors. Markdown images and covers are restricted to the local writing raster folder. Code fences use Marked tokens and Shiki, with escaped plain-code fallback. Inline HTML embeds and remote Markdown images are deliberately unsupported.
+Raw HTML renders as text. Links allow HTTP(S), root-relative paths and anchors (mailto links are rejected to avoid unvetted URI handlers). Markdown images and covers are restricted to the local writing raster folder. Code fences use Marked tokens and Shiki, with escaped plain-code fallback. Inline HTML embeds and remote Markdown images are deliberately unsupported.
 
-Public listings, article routes, search/tags, social metadata, RSS (`/rss.xml`), Atom (`/feed.xml`) and sitemap use published articles only. Empty feeds remain valid. Static sitemap routes omit modification dates; article dates come from frontmatter. An empty Atom feed uses its generation time for the required feed-level `updated` field.
+Public listings, article routes, search/tags, social metadata, RSS (`/rss.xml` and `/en/rss.xml`), Atom (`/feed.xml`) and sitemap use published articles only. Empty feeds remain valid. Static sitemap routes omit modification dates; article dates come from frontmatter. An empty Atom feed uses its generation time for the required feed-level `updated` field.
 
 ## Public project data
 

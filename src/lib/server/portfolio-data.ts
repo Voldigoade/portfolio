@@ -21,7 +21,8 @@ export const CURATED_PROJECT_MANIFEST: ReadonlyArray<CuratedProject> = [
     id: 1419669309,
     name: "spoor",
     full_name: "Voldigoade/spoor",
-    description: "Terminal-first GitHub public-footprint inspection tool.",
+    description:
+      "Outil CLI en Rust pour inspecter l'empreinte publique d'un compte GitHub.",
     language: "Rust",
     topics: ["cli", "github", "osint", "privacy", "rust"],
     html_url: "https://github.com/Voldigoade/spoor",
@@ -32,7 +33,7 @@ export const CURATED_PROJECT_MANIFEST: ReadonlyArray<CuratedProject> = [
     name: "recherche-messageries",
     full_name: "Voldigoade/recherche-messageries",
     description:
-      "Independent research comparing secure messaging apps: Signal, SimpleX, Session, Olvid, Threema, Briar and more across threat models, metadata, and evidence.",
+      "Étude comparative de messageries sécurisées selon les modèles de menaces, métadonnées et preuves documentées.",
     language: "Python",
     topics: [
       "privacy",
@@ -50,7 +51,7 @@ export const CURATED_PROJECT_MANIFEST: ReadonlyArray<CuratedProject> = [
     name: "ide-research",
     full_name: "Voldigoade/ide-research",
     description:
-      "Source-driven comparison of IDEs and development environments across stacks, platforms, remote workflows, AI tooling, security, privacy and licensing.",
+      "Étude comparative des environnements de développement et IDE selon les flux de travail, la sécurité et les licences.",
     language: "Python",
     topics: [
       "developer-tools",
@@ -67,7 +68,7 @@ export const CURATED_PROJECT_MANIFEST: ReadonlyArray<CuratedProject> = [
     name: "crukst",
     full_name: "Voldigoade/crukst",
     description:
-      "Early design and implementation work toward semantic firmware comparison and triage in Rust.",
+      "Prototype et fondation en Rust pour le tri et la comparaison sémantique de firmwares.",
     language: "Rust",
     topics: [
       "rust",

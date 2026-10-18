@@ -28,9 +28,7 @@ const processSteps = [
 export function HomeDeliveryProcess() {
   return (
     <section className="space-y-4">
-      <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        Principes d&apos;ingénierie
-      </h2>
+      <h2 className="font-display text-3xl uppercase sm:text-4xl">Méthode</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {processSteps.map((step, index) => (
           <Card
