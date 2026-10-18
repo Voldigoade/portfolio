@@ -28,16 +28,24 @@ async function runQA() {
 
   // Monitor all outgoing network requests for forbidden Google Analytics / GTM endpoints
   page.on("request", (req) => {
-    const url = req.url().toLowerCase();
-    if (
-      url.includes("google-analytics.com") ||
-      url.includes("googletagmanager.com") ||
-      url.includes("doubleclick.net")
-    ) {
-      console.error(
-        `[SECURITY ALERT] Intercepted forbidden Google request: ${url}`,
-      );
-      interceptedGoogleRequests.push(url);
+    try {
+      const parsedUrl = new URL(req.url());
+      const host = parsedUrl.hostname.toLowerCase();
+      if (
+        host === "google-analytics.com" ||
+        host.endsWith(".google-analytics.com") ||
+        host === "googletagmanager.com" ||
+        host.endsWith(".googletagmanager.com") ||
+        host === "doubleclick.net" ||
+        host.endsWith(".doubleclick.net")
+      ) {
+        console.error(
+          `[SECURITY ALERT] Intercepted forbidden Google request: ${req.url()}`,
+        );
+        interceptedGoogleRequests.push(req.url());
+      }
+    } catch {
+      // ignore unparseable URLs
     }
   });
 
