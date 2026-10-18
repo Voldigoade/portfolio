@@ -6,33 +6,33 @@ import { Card } from "@/components/retroui/Card";
 
 const models = [
   {
-    title: "Systems & CLI Tools",
+    title: "Systèmes & Outils CLI",
     summary:
-      "Spoor provides a terminal interface and HTTP service for public GitHub inspection.",
+      "Spoor propose une interface terminal et un service HTTP pour l'inspection de l'empreinte publique sur GitHub.",
     bullets: [
-      "Rust command-line implementation",
-      "HTTP lookups with streamed progress",
-      "JSON and readable report exports",
+      "Implémentation en ligne de commande en Rust",
+      "Requêtes HTTP avec suivi de progression en temps réel",
+      "Export JSON et rapports d'audit lisibles",
     ],
   },
   {
-    title: "Security & Threat Research",
+    title: "Sécurité & Modélisation de menaces",
     summary:
-      "Recherche Messageries compares messaging systems using public sources and explicit limits.",
+      "Recherche Messageries analyse les applications de messagerie sécurisée à partir de sources publiques et de critères vérifiables.",
     bullets: [
-      "Threat-model comparisons",
-      "Metadata and network-exposure questions",
-      "Source references and evidence registers",
+      "Comparatifs selon les modèles de menaces",
+      "Analyse des métadonnées et de l'exposition réseau",
+      "Registre des preuves et traçabilité documentaire",
     ],
   },
   {
-    title: "Developer Environments",
+    title: "Environnements de développement",
     summary:
-      "IDE Research compares complete working environments and the trade-offs between them.",
+      "IDE Research étudie les architectures d'environnements de travail et leurs compromis opérationnels.",
     bullets: [
-      "Local, remote, and container workflows",
-      "AI tooling and agent compatibility",
-      "Privacy, licensing, and vendor dependence",
+      "Flux locaux, distants et conteneurisés",
+      "Intégration d'outils et d'agents de développement",
+      "Confidentialité, licences et souveraineté logicielle",
     ],
   },
 ] as const;
@@ -42,14 +42,14 @@ export function HomeEngagementModel() {
     <section className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Technical Focus Areas
+          Domaines de recherche & outillage
         </h2>
         <Button
           asChild
           variant="secondary"
           className="w-full sm:w-auto uppercase"
         >
-          <Link href="/project">Explore All Projects</Link>
+          <Link href="/project">Explorer tous les projets</Link>
         </Button>
       </div>
 

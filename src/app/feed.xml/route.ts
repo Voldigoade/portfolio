@@ -3,9 +3,7 @@ import { siteName, siteUrl } from "@/lib/site-config";
 import { escapeXml } from "@/lib/writing-xml";
 
 export async function GET() {
-  const articles = await getPublishedArticles();
-  // An empty feed still requires an updated timestamp. This describes when the
-  // representation was produced; article timestamps always come from content.
+  const articles = await getPublishedArticles("fr");
   const updated = articles.length
     ? new Date(
         Math.max(
@@ -33,7 +31,7 @@ export async function GET() {
     `<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <id>${siteUrl}/blog</id>
-  <title>${escapeXml(siteName)} - Writing</title>
+  <title>${escapeXml(siteName)} - Publications</title>
   <link href="${siteUrl}/feed.xml" rel="self" type="application/atom+xml"/>
   <link href="${siteUrl}/blog"/>
   <author><name>${escapeXml(siteName)}</name><uri>${siteUrl}</uri></author>

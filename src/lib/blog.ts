@@ -3,15 +3,9 @@ import path from "node:path";
 import { load } from "js-yaml";
 import { Marked, type Tokens } from "marked";
 import { codeToHtml } from "shiki";
-import type { BlogPost, WritingType } from "@/lib/portfolio-types";
+import type { BlogPost, WritingLocale } from "@/lib/portfolio-types";
 
-export const VALID_WRITING_TYPES: WritingType[] = [
-  "Article",
-  "Write-up",
-  "Research",
-  "Note",
-  "Project Log",
-];
+export type { WritingLocale };
 
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 // biome-ignore lint/suspicious/noControlCharactersInRegex: URL schemes must reject browser-ignored control characters.
@@ -21,73 +15,131 @@ export interface ArticleFrontmatter {
   title: string;
   slug: string;
   summary: string;
-  type: WritingType;
+  category: string;
   tags: string[];
+  series?: string;
   publishedAt: string;
   updatedAt?: string;
+  eventDate?: string;
   draft: boolean;
   cover?: string;
   canonical?: string;
+  frenchVersion?: string;
+  translationSlug?: string;
 }
 
 export interface Article extends ArticleFrontmatter {
   id: string;
+  locale: WritingLocale;
   body: string;
   html?: string;
   readingMinutes: number;
+  readingTimeText: string;
   url: string;
 }
 
-const CONTENT_DIR = path.join(process.cwd(), "content", "writing");
+const CONTENT_DIR_FR = path.join(process.cwd(), "content", "writing", "fr");
+const CONTENT_DIR_EN = path.join(process.cwd(), "content", "writing", "en");
 
-export function calculateReadingTime(content: string): number {
+export function getContentDir(locale: WritingLocale = "fr"): string {
+  return locale === "en" ? CONTENT_DIR_EN : CONTENT_DIR_FR;
+}
+
+export function calculateReadingMinutes(content: string): number {
   const words = content.trim().split(/\s+/).filter(Boolean);
   const wordsPerMinute = 200;
   return Math.max(1, Math.ceil(words.length / wordsPerMinute));
 }
 
+export function calculateReadingTimeText(
+  content: string,
+  locale: WritingLocale = "fr",
+): string {
+  const minutes = calculateReadingMinutes(content);
+  return locale === "en" ? `${minutes} min read` : `${minutes} min de lecture`;
+}
+
+// Backwards-compatible signature
+export function calculateReadingTime(content: string): number {
+  return calculateReadingMinutes(content);
+}
+
+export function normalizeTranslationRef(value: unknown): string | undefined {
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  const cleaned = value
+    .trim()
+    .replace(/^.*[\\/]/, "")
+    .replace(/\.md$/, "");
+  return SLUG_REGEX.test(cleaned) ? cleaned : undefined;
+}
+
 export function validateFrontmatter(
   data: Record<string, unknown>,
   filename: string,
+  locale: WritingLocale = "fr",
 ): ArticleFrontmatter {
   const errors: string[] = [];
+
+  const cleanedFilename = filename.replace(/\.md$/, "");
+  if (!SLUG_REGEX.test(cleanedFilename)) {
+    errors.push(
+      `Filename '${filename}' produces an invalid slug '${cleanedFilename}'. Use lowercase alphanumeric letters and single hyphens.`,
+    );
+  }
+  const derivedSlug = path.basename(filename, ".md");
 
   if (typeof data.title !== "string" || !data.title.trim()) {
     errors.push(`Missing or invalid 'title' in ${filename}`);
   }
 
-  if (typeof data.slug !== "string" || !SLUG_REGEX.test(data.slug)) {
-    errors.push(
-      `Invalid 'slug' in ${filename}. Must be lowercase alphanumeric with hyphens (received: ${String(data.slug)})`,
-    );
-  }
-
-  const expectedSlug = filename.replace(/\.md$/, "");
-  if (data.slug !== expectedSlug) {
-    errors.push(
-      `Filename / slug mismatch in ${filename}: filename is '${expectedSlug}.md' but frontmatter slug is '${String(data.slug)}'`,
-    );
+  // If frontmatter provides slug, it must match the filename slug
+  if (data.slug !== undefined && data.slug !== "") {
+    if (typeof data.slug !== "string" || !SLUG_REGEX.test(data.slug)) {
+      errors.push(
+        `Invalid 'slug' in ${filename}. Must be lowercase alphanumeric with hyphens (received: ${String(data.slug)})`,
+      );
+    } else if (data.slug !== derivedSlug) {
+      errors.push(
+        `Filename / slug mismatch in ${filename}: filename is '${derivedSlug}.md' but frontmatter slug is '${String(data.slug)}'`,
+      );
+    }
   }
 
   if (typeof data.summary !== "string" || !data.summary.trim()) {
     errors.push(`Missing or invalid 'summary' in ${filename}`);
   }
 
-  if (
-    typeof data.type !== "string" ||
-    !VALID_WRITING_TYPES.includes(data.type as WritingType)
-  ) {
-    errors.push(
-      `Invalid 'type' in ${filename}: must be one of [${VALID_WRITING_TYPES.join(", ")}], got: '${String(data.type)}'`,
-    );
+  const defaultCategory = locale === "en" ? "Systems" : "Systèmes";
+  let category = defaultCategory;
+  if (data.category !== undefined) {
+    if (typeof data.category !== "string" || !data.category.trim()) {
+      errors.push(`'category' in ${filename} must be a non-empty string`);
+    } else {
+      category = data.category.trim();
+    }
   }
 
-  if (
-    !Array.isArray(data.tags) ||
-    data.tags.length === 0 ||
-    data.tags.some((tag) => typeof tag !== "string" || !tag.trim())
-  ) {
-    errors.push(`'tags' in ${filename} must be an array of strings`);
+  let tags: string[] = [];
+  if (data.tags !== undefined) {
+    if (
+      !Array.isArray(data.tags) ||
+      data.tags.some((tag) => typeof tag !== "string" || !tag.trim())
+    ) {
+      errors.push(
+        `'tags' in ${filename} must be an array of non-empty strings`,
+      );
+    } else {
+      tags = [...new Set((data.tags as string[]).map((tag) => tag.trim()))];
+    }
+  }
+
+  let series: string | undefined;
+  if (data.series !== undefined && data.series !== "") {
+    if (typeof data.series !== "string" || !data.series.trim()) {
+      errors.push(`'series' in ${filename} must be a string`);
+    } else {
+      series = data.series.trim();
+    }
   }
 
   const publishedAt = normalizeDate(data.publishedAt);
@@ -95,6 +147,10 @@ export function validateFrontmatter(
     data.updatedAt === undefined || data.updatedAt === ""
       ? undefined
       : normalizeDate(data.updatedAt);
+  const eventDate =
+    data.eventDate === undefined || data.eventDate === ""
+      ? undefined
+      : normalizeDate(data.eventDate);
 
   if (!publishedAt) {
     errors.push(
@@ -108,7 +164,15 @@ export function validateFrontmatter(
     );
   }
 
-  if (typeof data.draft !== "boolean") {
+  if (data.eventDate !== undefined && data.eventDate !== "" && !eventDate) {
+    errors.push(
+      `Invalid 'eventDate' date in ${filename}: '${String(data.eventDate)}'`,
+    );
+  }
+
+  // Draft defaults to true for safety
+  const draft = data.draft === undefined ? true : Boolean(data.draft);
+  if (data.draft !== undefined && typeof data.draft !== "boolean") {
     errors.push(`'draft' in ${filename} must be a boolean (true or false)`);
   }
 
@@ -130,21 +194,26 @@ export function validateFrontmatter(
     errors.push(`'canonical' in ${filename} must be an absolute HTTP(S) URL`);
   }
 
+  const frenchVersion = normalizeTranslationRef(data.frenchVersion);
+
   if (errors.length > 0) {
     throw new Error(`Frontmatter validation failed:\n- ${errors.join("\n- ")}`);
   }
 
   return {
     title: (data.title as string).trim(),
-    slug: (data.slug as string).trim(),
+    slug: derivedSlug,
     summary: (data.summary as string).trim(),
-    type: data.type as WritingType,
-    tags: [...new Set((data.tags as string[]).map((tag) => tag.trim()))],
+    category,
+    tags,
+    series,
     publishedAt: publishedAt as string,
     updatedAt,
-    draft: Boolean(data.draft),
+    eventDate,
+    draft,
     cover: data.cover ? String(data.cover).trim() : undefined,
     canonical: data.canonical ? String(data.canonical).trim() : undefined,
+    frenchVersion,
   };
 }
 
@@ -158,7 +227,6 @@ function normalizeDate(value: unknown): string | undefined {
   )
     return undefined;
   const date = new Date(value);
-  // Date.parse silently rolls dates such as February 31 into the following month.
   if (
     Number.isNaN(date.getTime()) ||
     date.toISOString().slice(0, 10) !== value.slice(0, 10)
@@ -204,9 +272,6 @@ function isSafeLink(value: string): boolean {
 }
 
 export async function renderMarkdownToHtml(markdown: string): Promise<string> {
-  // Raw HTML is text. Marked owns all ordinary tag/attribute escaping; only
-  // its link/image destinations need an explicit policy. Shiki HTML is trusted
-  // output from code tokens, never substituted into user-controlled text.
   const highlighted = new Map<Tokens.Code, string>();
   const marked = new Marked({
     async: true,
@@ -251,13 +316,11 @@ export async function renderMarkdownToHtml(markdown: string): Promise<string> {
   return marked.parse(markdown, { async: true });
 }
 
-function parseYamlFrontmatter(source: string) {
+export function parseYamlFrontmatter(source: string) {
   const normalized = source.replace(/^\uFEFF/, "");
   const opening = /^---\r?\n/.exec(normalized);
   const remainder = opening ? normalized.slice(opening[0].length) : "";
   const closing = /(?:^|\r?\n)---(?:\r?\n|$)/.exec(remainder);
-  // Only a complete YAML fence is accepted. No content-selected parser or
-  // executable frontmatter engine participates in this pipeline.
   if (!opening || !closing) {
     throw new Error(
       "Articles require complete YAML frontmatter delimited by ---",
@@ -281,109 +344,184 @@ function parseYamlFrontmatter(source: string) {
 export interface ArticleSource {
   filename: string;
   content: string;
+  locale?: WritingLocale;
 }
 
 export function parseArticleSources(
   sources: ArticleSource[],
-  options?: { includeDrafts?: boolean },
+  options?: { includeDrafts?: boolean; locale?: WritingLocale },
 ): Article[] {
+  const defaultLocale = options?.locale ?? "fr";
   const seenSlugs = new Set<string>();
   const articles: Article[] = [];
+
   for (const source of sources) {
+    const locale = source.locale ?? defaultLocale;
     const { data, content } = parseYamlFrontmatter(source.content);
-    const frontmatter = validateFrontmatter(data, source.filename);
-    if (seenSlugs.has(frontmatter.slug))
+    const frontmatter = validateFrontmatter(data, source.filename, locale);
+    if (seenSlugs.has(frontmatter.slug)) {
       throw new Error(
         `Duplicate slug '${frontmatter.slug}' found in ${source.filename}`,
       );
+    }
     seenSlugs.add(frontmatter.slug);
     if (frontmatter.draft && !options?.includeDrafts) continue;
+
+    const url =
+      locale === "en"
+        ? `/en/blog/${frontmatter.slug}`
+        : `/blog/${frontmatter.slug}`;
+
     articles.push({
       ...frontmatter,
       id: frontmatter.slug,
+      locale,
       body: content,
-      readingMinutes: calculateReadingTime(content),
-      url: `/blog/${frontmatter.slug}`,
+      readingMinutes: calculateReadingMinutes(content),
+      readingTimeText: calculateReadingTimeText(content, locale),
+      url,
     });
   }
+
   return articles.sort(
     (a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt),
   );
 }
 
-export async function getAllArticles(options?: {
-  includeDrafts?: boolean;
-}): Promise<Article[]> {
+export async function readDirSources(
+  dir: string,
+  locale: WritingLocale,
+): Promise<ArticleSource[]> {
   try {
-    const entries = await fs.readdir(CONTENT_DIR, { withFileTypes: true });
-    const sources = await Promise.all(
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    return await Promise.all(
       entries
         .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
         .map(async (entry) => ({
           filename: entry.name,
-          content: await fs.readFile(
-            path.join(CONTENT_DIR, entry.name),
-            "utf-8",
-          ),
+          locale,
+          content: await fs.readFile(path.join(dir, entry.name), "utf-8"),
         })),
     );
-    return parseArticleSources(sources, options);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
     throw error;
   }
 }
 
-export async function getPublishedArticles(): Promise<Article[]> {
-  return getAllArticles({ includeDrafts: false });
+export async function getAllArticles(options?: {
+  locale?: WritingLocale;
+  includeDrafts?: boolean;
+}): Promise<Article[]> {
+  const targetLocale = options?.locale ?? "fr";
+  const includeDrafts = options?.includeDrafts ?? false;
+
+  // Read both collections to wire bidirectional translations
+  const [frSources, enSources] = await Promise.all([
+    readDirSources(CONTENT_DIR_FR, "fr"),
+    readDirSources(CONTENT_DIR_EN, "en"),
+  ]);
+
+  const frArticles = parseArticleSources(frSources, {
+    locale: "fr",
+    includeDrafts,
+  });
+  const enArticles = parseArticleSources(enSources, {
+    locale: "en",
+    includeDrafts,
+  });
+
+  // Bidirectional resolution:
+  // For each EN article: if it has frenchVersion, link to FR article with that slug;
+  // otherwise if a FR article shares the exact same slug, link them.
+  const frBySlug = new Map<string, Article>(frArticles.map((a) => [a.slug, a]));
+
+  for (const enArticle of enArticles) {
+    const targetFrSlug = enArticle.frenchVersion || enArticle.slug;
+    const matchedFr = frBySlug.get(targetFrSlug);
+    if (matchedFr) {
+      enArticle.translationSlug = matchedFr.slug;
+      matchedFr.translationSlug = enArticle.slug;
+    }
+  }
+
+  return targetLocale === "en" ? enArticles : frArticles;
+}
+
+export async function getPublishedArticles(
+  locale: WritingLocale = "fr",
+): Promise<Article[]> {
+  return getAllArticles({ locale, includeDrafts: false });
 }
 
 export async function getArticleBySlug(
   slug: string,
+  locale: WritingLocale = "fr",
   options?: { includeDrafts?: boolean },
 ): Promise<Article | null> {
   if (!slug || !SLUG_REGEX.test(slug)) {
     return null;
   }
 
-  const includeDrafts = options?.includeDrafts ?? false;
-  const filePath = path.join(CONTENT_DIR, `${slug}.md`);
+  const articles = await getAllArticles({
+    locale,
+    includeDrafts: options?.includeDrafts,
+  });
+  const article = articles.find((a) => a.slug === slug);
+  if (!article) return null;
 
-  // Path traversal guard
-  const resolved = path.resolve(filePath);
-  if (!resolved.startsWith(path.resolve(CONTENT_DIR))) {
-    return null;
-  }
-
-  try {
-    const rawContent = await fs.readFile(resolved, "utf-8");
-    const article = parseArticleSources(
-      [{ filename: `${slug}.md`, content: rawContent }],
-      { includeDrafts },
-    )[0];
-    if (!article) return null;
-    return { ...article, html: await renderMarkdownToHtml(article.body) };
-  } catch {
-    return null;
-  }
+  return {
+    ...article,
+    html: await renderMarkdownToHtml(article.body),
+  };
 }
 
-export async function getBlogPostsForListing(): Promise<BlogPost[]> {
-  const articles = await getPublishedArticles();
+export async function getBlogPostsForListing(
+  locale: WritingLocale = "fr",
+): Promise<BlogPost[]> {
+  const articles = await getPublishedArticles(locale);
 
   return articles.map((article) => ({
     id: article.id,
     slug: article.slug,
+    locale: article.locale,
     title: article.title,
     excerpt: article.summary,
     url: article.url,
-    type: article.type,
+    category: article.category,
+    series: article.series,
     tags: article.tags,
     publishedAt: article.publishedAt,
     updatedAt: article.updatedAt,
+    eventDate: article.eventDate,
     readingMinutes: article.readingMinutes,
+    readingTimeText: article.readingTimeText,
     draft: article.draft,
     cover: article.cover,
     canonical: article.canonical,
+    frenchVersion: article.frenchVersion,
+    translationSlug: article.translationSlug,
   }));
+}
+
+export async function getAllCategories(
+  locale: WritingLocale = "fr",
+): Promise<string[]> {
+  const articles = await getPublishedArticles(locale);
+  const categories = new Set<string>();
+  for (const a of articles) {
+    if (a.category) categories.add(a.category);
+  }
+  return Array.from(categories);
+}
+
+export async function getAllTags(
+  locale: WritingLocale = "fr",
+): Promise<string[]> {
+  const articles = await getPublishedArticles(locale);
+  const tags = new Set<string>();
+  for (const a of articles) {
+    for (const t of a.tags) tags.add(t);
+  }
+  return Array.from(tags);
 }

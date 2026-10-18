@@ -1,24 +1,13 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import type {
   BlogPost,
   GitHubOverviewPayload,
   GithubRepo,
-  HackatimePayload,
-  Web3FormsSubmissionValues,
 } from "@/lib/portfolio-types";
-import { submitContactAction } from "@/lib/server/contact-actions";
-
-export type { Web3FormsSubmissionValues };
 
 const TWELVE_HOURS_MS = 1000 * 60 * 60 * 12;
-
-async function submitContactForm(values: Web3FormsSubmissionValues) {
-  const result = await submitContactAction(values);
-  if (!result.success) throw new Error(result.message);
-  return result;
-}
 
 export function usePortfolioReposQuery(initialData?: GithubRepo[]) {
   return useQuery({
@@ -50,23 +39,6 @@ export function usePortfolioPostsQuery(initialData?: BlogPost[]) {
   });
 }
 
-export function usePortfolioHackatimeQuery(
-  initialData?: HackatimePayload | null,
-) {
-  return useQuery({
-    queryKey: ["portfolio", "hackatime"],
-    queryFn: async (): Promise<HackatimePayload | null> => {
-      const res = await fetch("/api/portfolio/stats");
-      if (!res.ok) throw new Error("Failed to fetch stats");
-      return res.json() as Promise<HackatimePayload | null>;
-    },
-    staleTime: TWELVE_HOURS_MS,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    initialData,
-  });
-}
-
 export function usePortfolioGitHubOverviewQuery(
   initialData?: GitHubOverviewPayload | null,
 ) {
@@ -81,12 +53,5 @@ export function usePortfolioGitHubOverviewQuery(
     refetchOnMount: false,
     refetchOnReconnect: false,
     initialData,
-  });
-}
-
-export function useContactSubmissionMutation() {
-  return useMutation({
-    mutationKey: ["portfolio", "contact-submit"],
-    mutationFn: submitContactForm,
   });
 }

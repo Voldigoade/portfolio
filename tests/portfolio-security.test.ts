@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 
 mock.module("server-only", () => ({}));
-const { getGithubRepos, getGithubOverview, getHackatimeStats } = await import(
+const { getGithubRepos, getGithubOverview } = await import(
   "../src/lib/server/portfolio-data"
 );
 const originalFetch = globalThis.fetch;
@@ -222,68 +222,5 @@ describe("public portfolio boundary", () => {
     expect(result?.monthlyActivity).toEqual([]);
     expect(result?.totalStars).toBeNull(); // incomplete curated metric set
     expect(JSON.stringify(result)).not.toContain("99");
-  });
-
-  it("unconfigured coding providers return null without making requests", async () => {
-    globalThis.fetch = mock(async () => {
-      throw new Error("must not fetch");
-    }) as unknown as typeof fetch;
-    expect(await getHackatimeStats()).toBeNull();
-  });
-
-  it("uses documented WakaTime summaries and status_bar endpoints without putting credentials in URLs", async () => {
-    process.env.WAKATIME_ACCESS_TOKEN = "OAUTH_TEST";
-    const calls: string[] = [];
-    globalThis.fetch = mock(async (input) => {
-      const url = String(input);
-      calls.push(url);
-      if (url.includes("/stats/"))
-        return Response.json({
-          data: {
-            total_seconds: 25200,
-            daily_average: 3600,
-            start: "2026-10-10T00:00:00Z",
-            end: "2026-10-16T23:59:59Z",
-            languages: [{ name: "Rust", total_seconds: 25200 }],
-          },
-        });
-      if (url.includes("/summaries?"))
-        return Response.json({
-          data: Array.from({ length: 7 }, (_, i) => ({
-            range: { date: `2026-10-${10 + i}` },
-            grand_total: { total_seconds: 3600 },
-          })),
-        });
-      if (url.endsWith("/all_time_since_today"))
-        return Response.json({ data: { total_seconds: 360000 } });
-      if (url.endsWith("/status_bar/today"))
-        return Response.json({
-          data: { grand_total: { total_seconds: 1800 } },
-        });
-      return Response.json({}, { status: 404 });
-    }) as unknown as typeof fetch;
-    const stats = await getHackatimeStats();
-    expect(stats?.totalHours).toBe("100.0h");
-    expect(stats?.last7DaysTotalHours).toBe("7.0h");
-    expect(stats?.todaySeconds).toBe(1800);
-    expect(stats?.activeDaysLast7).toBe(7);
-    expect(calls.some((url) => url.includes("OAUTH_TEST"))).toBe(false);
-  });
-
-  it("coding provider errors, malformed or incomplete data never become zero-hour stats", async () => {
-    process.env.WAKATIME_API_KEY = "TEST";
-    for (const payload of [
-      null,
-      {},
-      { data: {} },
-      { data: { total_seconds: 7 } },
-    ]) {
-      respond(payload);
-      expect(await getHackatimeStats()).toBeNull();
-    }
-    globalThis.fetch = mock(async () => {
-      throw new Error("provider secret");
-    }) as unknown as typeof fetch;
-    expect(await getHackatimeStats()).toBeNull();
   });
 });

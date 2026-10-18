@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArticleLanguageSwitcher } from "@/components/portfolio/article-language-switcher";
 import { Button } from "@/components/retroui/Button";
 import { getArticleBySlug, getPublishedArticles } from "@/lib/blog";
 import { githubUrl, siteName, siteUrl } from "@/lib/site-config";
@@ -12,7 +13,7 @@ interface ArticlePageProps {
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  const articles = await getPublishedArticles();
+  const articles = await getPublishedArticles("fr");
   return articles.map((article) => ({
     slug: article.slug,
   }));
@@ -22,7 +23,7 @@ export async function generateMetadata({
   params,
 }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug, { includeDrafts: false });
+  const article = await getArticleBySlug(slug, "fr", { includeDrafts: false });
 
   if (!article) {
     notFound();
@@ -35,6 +36,12 @@ export async function generateMetadata({
     description: article.summary,
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        fr: `${siteUrl}/blog/${article.slug}`,
+        ...(article.translationSlug
+          ? { en: `${siteUrl}/en/blog/${article.translationSlug}` }
+          : {}),
+      },
     },
     keywords: article.tags,
     openGraph: {
@@ -42,6 +49,7 @@ export async function generateMetadata({
       description: article.summary,
       url: `${siteUrl}/blog/${article.slug}`,
       type: "article",
+      locale: "fr_FR",
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt || article.publishedAt,
       authors: [siteName],
@@ -57,7 +65,7 @@ export async function generateMetadata({
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug, { includeDrafts: false });
+  const article = await getArticleBySlug(slug, "fr", { includeDrafts: false });
 
   if (!article) {
     notFound();
@@ -70,6 +78,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     description: article.summary,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
+    inLanguage: "fr",
     url: `${siteUrl}/blog/${article.slug}`,
     author: {
       "@type": "Person",
@@ -97,28 +106,36 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         }}
       />
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Button
           asChild
           variant="secondary"
           className="border-4 border-black uppercase shadow-retro-sm"
         >
-          <Link href="/blog">← All Writing</Link>
+          <Link href="/blog">← Tous les articles</Link>
         </Button>
-        <span className="border-2 border-black bg-accent px-3 py-1 font-pixel text-xs uppercase text-accent-foreground">
-          {article.type}
-        </span>
+        <div className="flex items-center gap-3">
+          <ArticleLanguageSwitcher
+            currentLocale="fr"
+            translationSlug={article.translationSlug}
+          />
+          {article.category ? (
+            <span className="border-2 border-black bg-accent px-3 py-1 font-pixel text-xs uppercase text-accent-foreground">
+              {article.category}
+            </span>
+          ) : null}
+        </div>
       </div>
 
       <header className="border-4 border-black bg-card p-6 shadow-retro-lg sm:p-8 md:p-10 space-y-4">
         <div className="flex flex-wrap items-center gap-3 text-xs font-black uppercase text-muted-foreground">
           <time dateTime={article.publishedAt}>{article.publishedAt}</time>
           <span>•</span>
-          <span>{article.readingMinutes} min read</span>
+          <span>{article.readingTimeText}</span>
           {article.updatedAt ? (
             <>
               <span>•</span>
-              <span>Updated: {article.updatedAt}</span>
+              <span>Mis à jour : {article.updatedAt}</span>
             </>
           ) : null}
         </div>
@@ -156,14 +173,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           variant="secondary"
           className="border-2 border-black uppercase shadow-retro-xs"
         >
-          <Link href="/blog">Back to All Articles</Link>
+          <Link href="/blog">Retour aux articles</Link>
         </Button>
         <Button
           asChild
           className="border-2 border-black uppercase shadow-retro-xs"
         >
           <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
-            View on GitHub
+            Voir sur GitHub
           </Link>
         </Button>
       </footer>

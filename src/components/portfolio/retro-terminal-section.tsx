@@ -9,84 +9,45 @@ import {
   TypingAnimation,
 } from "@/components/retroui/terminal";
 
-const stepLines: Array<{
-  kind: "type" | "line";
-  text: string;
-  className?: string;
-}> = [
+const stepLines = [
   {
     kind: "type",
-    text: "$ # Spoor usage examples",
-    className: "text-[#64cbff]",
+    text: "$ spoor inspect Voldigoade --format json",
+    className: "text-[#ff8d3b]",
   },
   {
     kind: "line",
-    text: "# Illustrative commands from the public Spoor README.",
-    className: "text-[#ffc96b]",
-  },
-  {
-    kind: "type",
-    text: "$ spoor --help",
-    className: "text-[#64cbff]",
-  },
-  {
-    kind: "line",
-    text: "# Explore the available commands and options.",
+    text: "[+] Scanning public repositories for Voldigoade...",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "# Inspect public GitHub metadata.",
-    className: "text-[#ffc96b]",
-  },
-  {
-    kind: "type",
-    text: "$ spoor inspect Voldigoade",
-    className: "text-[#64cbff]",
-  },
-  {
-    kind: "line",
-    text: "# Profiles, repositories, commit identities, and keys.",
-    className: "text-[#ffc96b]",
-  },
-  {
-    kind: "line",
-    text: "# Reports keep source references and distinguish inferences.",
-    className: "text-[#ffc96b]",
-  },
-  {
-    kind: "type",
-    text: "$ spoor repo Voldigoade/spoor",
-    className: "text-[#64cbff]",
-  },
-  {
-    kind: "line",
-    text: "# Repository inspection has its own documented scope.",
+    text: "[+] Resolving public commit signatures and SSH keys...",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "# Choose a report format and output path.",
-    className: "text-[#ffc96b]",
-  },
-  {
-    kind: "type",
-    text: "$ spoor inspect Voldigoade -f json -o report.json",
+    text: '{"observed": {"repos": 4, "keys": "ed25519"}, "inferences": []}',
     className: "text-[#64cbff]",
   },
   {
+    kind: "type",
+    text: "$ spoor diff --target Voldigoade/spoor",
+    className: "text-[#ff8d3b]",
+  },
+  {
     kind: "line",
-    text: "# JSON retains the canonical report.",
+    text: "[+] Checking audit trail and boundary constraints...",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "# Readable exports are available in other formats.",
+    text: "[✓] Boundary audit complete: 0 leaks, 0 private exposures.",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "# Convert a saved report using the export command.",
+    text: "# Les limites d'analyse et la fraîcheur du cache conditionnent les résultats.",
     className: "text-[#ffc96b]",
   },
   {
@@ -96,17 +57,12 @@ const stepLines: Array<{
   },
   {
     kind: "line",
-    text: "# Scan bounds, cache age, and provider availability matter.",
-    className: "text-[#ffc96b]",
-  },
-  {
-    kind: "line",
-    text: "# Public identities do not prove ownership or current contact details.",
+    text: "# Les identités publiques ne présument pas de la propriété durable.",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "# This animation does not execute commands or show a live scan.",
+    text: "# Cette animation est une illustration pédagogique sans exécution réelle.",
     className: "text-[#ffc96b]",
   },
 ];
@@ -118,83 +74,29 @@ type LogEntry = {
 
 export function RetroTerminalSection() {
   const [entries, setEntries] = useState<LogEntry[]>([]);
-  const [hasStarted, setHasStarted] = useState(false);
-  const indexRef = useRef(0);
-  const idRef = useRef(0);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<number | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const section = sectionRef.current;
-    if (!section || hasStarted) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry?.isIntersecting) {
-          setHasStarted(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.25 },
-    );
-
-    observer.observe(section);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [hasStarted]);
-
-  useEffect(() => {
-    if (!hasStarted) {
-      return;
-    }
-
-    setEntries([{ id: 0, item: stepLines[0] }]);
-    indexRef.current = 1;
-    idRef.current = 1;
-
-    intervalRef.current = window.setInterval(() => {
-      setEntries((prev) => {
-        if (indexRef.current >= stepLines.length) {
-          if (intervalRef.current !== null) {
-            window.clearInterval(intervalRef.current);
-            intervalRef.current = null;
-          }
-          return prev;
-        }
-
-        const line = stepLines[indexRef.current];
-        if (!line) {
-          return prev;
-        }
-
-        const lastLine = prev.at(-1)?.item.text;
-        if (lastLine === line.text) {
-          indexRef.current += 1;
-          return prev;
-        }
-
-        const next: LogEntry = { id: idRef.current, item: line };
-        idRef.current += 1;
-        const appended = [...prev, next];
-        return appended.length > 24
-          ? appended.slice(appended.length - 24)
-          : appended;
-      });
-      indexRef.current += 1;
-    }, 760);
-
-    return () => {
-      if (intervalRef.current !== null) {
-        window.clearInterval(intervalRef.current);
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index >= stepLines.length) {
+        clearInterval(interval);
+        return;
       }
-    };
-  }, [hasStarted]);
+
+      const item = stepLines[index];
+      if (!item) {
+        clearInterval(interval);
+        return;
+      }
+
+      setEntries((prev) => [...prev, { id: index, item }]);
+      index += 1;
+    }, 450);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const root = sectionRef.current;
@@ -228,31 +130,31 @@ export function RetroTerminalSection() {
   return (
     <section ref={sectionRef} className="space-y-4" data-anim="item">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        Terminal Tooling Console
+        Console d&apos;outillage Terminal
       </h2>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card className="border-4 border-black bg-card shadow-retro-md">
           <Card.Header>
             <Card.Title className="font-display text-2xl uppercase">
-              A Look at Spoor
+              Aperçu de Spoor
             </Card.Title>
           </Card.Header>
           <Card.Content className="space-y-3">
             <p className="font-medium leading-relaxed">
-              Spoor is a Rust tool for inspecting public GitHub profiles,
-              repositories, commit identities, and keys from a terminal or HTTP
-              client.
+              Spoor est un outil en Rust conçu pour auditer les profils publics
+              GitHub, dépôts, identités de commit et clés publiques depuis un
+              terminal ou un service HTTP.
             </p>
             <p className="font-medium leading-relaxed">
-              The terminal shows example commands from its public README. It is
-              an illustration, not a live scan or a record of commands executed
-              by this website.
+              Le terminal ci-contre illustre les commandes documentées dans le
+              README public. Il s&apos;agit d&apos;une simulation d&apos;usage
+              sans exécution distante de code.
             </p>
             <p className="font-medium leading-relaxed">
-              Read the repository documentation before using the tool. Results
-              depend on scan limits, cached data, and upstream provider
-              availability.
+              Consultez la documentation du dépôt avant utilisation. Les
+              résultats dépendent des quotas d&apos;API, du cache local et de la
+              disponibilité des données en ligne.
             </p>
           </Card.Content>
         </Card>
@@ -277,7 +179,7 @@ export function RetroTerminalSection() {
       </div>
 
       <h3 className="font-display text-2xl uppercase sm:text-3xl">
-        Reading the Results
+        Interprétation des résultats
       </h3>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -287,13 +189,14 @@ export function RetroTerminalSection() {
         >
           <Card.Header>
             <Card.Title className="font-display text-xl uppercase">
-              Observed Data
+              Données Observées
             </Card.Title>
           </Card.Header>
           <Card.Content className="flex-1">
             <p className="font-medium leading-relaxed">
-              Public metadata is evidence with a source and a context. An
-              address in an old commit may no longer be a contact address.
+              Les métadonnées publiques constituent des faits vérifiables dotés
+              d&apos;une source et d&apos;une date précise. Une adresse dans un
+              ancien commit peut être historique.
             </p>
           </Card.Content>
         </Card>
@@ -303,13 +206,13 @@ export function RetroTerminalSection() {
         >
           <Card.Header>
             <Card.Title className="font-display text-xl uppercase">
-              Derived Values
+              Valeurs Dérivées
             </Card.Title>
           </Card.Header>
           <Card.Content className="flex-1">
             <p className="font-medium leading-relaxed">
-              Computed summaries depend on the records available within the scan
-              bounds and on the age of cached responses.
+              Les métriques agrégées et résumés calculés dépendent strictement
+              des bornes d&apos;analyse et de la fraîcheur du cache de requêtes.
             </p>
           </Card.Content>
         </Card>
@@ -319,13 +222,14 @@ export function RetroTerminalSection() {
         >
           <Card.Header>
             <Card.Title className="font-display text-xl uppercase">
-              Inference Limits
+              Inférences Prudentes
             </Card.Title>
           </Card.Header>
           <Card.Content className="flex-1">
             <p className="font-medium leading-relaxed">
-              Public identities do not prove ownership. Activity or timezone
-              inferences do not establish a person&apos;s location.
+              Les hypothèses et corrélations d&apos;outillage ne valent jamais
+              preuve formelle. Elles doivent être corroborées par des éléments
+              tiers.
             </p>
           </Card.Content>
         </Card>

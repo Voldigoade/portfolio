@@ -12,17 +12,9 @@ import { Card } from "@/components/retroui/Card";
 import { Input } from "@/components/retroui/Input";
 import { Search } from "@/components/retroui/icons";
 import { usePortfolioPostsQuery } from "@/lib/client/portfolio-queries";
-import type { BlogPost, WritingType } from "@/lib/portfolio-types";
-import { type BlogFilterType, useBlogStore } from "@/store/blog-store";
+import type { BlogPost, WritingLocale } from "@/lib/portfolio-types";
+import { useBlogStore } from "@/store/blog-store";
 
-const WRITING_TYPES: BlogFilterType[] = [
-  "All",
-  "Article",
-  "Write-up",
-  "Research",
-  "Note",
-  "Project Log",
-];
 const BLOG_SKELETON_KEYS = ["b1", "b2", "b3", "b4", "b5", "b6"] as const;
 const BLOG_TAG_SKELETON_KEYS = ["t1", "t2", "t3"] as const;
 
@@ -59,26 +51,33 @@ type BlogGridProps = {
   compact?: boolean;
   limit?: number;
   initialPosts?: BlogPost[];
+  locale?: WritingLocale;
 };
 
 export function BlogGrid({
   compact = false,
   limit = 3,
   initialPosts,
+  locale = "fr",
 }: BlogGridProps) {
   const PAGE_SIZE = 9;
+  const isFrench = locale === "fr";
+
   const {
     data: posts = [],
     isLoading,
     isFetching,
     isError,
   } = usePortfolioPostsQuery(initialPosts);
+
   const query = useBlogStore((state) => state.query);
-  const source = useBlogStore((state) => state.source);
+  const selectedCategory = useBlogStore((state) => state.selectedCategory);
   const selectedTag = useBlogStore((state) => state.selectedTag);
   const sortBy = useBlogStore((state) => state.sortBy);
   const setQuery = useBlogStore((state) => state.setQuery);
-  const setSource = useBlogStore((state) => state.setSource);
+  const setSelectedCategory = useBlogStore(
+    (state) => state.setSelectedCategory,
+  );
   const setSelectedTag = useBlogStore((state) => state.setSelectedTag);
   const setSortBy = useBlogStore((state) => state.setSortBy);
 
@@ -86,11 +85,20 @@ export function BlogGrid({
     if (compact) {
       return;
     }
-
-    setSource("All");
+    setSelectedCategory("All");
     setSelectedTag("All");
-  }, [compact, setSelectedTag, setSource]);
+  }, [compact, setSelectedCategory, setSelectedTag]);
 
+  // Dynamic category extraction
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of posts) {
+      if (p.category) set.add(p.category);
+    }
+    return ["All", ...Array.from(set)];
+  }, [posts]);
+
+  // Distinct tags
   const distinctTags = useMemo(() => {
     const counts = new Map<string, number>();
 
@@ -98,10 +106,7 @@ export function BlogGrid({
       .flatMap((post) => post.tags ?? [])
       .filter(Boolean)) {
       const key = normalizeTag(tag);
-      if (!key) {
-        continue;
-      }
-
+      if (!key) continue;
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
 
@@ -115,8 +120,11 @@ export function BlogGrid({
   const filtered = useMemo(() => {
     const text = query.trim().toLowerCase();
     const filteredPosts = posts.filter((post) => {
-      const byType =
-        compact || source === "All" || post.type === (source as WritingType);
+      const byCategory =
+        compact ||
+        selectedCategory === "All" ||
+        post.category?.toLowerCase() === selectedCategory.toLowerCase();
+
       const normalizedTags = post.tags.map((tag) =>
         normalizeTag(tag).toUpperCase(),
       );
@@ -124,9 +132,10 @@ export function BlogGrid({
         compact ||
         selectedTag === "All" ||
         normalizedTags.includes(selectedTag);
+
       const haystack =
         `${post.title} ${post.excerpt} ${post.tags.join(" ")}`.toLowerCase();
-      return byType && byTag && (compact || haystack.includes(text));
+      return byCategory && byTag && (compact || haystack.includes(text));
     });
 
     return [...filteredPosts].sort((a, b) => {
@@ -138,7 +147,7 @@ export function BlogGrid({
       if (sortBy === "title-asc") return a.title.localeCompare(b.title);
       return Date.parse(b.publishedAt) - Date.parse(a.publishedAt);
     });
-  }, [posts, query, source, selectedTag, sortBy, compact]);
+  }, [posts, query, selectedCategory, selectedTag, sortBy, compact]);
 
   const visible = compact ? filtered.slice(0, limit) : filtered;
   const [currentPage, setCurrentPage] = useState(1);
@@ -148,9 +157,9 @@ export function BlogGrid({
     setQuery(value);
   };
 
-  const handleTypeChange = (value: BlogFilterType) => {
+  const handleCategoryChange = (value: string) => {
     setCurrentPage(1);
-    setSource(value);
+    setSelectedCategory(value);
   };
 
   const handleTagChange = (value: string) => {
@@ -181,8 +190,14 @@ export function BlogGrid({
             <Input
               value={query}
               onChange={(event) => handleSearchChange(event.target.value)}
-              placeholder="Search by title, tags, description..."
-              aria-label="Search writing"
+              placeholder={
+                isFrench
+                  ? "Rechercher par titre, tags, résumé..."
+                  : "Search by title, tags, description..."
+              }
+              aria-label={
+                isFrench ? "Rechercher des articles" : "Search writing"
+              }
               className="w-full border-4 border-black bg-card py-3 pl-11 font-bold shadow-retro"
             />
           </div>
@@ -209,28 +224,46 @@ export function BlogGrid({
                   )
                 }
                 className="h-11 w-full border-4 border-black bg-card px-3 font-black uppercase shadow-retro"
-                aria-label="Sort blog posts"
+                aria-label={isFrench ? "Trier les articles" : "Sort blog posts"}
               >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="read-desc">Read Time: High to Low</option>
-                <option value="read-asc">Read Time: Low to High</option>
-                <option value="title-asc">Title: A-Z</option>
+                <option value="newest">
+                  {isFrench ? "Plus récents d'abord" : "Newest First"}
+                </option>
+                <option value="oldest">
+                  {isFrench ? "Plus anciens d'abord" : "Oldest First"}
+                </option>
+                <option value="read-desc">
+                  {isFrench
+                    ? "Temps de lecture: décroissant"
+                    : "Read Time: High to Low"}
+                </option>
+                <option value="read-asc">
+                  {isFrench
+                    ? "Temps de lecture: croissant"
+                    : "Read Time: Low to High"}
+                </option>
+                <option value="title-asc">
+                  {isFrench ? "Titre: A-Z" : "Title: A-Z"}
+                </option>
               </select>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {WRITING_TYPES.map((item) => (
-                <Button
-                  key={item}
-                  variant={source === item ? "default" : "secondary"}
-                  onClick={() => handleTypeChange(item)}
-                  className="border-4 border-black shadow-retro-sm uppercase"
-                >
-                  {item}
-                </Button>
-              ))}
-            </div>
+            {categories.length > 1 ? (
+              <div className="flex flex-wrap gap-2">
+                {categories.map((item) => (
+                  <Button
+                    key={item}
+                    variant={
+                      selectedCategory === item ? "default" : "secondary"
+                    }
+                    onClick={() => handleCategoryChange(item)}
+                    className="border-4 border-black shadow-retro-sm uppercase text-xs"
+                  >
+                    {item === "All" ? (isFrench ? "Tous" : "All") : item}
+                  </Button>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -239,7 +272,9 @@ export function BlogGrid({
 
       {isError ? (
         <div className="border-4 border-black bg-destructive p-5 font-black uppercase text-destructive-foreground shadow-retro-md">
-          Failed to load writing feed right now.
+          {isFrench
+            ? "Impossible de charger les articles actuellement."
+            : "Failed to load writing feed right now."}
         </div>
       ) : null}
 
@@ -250,13 +285,21 @@ export function BlogGrid({
         >
           <h2 className="font-display text-xl uppercase sm:text-2xl">
             {posts.length === 0
-              ? "No published writing yet"
-              : "No matching writing"}
+              ? isFrench
+                ? "Aucun article publié pour le moment"
+                : "No published writing yet"
+              : isFrench
+                ? "Aucun article correspondant"
+                : "No matching writing"}
           </h2>
           <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-muted-foreground sm:text-base">
             {posts.length === 0
-              ? "Published articles and project notes will appear here. You can explore the public projects in the meantime."
-              : "Try another search or clear the filters to see all published writing."}
+              ? isFrench
+                ? "Les articles publiés et notes techniques apparaîtront ici. Vous pouvez en attendant explorer les projets publics."
+                : "Published articles and project notes will appear here. You can explore the public projects in the meantime."
+              : isFrench
+                ? "Essayez une autre recherche ou réinitialisez les filtres pour afficher tous les articles."
+                : "Try another search or clear the filters to see all published writing."}
           </p>
           {posts.length === 0 ? (
             <Button
@@ -264,7 +307,9 @@ export function BlogGrid({
               variant="secondary"
               className="mt-5 border-4 border-black uppercase shadow-retro-sm"
             >
-              <Link href="/project">Explore projects</Link>
+              <Link href="/project">
+                {isFrench ? "Explorer les projets" : "Explore projects"}
+              </Link>
             </Button>
           ) : (
             <Button
@@ -273,11 +318,11 @@ export function BlogGrid({
               onClick={() => {
                 setCurrentPage(1);
                 setQuery("");
-                setSource("All");
+                setSelectedCategory("All");
                 setSelectedTag("All");
               }}
             >
-              Clear filters
+              {isFrench ? "Réinitialiser les filtres" : "Clear filters"}
             </Button>
           )}
         </div>
@@ -319,10 +364,12 @@ export function BlogGrid({
                   </Card.Header>
                   <Card.Content className="mt-auto flex flex-col gap-4 pt-0">
                     <div className="flex items-center justify-between text-xs font-black uppercase">
-                      <span className="border-2 border-black bg-accent px-2 py-0.5 text-accent-foreground">
-                        {post.type}
-                      </span>
-                      <span>{post.readingMinutes} min read</span>
+                      {post.category ? (
+                        <span className="border-2 border-black bg-accent px-2 py-0.5 text-accent-foreground">
+                          {post.category}
+                        </span>
+                      ) : null}
+                      <span>{post.readingTimeText}</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {post.tags.slice(0, compact ? 4 : 8).map((tag) => (
@@ -344,7 +391,9 @@ export function BlogGrid({
                       asChild
                       className="mt-auto w-full justify-center border-4 border-black shadow-retro-sm uppercase"
                     >
-                      <Link href={post.url}>Read {post.type}</Link>
+                      <Link href={post.url}>
+                        {isFrench ? "Lire l'article" : "Read article"}
+                      </Link>
                     </Button>
                   </Card.Content>
                 </Card>
@@ -357,7 +406,9 @@ export function BlogGrid({
       {!compact && totalPages > 1 ? (
         <div className="flex flex-wrap items-center justify-between gap-3 border-4 border-black bg-card p-3 shadow-retro-sm">
           <p className="text-xs font-black uppercase text-muted-foreground sm:text-sm">
-            Page {currentPage} of {totalPages}
+            {isFrench
+              ? `Page ${currentPage} sur ${totalPages}`
+              : `Page ${currentPage} of ${totalPages}`}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -366,7 +417,7 @@ export function BlogGrid({
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               className="border-2 border-black shadow-retro-xs uppercase"
             >
-              Previous
+              {isFrench ? "Précédent" : "Previous"}
             </Button>
             <Button
               variant="secondary"
@@ -374,7 +425,7 @@ export function BlogGrid({
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               className="border-2 border-black shadow-retro-xs uppercase"
             >
-              Next
+              {isFrench ? "Suivant" : "Next"}
             </Button>
           </div>
         </div>

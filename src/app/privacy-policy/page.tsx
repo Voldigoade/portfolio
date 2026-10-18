@@ -5,23 +5,24 @@ import { siteUrl } from "@/lib/site-config";
 const privacyPolicyOgImageUrl = `${siteUrl}/privacy-policy/opengraph-image`;
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
+  title: "Politique de confidentialité",
   description:
-    "How voldigoade.xyz handles analytics preferences and contact messages.",
+    "Traitement des données techniques, préférences de navigation et mesure d'audience sur voldigoade.xyz.",
   alternates: { canonical: "/privacy-policy" },
   openGraph: {
-    title: "Privacy Policy | Voldigoade",
+    title: "Politique de confidentialité | Voldigoade",
     description:
-      "Information about analytics, browser preferences, and contact messages on voldigoade.xyz.",
+      "Informations sur la mesure d'audience, les préférences de navigation et la protection des données sur voldigoade.xyz.",
     url: `${siteUrl}/privacy-policy`,
     type: "website",
+    locale: "fr_FR",
     images: [privacyPolicyOgImageUrl],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Privacy Policy | Voldigoade",
+    title: "Politique de confidentialité | Voldigoade",
     description:
-      "Information about analytics, browser preferences, and contact messages on voldigoade.xyz.",
+      "Informations sur la mesure d'audience, les préférences de navigation et la protection des données sur voldigoade.xyz.",
     images: [privacyPolicyOgImageUrl],
   },
 };
@@ -29,49 +30,35 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <PolicyPageClient
-      pageTitle="Privacy Policy"
-      intro="This policy describes the data used by voldigoade.xyz for browsing preferences, optional analytics, and contact messages."
+      pageTitle="Politique de Confidentialité"
+      intro="Cette politique explicite le traitement des données techniques, la gestion des préférences locales et la mesure d'audience sur voldigoade.xyz."
       sections={[
         {
-          title: "Core Privacy Principles",
+          title: "Principes Fondamentaux",
           content: [
-            "Browsing the portfolio does not require an account. This application does not implement visitor fingerprinting or sell contact-form information.",
-            "Links to GitHub and other external sites are subject to those services’ own privacy policies.",
+            "La consultation de ce portfolio ne nécessite aucun compte utilisateur. Ce site ne pratique aucun traçage inter-sites, ne commercialise aucune donnée et ne comporte aucun formulaire de collecte intrusive.",
+            "Les liens menant vers GitHub ou d'autres plateformes externes sont régis par les politiques de confidentialité respectives de ces services.",
           ],
         },
         {
-          title: "Analytics & Telemetry",
+          title: "Mesure d'Audience & Télémétrie",
           content: [
-            "Cloudflare Web Analytics can be enabled through site configuration. Its cookieless beacon operates independently of the Google analytics consent choice.",
-            "Google Analytics and Google Tag Manager load only when configured and after you explicitly accept the Cookie Notice. Google services may then use cookies or other browser storage according to their configuration.",
+            "Cloudflare Web Analytics peut être activé afin de mesurer les performances d'acheminement et de disponibilité. Cette solution fonctionne sans cookie et sans collecte d'identifiants personnels.",
+            "Google Analytics 4 est strictement conditionné à votre consentement explicite via le bandeau dédié. Lorsqu'il est autorisé, il opère selon des paramètres de minimisation stricts (anonymisation des adresses IP, désactivation des signaux publicitaires et suppression des paramètres d'URL).",
           ],
         },
         {
-          title: "Contact Form Submissions",
+          title: "Stockage Local (localStorage)",
           content: [
-            "When the contact service is configured, submitting the form sends your name, email, topic, and message to Web3Forms for delivery. These details are used to handle your inquiry. Do not submit secrets or sensitive security reports.",
-            "The application does not persist contact-form fields in browser local storage. Its temporary submission throttle runs in server memory and is not a durable abuse-prevention service.",
+            "Le stockage local de votre navigateur est exclusivement utilisé pour conserver vos préférences d'affichage (thème sombre ou clair, filtres actifs) et l'état de votre consentement relatif aux cookies.",
+            "Vous pouvez à tout moment réinitialiser ou modifier vos choix de consentement via le bouton « Gérer les préférences » accessible en bas de chaque page.",
           ],
         },
         {
-          title: "Cookies & Local Storage",
+          title: "Sécurité & Signalements",
           content: [
-            "Browser local storage remembers theme, cookie consent, filters, and interactive display preferences. See the Cookies Policy for details.",
-            "Without explicit acceptance, the application does not load its configured Google analytics scripts. Cloudflare’s cookieless beacon may still be enabled.",
-          ],
-        },
-        {
-          title: "Data Security & Hygiene",
-          content: [
-            "The public site uses HTTPS. Hosting, form delivery, analytics, and linked services each have their own processing and retention policies.",
-            "No online service can guarantee complete security. Avoid sending credentials, private keys, or confidential information through the general contact form.",
-          ],
-        },
-        {
-          title: "Contact & Data Rights",
-          content: [
-            "You have the right to request deletion or clarification regarding any communications sent through the contact form.",
-            "For any inquiries regarding this policy, reach out via the Contact page or directly on GitHub: https://github.com/Voldigoade.",
+            "Le site est servi exclusivement en HTTPS avec des en-têtes de sécurité renforcés (Content-Security-Policy, protection contre l'encapsulation en iframe, HSTS).",
+            "Pour toute question relative à cette politique ou pour signaler une vulnérabilité de sécurité, utilisez les avis de sécurité GitHub (GitHub Security Advisories) sur les dépôts officiels du projet : https://github.com/Voldigoade.",
           ],
         },
       ]}

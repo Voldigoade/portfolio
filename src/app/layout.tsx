@@ -32,11 +32,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: "Voldigoade Portfolio",
   title: {
-    default: "Voldigoade | Software, Systems, Security and Privacy",
+    default: "Voldigoade | Systèmes, Logiciels, Sécurité & Confidentialité",
     template: "%s | Voldigoade",
   },
   description:
-    "Public software projects and source-linked research into systems, security, privacy, and developer tools by Voldigoade.",
+    "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et l'outillage développeur par Voldigoade.",
   alternates: {
     canonical: "/",
   },
@@ -45,11 +45,11 @@ export const metadata: Metadata = {
     "voldigoade.xyz",
     "Rust",
     "Linux",
-    "Systems",
-    "Security",
-    "Privacy",
+    "Systèmes",
+    "Sécurité",
+    "Confidentialité",
     "Open Source",
-    "Developer Tools",
+    "Outils développeur",
   ],
   creator: "Voldigoade",
   publisher: "Voldigoade",
@@ -65,13 +65,13 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Voldigoade | Software, Systems, Security and Privacy",
+    title: "Voldigoade | Systèmes, Logiciels, Sécurité & Confidentialité",
     description:
-      "Public software projects and source-linked research into systems, security, privacy, and developer tools.",
+      "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et l'outillage développeur.",
     url: siteUrl,
     siteName: "Voldigoade",
     type: "website",
-    locale: "en_US",
+    locale: "fr_FR",
     images: [
       {
         url: ogImageUrl,
@@ -84,7 +84,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Voldigoade",
-    description: "Software, systems, security and privacy.",
+    description: "Systèmes, sécurité et confidentialité numérique.",
     images: [ogImageUrl],
   },
 };
@@ -110,7 +110,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const cfToken = process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN;
 
@@ -127,7 +126,7 @@ export default function RootLayout({
     "@type": "WebSite",
     name: "Voldigoade",
     url: siteUrl,
-    inLanguage: "en",
+    inLanguage: "fr",
     publisher: {
       "@type": "Person",
       name: "Voldigoade",
@@ -143,7 +142,7 @@ export default function RootLayout({
           Voldigoade
         </p>
         <p className="mt-2 text-sm font-black uppercase text-muted-foreground sm:text-base">
-          Loading workspace
+          Chargement de l&apos;espace de travail
           <span className="animate-dots" />
         </p>
         <div className="mt-5 h-7 border-4 border-black bg-muted p-1 sm:h-8">
@@ -154,7 +153,7 @@ export default function RootLayout({
   );
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <link
@@ -177,7 +176,7 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${bungee.variable} ${pressStart.variable} antialiased`}
       >
-        <AnalyticsManager gaId={gaId} gtmId={gtmId} cfToken={cfToken} />
+        <AnalyticsManager gaId={gaId} cfToken={cfToken} />
         <Suspense fallback={shellFallback}>
           <ThemeProvider>
             <RouteProgressBar />

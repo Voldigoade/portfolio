@@ -140,12 +140,12 @@ export function ReleaseUpdateNotice() {
             </span>
             <div>
               <p className="font-display text-2xl uppercase">
-                New Release Available
+                Nouvelle Version Disponible
               </p>
               <p className="mt-1 text-sm font-medium leading-relaxed sm:text-base">
-                Latest portfolio release is <strong>v{latestVersion}</strong>.
-                You are on
-                <strong> v{normalizedCurrentVersion}</strong>.
+                La dernière version du portfolio est la{" "}
+                <strong>v{latestVersion}</strong>. Vous utilisez actuellement la{" "}
+                <strong>v{normalizedCurrentVersion}</strong>.
               </p>
             </div>
           </div>
@@ -153,7 +153,7 @@ export function ReleaseUpdateNotice() {
             type="button"
             onClick={handleDismiss}
             className="retro-social-icon"
-            aria-label="Dismiss update notice"
+            aria-label="Fermer la notification de mise à jour"
           >
             <X className="h-4 w-4" />
           </button>
@@ -165,7 +165,7 @@ export function ReleaseUpdateNotice() {
             onClick={handleDismiss}
             className="inline-flex items-center justify-center border-4 border-black bg-muted px-4 py-2 text-sm font-black uppercase shadow-retro-sm transition hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
           >
-            Got It (1 Day)
+            Compris (1 jour)
           </button>
           <Link
             href={`${PORTFOLIO_REPO_URL}/releases/latest`}
@@ -173,7 +173,7 @@ export function ReleaseUpdateNotice() {
             rel="noreferrer noopener"
             className="inline-flex items-center justify-center border-4 border-black bg-primary px-4 py-2 text-sm font-black uppercase text-primary-foreground shadow-retro-sm transition hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
           >
-            Upgrade Now
+            Consulter la version
           </Link>
         </div>
       </div>

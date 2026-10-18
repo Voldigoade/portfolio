@@ -6,40 +6,45 @@ import { siteName, siteUrl } from "@/lib/site-config";
 const blogOgImageUrl = `${siteUrl}/blog/opengraph-image`;
 
 export const metadata: Metadata = {
-  title: "Writing",
+  title: "Blog & Publications",
   description:
-    "Technical articles, security write-ups, research notes and project logs by Voldigoade.",
+    "Articles techniques, retours d'expérience, notes de recherche sur les systèmes et la sécurité par Voldigoade.",
   alternates: {
     canonical: "/blog",
+    languages: {
+      fr: "/blog",
+      en: "/en/blog",
+    },
   },
   keywords: [
-    "Voldigoade writing",
-    "technical write-ups",
-    "security research",
-    "systems engineering",
-    "Rust articles",
-    "Linux notes",
+    "Voldigoade blog",
+    "articles techniques",
+    "recherche sécurité",
+    "ingénierie systèmes",
+    "articles Rust",
+    "notes Linux",
   ],
   openGraph: {
-    title: "Writing & Research | Voldigoade",
+    title: "Blog & Publications | Voldigoade",
     description:
-      "Articles, research notes and project logs on software systems, security and privacy.",
+      "Articles, notes de recherche et retours d'expérience sur les systèmes, la sécurité et la confidentialité.",
     url: `${siteUrl}/blog`,
     type: "website",
+    locale: "fr_FR",
     images: [
       {
         url: blogOgImageUrl,
         width: 1200,
         height: 630,
-        alt: "Voldigoade Writing",
+        alt: "Voldigoade Blog",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Writing & Research | Voldigoade",
+    title: "Blog & Publications | Voldigoade",
     description:
-      "Articles, research notes and project logs on software systems, security and privacy.",
+      "Articles, notes de recherche et retours d'expérience sur les systèmes, la sécurité et la confidentialité.",
     images: [blogOgImageUrl],
   },
 };
@@ -57,15 +62,16 @@ async function safeFetch<T>(fallback: T, fn: () => Promise<T>): Promise<T> {
 }
 
 export default async function BlogPage() {
-  const posts = await safeFetch([], () => getBlogPosts());
+  const posts = await safeFetch([], () => getBlogPosts("fr"));
 
   const blogJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Writing & Research",
+    name: "Blog & Publications",
     url: `${siteUrl}/blog`,
+    inLanguage: "fr",
     description:
-      "Technical writing, security research notes and systems project logs.",
+      "Articles techniques, notes de recherche et retours d'expérience d'ingénierie logicielle.",
     mainEntity: {
       "@type": "ItemList",
       itemListElement: posts.map((post, index) => ({
@@ -77,6 +83,7 @@ export default async function BlogPage() {
           headline: post.title,
           description: post.excerpt,
           datePublished: post.publishedAt,
+          inLanguage: "fr",
           author: {
             "@type": "Person",
             name: siteName,
@@ -100,7 +107,7 @@ export default async function BlogPage() {
       {
         "@type": "ListItem",
         position: 1,
-        name: "Home",
+        name: "Accueil",
         item: siteUrl,
       },
       {
@@ -123,16 +130,20 @@ export default async function BlogPage() {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       <section className="border-4 border-black bg-card p-4 shadow-retro-lg sm:p-6 md:p-8">
-        <h1 className="font-pixel text-3xl uppercase sm:text-4xl md:text-5xl">
-          Writing & Research
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-muted-foreground sm:text-base">
-          First-party technical articles, research write-ups, architecture
-          notes, and project engineering logs.
-        </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="font-pixel text-3xl uppercase sm:text-4xl md:text-5xl">
+              Blog & Publications
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-muted-foreground sm:text-base">
+              Articles techniques originaux, retours d'expérience
+              d'architecture, notes de recherche et journaux de développement.
+            </p>
+          </div>
+        </div>
       </section>
 
-      <BlogPageClient initialPosts={posts} />
+      <BlogPageClient initialPosts={posts} locale="fr" />
     </div>
   );
 }

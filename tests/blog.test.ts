@@ -4,7 +4,9 @@ import * as blog from "../src/lib/blog";
 const { parseArticleSources } = blog;
 
 import {
+  calculateReadingMinutes,
   calculateReadingTime,
+  calculateReadingTimeText,
   getAllArticles,
   getArticleBySlug,
   getBlogPostsForListing,
@@ -17,7 +19,7 @@ const valid = {
   title: "Parser fixture",
   slug: "parser-fixture",
   summary: "Internal deterministic fixture",
-  type: "Note",
+  category: "Systèmes",
   tags: ["testing"],
   publishedAt: "2026-10-18",
   draft: false,
@@ -38,12 +40,53 @@ describe("article parsing and publication boundary", () => {
     const articles = parseArticleSources([articleSource()]);
     expect(articles).toHaveLength(1);
     expect(articles[0]).toMatchObject({
-      ...valid,
+      title: "Parser fixture",
+      slug: "parser-fixture",
+      summary: "Internal deterministic fixture",
+      category: "Systèmes",
+      tags: ["testing"],
       id: "parser-fixture",
       url: "/blog/parser-fixture",
       readingMinutes: 1,
+      readingTimeText: "1 min de lecture",
     });
     expect(articles[0]?.body).toContain("Fixture **body**.");
+  });
+
+  it("derives slug from filename when slug is omitted from frontmatter", () => {
+    const withoutSlug = {
+      title: "Parser fixture",
+      summary: "Internal deterministic fixture",
+      publishedAt: "2026-10-18",
+      draft: false,
+    };
+    const articles = parseArticleSources([
+      {
+        filename: "auto-derived-slug.md",
+        content: `---\n${Object.entries(withoutSlug)
+          .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+          .join("\n")}\n---\nBody`,
+      },
+    ]);
+    expect(articles[0]?.slug).toBe("auto-derived-slug");
+    expect(articles[0]?.url).toBe("/blog/auto-derived-slug");
+  });
+
+  it("supports English locale with /en/blog URL and 'X min read'", () => {
+    const articles = parseArticleSources(
+      [
+        {
+          filename: "english-post.md",
+          locale: "en",
+          content: `---\ntitle: "English Post"\nsummary: "English summary"\npublishedAt: "2026-10-18"\ndraft: false\n---\nBody content`,
+        },
+      ],
+      { locale: "en" },
+    );
+    expect(articles[0]?.locale).toBe("en");
+    expect(articles[0]?.url).toBe("/en/blog/english-post");
+    expect(articles[0]?.readingTimeText).toBe("1 min read");
+    expect(articles[0]?.category).toBe("Systems");
   });
 
   it("excludes drafts, including from an otherwise empty collection", () => {
@@ -120,10 +163,8 @@ describe("article parsing and publication boundary", () => {
   it.each([
     ["title", ""],
     ["summary", ""],
-    ["slug", "../traversal"],
-    ["type", "Unknown"],
+    ["category", ""],
     ["tags", [123]],
-    ["tags", []],
     ["tags", ["   "]],
     ["publishedAt", "2026-02-31"],
     ["publishedAt", "October 18, 2026"],
@@ -137,16 +178,30 @@ describe("article parsing and publication boundary", () => {
     ).toThrow();
   });
 
-  it("rejects filename/slug mismatches", () => {
+  it("rejects filename/slug mismatches when slug is explicitly provided", () => {
     expect(() => validateFrontmatter(valid, "other.md")).toThrow(
       /Filename \/ slug mismatch/,
     );
   });
 
+  it("rejects filenames that produce invalid slugs", () => {
+    expect(() =>
+      validateFrontmatter(
+        {
+          title: "Test",
+          summary: "Summary",
+          publishedAt: "2026-10-18",
+          draft: false,
+        },
+        "../traversal.md",
+      ),
+    ).toThrow(/invalid slug/);
+  });
+
   it("keeps synthetic slugs and every draft out of real public content", async () => {
-    const published = await getPublishedArticles();
-    const listings = await getBlogPostsForListing();
-    const all = await getAllArticles({ includeDrafts: true });
+    const published = await getPublishedArticles("fr");
+    const listings = await getBlogPostsForListing("fr");
+    const all = await getAllArticles({ locale: "fr", includeDrafts: true });
     const syntheticSlugs = [
       "spoor-github-footprint-inspection",
       "threat-modeling-secure-messengers",
@@ -159,7 +214,7 @@ describe("article parsing and publication boundary", () => {
     );
     for (const slug of syntheticSlugs) {
       expect(all.some((article) => article.slug === slug)).toBe(false);
-      expect(await getArticleBySlug(slug)).toBeNull();
+      expect(await getArticleBySlug(slug, "fr")).toBeNull();
     }
     for (const draft of all.filter((article) => article.draft)) {
       expect(published.some((article) => article.slug === draft.slug)).toBe(
@@ -168,16 +223,23 @@ describe("article parsing and publication boundary", () => {
       expect(listings.some((article) => article.slug === draft.slug)).toBe(
         false,
       );
-      expect(await getArticleBySlug(draft.slug)).toBeNull();
+      expect(await getArticleBySlug(draft.slug, "fr")).toBeNull();
     }
     for (const slug of ["../draft-example-post", "INVALID_UPPERCASE"]) {
-      expect(await getArticleBySlug(slug)).toBeNull();
+      expect(await getArticleBySlug(slug, "fr")).toBeNull();
     }
   });
 
-  it("calculates reading time", () => {
+  it("calculates reading time and text per locale", () => {
+    expect(calculateReadingMinutes("Word ".repeat(50))).toBe(1);
+    expect(calculateReadingMinutes("Word ".repeat(650))).toBe(4);
     expect(calculateReadingTime("Word ".repeat(50))).toBe(1);
-    expect(calculateReadingTime("Word ".repeat(650))).toBe(4);
+    expect(calculateReadingTimeText("Word ".repeat(50), "fr")).toBe(
+      "1 min de lecture",
+    );
+    expect(calculateReadingTimeText("Word ".repeat(50), "en")).toBe(
+      "1 min read",
+    );
   });
 });
 

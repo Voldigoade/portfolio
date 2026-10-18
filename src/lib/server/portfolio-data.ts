@@ -4,7 +4,7 @@ import type {
   BlogPost,
   GitHubOverviewPayload,
   GithubRepo,
-  HackatimePayload,
+  WritingLocale,
 } from "@/lib/portfolio-types";
 
 export const DEFAULT_GITHUB_USER = "Voldigoade";
@@ -88,11 +88,6 @@ function record(value: unknown): Record<string, unknown> | null {
 }
 function count(value: unknown): number | undefined {
   return typeof value === "number" && Number.isSafeInteger(value) && value >= 0
-    ? value
-    : undefined;
-}
-function seconds(value: unknown): number | undefined {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0
     ? value
     : undefined;
 }
@@ -212,127 +207,8 @@ export async function getGithubOverview(
     commitHistory: [],
   };
 }
-export async function getBlogPosts(): Promise<BlogPost[]> {
-  return getBlogPostsForListing();
-}
-export async function getHackatimeStats(): Promise<HackatimePayload | null> {
-  const provider =
-    process.env.CODING_STATS_PROVIDER === "hackatime"
-      ? "hackatime"
-      : "wakatime";
-  const apiKey =
-    provider === "hackatime"
-      ? process.env.HACKATIME_API_KEY
-      : (process.env.WAKATIME_ACCESS_TOKEN ?? process.env.WAKATIME_API_KEY);
-  if (!apiKey) return null;
-  const baseUrl =
-    provider === "hackatime"
-      ? (
-          process.env.HACKATIME_API_BASE_URL ?? "https://hackatime.hackclub.com"
-        ).replace(/\/$/, "")
-      : "https://api.wakatime.com";
-  const prefix = provider === "hackatime" ? "/api/hackatime/v1" : "/api/v1";
-  const options = {
-    headers: { Authorization: `Bearer ${apiKey}` },
-    cache: "force-cache" as const,
-    next: { revalidate: 1800, tags: ["coding-time"] },
-  };
-  const weeklyPayload = await fetchJson(
-    `${baseUrl}${prefix}/users/current/stats/last_7_days`,
-    options,
-  );
-  const weekly = record(record(weeklyPayload)?.data);
-  if (
-    !weekly ||
-    typeof weekly.start !== "string" ||
-    typeof weekly.end !== "string" ||
-    !Array.isArray(weekly.languages)
-  )
-    return null;
-  const startDate = weekly.start.slice(0, 10);
-  const endDate = weekly.end.slice(0, 10);
-  if (
-    !/^\d{4}-\d{2}-\d{2}$/.test(startDate) ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(endDate) ||
-    !Number.isFinite(Date.parse(startDate)) ||
-    !Number.isFinite(Date.parse(endDate))
-  )
-    return null;
-  // Match the provider's calendar, including its timezone, instead of inventing zero-filled heartbeats.
-  const [summaryPayload, totalPayload, todayPayload] = await Promise.all([
-    fetchJson(
-      `${baseUrl}${prefix}/users/current/summaries?start=${startDate}&end=${endDate}`,
-      options,
-    ),
-    provider === "wakatime"
-      ? fetchJson(
-          `${baseUrl}${prefix}/users/current/all_time_since_today`,
-          options,
-        )
-      : Promise.resolve(null),
-    fetchJson(
-      `${baseUrl}${prefix}/users/current/${provider === "hackatime" ? "statusbar" : "status_bar"}/today`,
-      options,
-    ),
-  ]);
-  const days = record(summaryPayload)?.data;
-  const allTime = record(record(totalPayload)?.data);
-  const today = record(record(record(todayPayload)?.data)?.grand_total);
-  const totalSeconds = seconds(allTime?.total_seconds);
-  const todaySeconds = seconds(today?.total_seconds);
-  const weeklySeconds = seconds(weekly.total_seconds);
-  const dailyAverageSeconds = seconds(weekly.daily_average);
-  // Incomplete provider responses are unavailable, never synthetic zero activity.
-  if (
-    todaySeconds === undefined ||
-    weeklySeconds === undefined ||
-    dailyAverageSeconds === undefined ||
-    !Array.isArray(days)
-  )
-    return null;
-  const last7Days: HackatimePayload["last7Days"] = [];
-  for (const value of days) {
-    const day = record(value);
-    const duration = seconds(record(day?.grand_total)?.total_seconds);
-    const date = record(day?.range)?.date;
-    if (
-      typeof date !== "string" ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
-      !Number.isFinite(Date.parse(date)) ||
-      duration === undefined
-    )
-      return null;
-    last7Days.push({
-      day: new Date(`${date}T12:00:00Z`).toLocaleDateString("en-US", {
-        weekday: "short",
-        timeZone: "UTC",
-      }),
-      hours: duration / 3600,
-    });
-  }
-  // A partial day list cannot truthfully imply zero activity on missing days.
-  if (last7Days.length !== 7) return null;
-  const languages: HackatimePayload["topLanguages"] = [];
-  for (const value of weekly.languages) {
-    const language = record(value);
-    const duration = seconds(language?.total_seconds);
-    if (typeof language?.name !== "string" || duration === undefined)
-      return null;
-    languages.push({ name: language.name, hours: duration / 3600 });
-  }
-  return {
-    totalHours:
-      totalSeconds === undefined
-        ? null
-        : `${(totalSeconds / 3600).toFixed(1)}h`,
-    last7DaysTotalHours: `${(weeklySeconds / 3600).toFixed(1)}h`,
-    dailyAverage: `${(dailyAverageSeconds / 3600).toFixed(2)} h/day`,
-    dailyAverageHours: dailyAverageSeconds / 3600,
-    todayHours: `${(todaySeconds / 3600).toFixed(1)}h today`,
-    todaySeconds,
-    activeDaysLast7: last7Days.filter((day) => day.hours > 0).length,
-    topLanguages: languages.slice(0, 5),
-    last7Days,
-    hasActivity: weeklySeconds > 0,
-  };
+export async function getBlogPosts(
+  locale: WritingLocale = "fr",
+): Promise<BlogPost[]> {
+  return getBlogPostsForListing(locale);
 }

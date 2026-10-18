@@ -3,7 +3,8 @@
 import { animate } from "animejs";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { Github, Link2, Mail } from "@/components/retroui/icons";
+import { VOLDIGOADE_MANAGE_COOKIES_EVENT } from "@/components/layout/analytics-manager";
+import { Github, Link2 } from "@/components/retroui/icons";
 import {
   CURRENT_PORTFOLIO_VERSION,
   PORTFOLIO_REPO_URL,
@@ -50,6 +51,10 @@ export function Footer() {
     });
   }, []);
 
+  const handleOpenCookiePreferences = () => {
+    window.dispatchEvent(new Event(VOLDIGOADE_MANAGE_COOKIES_EVENT));
+  };
+
   return (
     <footer
       ref={footerRef}
@@ -77,13 +82,13 @@ export function Footer() {
         </div>
 
         <div className="flex w-full flex-col items-center gap-3 lg:w-auto lg:items-end">
-          <div className="grid grid-cols-4 gap-2">
+          <div className="flex items-center gap-2">
             <Link
               href={githubUrl}
               className="retro-social-icon"
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="GitHub"
+              aria-label="Profil GitHub de Voldigoade"
               data-footer-social
             >
               <Github className="h-4 w-4" />
@@ -91,41 +96,27 @@ export function Footer() {
             <Link
               href="/project"
               className="retro-social-icon"
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label="Explore projects"
+              aria-label="Explorer les projets"
               data-footer-social
             >
               <Link2 className="h-4 w-4" />
             </Link>
             <Link
-              href="/contact"
-              className="retro-social-icon"
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label="Contact Voldigoade"
-              data-footer-social
-            >
-              <Mail className="h-4 w-4" />
-            </Link>
-            <Link
               href="/blog"
               className="retro-social-icon"
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label="Technical writing"
+              aria-label="Lire les articles et notes de recherche"
               data-footer-social
             >
               <Link2 className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-end">
+          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-end text-xs font-bold uppercase">
             <Link href="/robots.txt" className="retro-link" data-footer-policy>
               Robots
             </Link>
             <Link href="/sitemap.xml" className="retro-link" data-footer-policy>
-              Sitemap
+              Plan du site
             </Link>
             <Link href="/rss.xml" className="retro-link" data-footer-policy>
               RSS
@@ -135,14 +126,7 @@ export function Footer() {
               className="retro-link"
               data-footer-policy
             >
-              Privacy
-            </Link>
-            <Link
-              href="/terms-of-service"
-              className="retro-link"
-              data-footer-policy
-            >
-              Terms
+              Confidentialité
             </Link>
             <Link
               href="/cookies-policy"
@@ -151,6 +135,14 @@ export function Footer() {
             >
               Cookies
             </Link>
+            <button
+              type="button"
+              onClick={handleOpenCookiePreferences}
+              className="retro-link underline cursor-pointer"
+              data-footer-policy
+            >
+              Gérer les préférences
+            </button>
           </div>
         </div>
       </div>

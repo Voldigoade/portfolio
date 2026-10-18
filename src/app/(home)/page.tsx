@@ -4,41 +4,41 @@ import {
   getBlogPosts,
   getGithubOverview,
   getGithubRepos,
-  getHackatimeStats,
 } from "@/lib/server/portfolio-data";
 import { githubUrl, ogImageUrl, siteName, siteUrl } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Voldigoade | Software, Systems, Security and Privacy",
+    absolute: "Voldigoade | Systèmes, Logiciels, Sécurité & Confidentialité",
   },
   description:
-    "Public software projects and source-linked research into systems, security, privacy, and developer tools by Voldigoade.",
+    "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et les outils développeur par Voldigoade.",
   alternates: {
     canonical: "/",
   },
   keywords: [
     "Voldigoade",
     "voldigoade.xyz",
-    "systems developer",
+    "développeur systèmes",
     "Rust",
     "Linux",
-    "security research",
-    "privacy engineering",
+    "recherche sécurité",
+    "confidentialité numérique",
     "open source",
   ],
   openGraph: {
-    title: "Voldigoade | Software, Systems, Security and Privacy",
+    title: "Voldigoade | Systèmes, Logiciels, Sécurité & Confidentialité",
     description:
-      "Public software projects and source-linked research into systems, security, privacy, and developer tools.",
+      "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et les outils développeur.",
     url: siteUrl,
     type: "website",
+    locale: "fr_FR",
     images: [
       {
         url: ogImageUrl,
         width: 1200,
         height: 630,
-        alt: "Voldigoade Portfolio Home",
+        alt: "Voldigoade Portfolio Accueil",
       },
     ],
   },
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Voldigoade",
     description:
-      "Public software projects and source-linked research into systems, security, privacy, and developer tools.",
+      "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et les outils développeur.",
     images: [ogImageUrl],
   },
 };
@@ -64,21 +64,22 @@ async function safeFetch<T>(fallback: T, fn: () => Promise<T>): Promise<T> {
 }
 
 export default async function HomePage() {
-  const [initialRepos, initialPosts, initialHackatime, initialGitHubOverview] =
-    await Promise.all([
+  const [initialRepos, initialPosts, initialGitHubOverview] = await Promise.all(
+    [
       safeFetch([], () => getGithubRepos()),
-      safeFetch([], () => getBlogPosts()),
-      safeFetch(null, () => getHackatimeStats()),
+      safeFetch([], () => getBlogPosts("fr")),
       safeFetch(null, () => getGithubOverview()),
-    ]);
+    ],
+  );
 
   const homepageJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Voldigoade Portfolio",
+    name: "Portfolio Voldigoade",
     url: siteUrl,
+    inLanguage: "fr",
     description:
-      "Software, systems, security and privacy portfolio of Voldigoade.",
+      "Portfolio de logiciels, systèmes, sécurité et confidentialité de Voldigoade.",
     mainEntity: {
       "@type": "Person",
       name: siteName,
@@ -91,9 +92,9 @@ export default async function HomePage() {
     ? {
         "@context": "https://schema.org",
         "@type": "Dataset",
-        name: "Voldigoade GitHub Portfolio Stats",
+        name: "Statistiques GitHub Voldigoade",
         description:
-          "Public GitHub repository, stars, forks, and language metrics.",
+          "Métriques publiques des dépôts GitHub, étoiles, forks et langages.",
         creator: {
           "@type": "Person",
           name: siteName,
@@ -113,7 +114,7 @@ export default async function HomePage() {
       {
         "@type": "ListItem",
         position: 1,
-        name: "Home",
+        name: "Accueil",
         item: siteUrl,
       },
     ],
@@ -140,7 +141,6 @@ export default async function HomePage() {
       <HomePageClient
         initialRepos={initialRepos}
         initialPosts={initialPosts}
-        initialHackatime={initialHackatime}
         initialGitHubOverview={initialGitHubOverview}
       />
     </>

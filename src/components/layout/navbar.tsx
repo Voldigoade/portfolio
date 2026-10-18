@@ -11,17 +11,21 @@ import { Menu } from "@/components/retroui/icons";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/project", label: "Projects" },
+  { href: "/", label: "Accueil" },
+  { href: "/about", label: "À propos" },
+  { href: "/project", label: "Projets" },
   { href: "/blog", label: "Blog" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  const isCurrent = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   return (
     <header className="fixed top-0 z-50 w-full border-b-4 border-black bg-background/95 backdrop-blur">
@@ -34,17 +38,17 @@ export function Navbar() {
         </Link>
 
         <nav
-          aria-label="Main navigation"
+          aria-label="Navigation principale"
           className="hidden items-center gap-2 md:flex"
         >
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              aria-current={pathname === item.href ? "page" : undefined}
+              aria-current={isCurrent(item.href) ? "page" : undefined}
               className={cn(
                 "border-4 border-black px-3 py-2 text-sm font-black uppercase tracking-wide shadow-retro transition hover:translate-x-1 hover:translate-y-1 hover:shadow-none",
-                pathname === item.href
+                isCurrent(item.href)
                   ? "bg-primary text-primary-foreground"
                   : "bg-card text-card-foreground",
               )}
@@ -65,7 +69,7 @@ export function Navbar() {
             className="md:hidden h-11 w-11"
             onClick={() => setOpen((v) => !v)}
             ref={menuButtonRef}
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={open}
             aria-controls="mobile-navigation"
           >
@@ -78,7 +82,7 @@ export function Navbar() {
         {open && (
           <motion.nav
             id="mobile-navigation"
-            aria-label="Mobile navigation"
+            aria-label="Navigation mobile"
             onKeyDown={(event) => {
               if (event.key === "Escape") {
                 setOpen(false);
@@ -97,10 +101,10 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  aria-current={pathname === item.href ? "page" : undefined}
+                  aria-current={isCurrent(item.href) ? "page" : undefined}
                   className={cn(
                     "border-4 border-black px-3 py-2 text-center text-sm font-black uppercase shadow-retro",
-                    pathname === item.href
+                    isCurrent(item.href)
                       ? "bg-primary text-primary-foreground"
                       : "bg-card text-card-foreground",
                   )}
