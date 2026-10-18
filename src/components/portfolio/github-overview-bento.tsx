@@ -102,7 +102,9 @@ export function GithubOverviewBento({
           data-gh-card
           className="sm:col-span-2 lg:col-span-4 self-start"
         >
-          <p className="font-display text-2xl uppercase">Pouls GitHub</p>
+          <p className="font-display text-2xl uppercase">
+            Activité GitHub publique
+          </p>
           <p className="mt-1 text-xs font-bold uppercase text-muted-foreground">
             Données publiques agrégées sur les dépôts sélectionnés. Les
             métriques indisponibles sont omises.
@@ -157,9 +159,7 @@ export function GithubOverviewBento({
           data-gh-card
           className="sm:col-span-2 lg:col-span-4 self-start"
         >
-          <p className="font-display text-2xl uppercase">
-            Carte des Projets Publics
-          </p>
+          <p className="font-display text-2xl uppercase">Dépôts publics</p>
           <p className="mt-1 text-xs font-bold uppercase text-muted-foreground">
             Sélection de projets open source et dépôts de recherche.
           </p>

@@ -250,6 +250,7 @@ describe("safe Markdown rendering", () => {
     "[click](data:text/html;base64,PHNjcmlwdD4=)",
     "[click](vbscript:msgbox%281%29)",
     "[click](//evil.example/path)",
+    "[click](mailto:test@example.com)",
     "![image](javascript:alert%281%29)",
     "![image](data:image/svg+xml;base64,PHN2Zz4=)",
     "![image](/images/writing/unsafe.svg)",
@@ -270,12 +271,11 @@ describe("safe Markdown rendering", () => {
 
   it("preserves safe links, formatting and raster images", async () => {
     const html = await renderMarkdownToHtml(
-      "**bold** [site](https://example.com/?a=1&b=2) [local](/blog) [email](mailto:hello@example.com) ![alt](/images/writing/test.webp)",
+      "**bold** [site](https://example.com/?a=1&b=2) [local](/blog) ![alt](/images/writing/test.webp)",
     );
     expect(html).toContain("<strong>bold</strong>");
     expect(html).toContain('href="https://example.com/?a=1&amp;b=2"');
     expect(html).toContain('href="/blog"');
-    expect(html).toContain('href="mailto:hello@example.com"');
     expect(html).toContain('src="/images/writing/test.webp"');
   });
 
