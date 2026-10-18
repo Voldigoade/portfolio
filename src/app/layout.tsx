@@ -1,30 +1,15 @@
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import { Bungee, Press_Start_2P, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
+import { AnalyticsManager } from "@/components/layout/analytics-manager";
 import { AnimePageAnimator } from "@/components/layout/anime-page-animator";
 import { Footer } from "@/components/layout/footer";
-import { GoogleAnalytics } from "@/components/layout/google-analytics";
-import { GoogleTagManager } from "@/components/layout/google-tag-manager";
 import { Navbar } from "@/components/layout/navbar";
 import { RouteProgressBar } from "@/components/layout/route-progress-bar";
 import { ThemeProvider } from "@/components/theme-provider";
-import {
-  donationUrl,
-  fiazDevUrl,
-  githubUrl,
-  hackatimeUrl,
-  linkedinUrl,
-  linkHubUrl,
-  ogImageUrl,
-  siteUrl,
-  sponsorUrl,
-  xUrl,
-  youtubeUrl,
-} from "@/lib/site-config";
+import { githubUrl, ogImageUrl, siteUrl } from "@/lib/site-config";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -42,16 +27,6 @@ const bungee = Bungee({
   weight: "400",
   subsets: ["latin"],
 });
-
-const BusinessScaleNotice = dynamic(
-  () =>
-    import("@/components/layout/business-scale-notice").then(
-      (module) => module.BusinessScaleNotice,
-    ),
-  {
-    loading: () => null,
-  },
-);
 
 const CookieNotice = dynamic(
   () =>
@@ -73,43 +48,31 @@ const ReleaseUpdateNotice = dynamic(
   },
 );
 
-const BusinessInquiryPopup = dynamic(
-  () =>
-    import("@/components/layout/business-inquiry-popup").then(
-      (module) => module.BusinessInquiryPopup,
-    ),
-  {
-    loading: () => null,
-  },
-);
-
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  applicationName: "Muhammad Fiaz Portfolio",
+  applicationName: "Voldigoade Portfolio",
   title: {
-    default: "Muhammad Fiaz | Founder, Entrepreneur, Full Stack Developer",
-    template: "%s | Muhammad Fiaz",
+    default: "Voldigoade | Software, Systems, Security and Privacy",
+    template: "%s | Voldigoade",
   },
   description:
-    "High-converting personal portfolio of Muhammad Fiaz. Founder, Entrepreneur, Full Stack Developer, Freelancer and Full-Time Open-Sourcerer.",
+    "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript by Voldigoade.",
   alternates: {
     canonical: "/",
   },
   keywords: [
-    "Muhammad Fiaz",
-    "muhammadfiaz.com",
-    "Full Stack Developer",
-    "Next.js developer",
-    "TypeScript developer",
-    "Freelancer",
-    "Startup product engineer",
-    "Open-Sourcerer",
-    "WakaTime",
-    "Portfolio",
-    "India",
+    "Voldigoade",
+    "voldigoade.xyz",
+    "Rust",
+    "Linux",
+    "Systems",
+    "Security",
+    "Privacy",
+    "Open Source",
+    "Software Engineer",
   ],
-  creator: "Muhammad Fiaz",
-  publisher: "Muhammad Fiaz",
+  creator: "Voldigoade",
+  publisher: "Voldigoade",
   robots: {
     index: true,
     follow: true,
@@ -122,11 +85,11 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Muhammad Fiaz | Founder, Entrepreneur, Full Stack Developer",
+    title: "Voldigoade | Software, Systems, Security and Privacy",
     description:
-      "25+ happy clients worldwide, 99.9% delivery, and modern full stack products built with speed.",
+      "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript.",
     url: siteUrl,
-    siteName: "Muhammad Fiaz",
+    siteName: "Voldigoade",
     type: "website",
     locale: "en_US",
     images: [
@@ -134,17 +97,15 @@ export const metadata: Metadata = {
         url: ogImageUrl,
         width: 1200,
         height: 630,
-        alt: "Muhammad Fiaz Portfolio v5",
+        alt: "Voldigoade Portfolio",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Muhammad Fiaz",
-    description:
-      "Founder, Entrepreneur, Full Stack Developer, Freelancer and Full-Time Open-Sourcerer.",
+    title: "Voldigoade",
+    description: "Software, systems, security and privacy.",
     images: [ogImageUrl],
-    creator: "@muhammadfiaz_",
   },
 };
 
@@ -158,9 +119,6 @@ export function generateViewport(): Viewport {
   };
 }
 
-const DEFAULT_GTM_ID = "GTM-5BQ5RPW2";
-const DEFAULT_GA_ID = "G-SDJ0K1Y70X";
-
 function serializeJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
@@ -172,45 +130,31 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID || DEFAULT_GTM_ID;
-  const gaId = process.env.NEXT_PUBLIC_GA_ID || DEFAULT_GA_ID;
-  const shouldLoadAnalytics = process.env.NODE_ENV === "production";
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const cfToken = process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN;
 
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: "Muhammad Fiaz",
+    name: "Voldigoade",
     url: siteUrl,
-    jobTitle: "Founder, Entrepreneur, Full Stack Developer",
-    sameAs: [
-      githubUrl,
-      linkedinUrl,
-      xUrl,
-      youtubeUrl,
-      hackatimeUrl,
-      linkHubUrl,
-      sponsorUrl,
-      donationUrl,
-      fiazDevUrl,
-    ],
-    address: {
-      "@type": "PostalAddress",
-      addressCountry: "IN",
-    },
+    jobTitle: "Software, Systems & Security Engineer",
+    sameAs: [githubUrl],
   };
 
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Muhammad Fiaz",
+    name: "Voldigoade",
     url: siteUrl,
     inLanguage: "en",
     publisher: {
       "@type": "Person",
-      name: "Muhammad Fiaz",
+      name: "Voldigoade",
       url: siteUrl,
     },
-    sameAs: [linkHubUrl, fiazDevUrl, sponsorUrl, donationUrl],
+    sameAs: [githubUrl],
     potentialAction: {
       "@type": "SearchAction",
       target: `${siteUrl}/project?query={search_term_string}`,
@@ -218,30 +162,11 @@ export default function RootLayout({
     },
   };
 
-  const organizationJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Fiaz Technologies",
-    url: fiazDevUrl,
-    founder: {
-      "@type": "Person",
-      name: "Muhammad Fiaz",
-      url: siteUrl,
-    },
-    sameAs: [githubUrl, linkedinUrl, xUrl, youtubeUrl, linkHubUrl],
-    sponsor: {
-      "@type": "Offer",
-      url: sponsorUrl,
-      name: "Sponsor Muhammad Fiaz on GitHub",
-    },
-    funding: donationUrl,
-  };
-
   const shellFallback = (
     <div className="fixed inset-0 z-80 flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-lg border-4 border-black bg-card p-4 shadow-retro-lg sm:p-6">
         <p className="font-pixel text-2xl uppercase text-foreground sm:text-3xl">
-          Muhammad Fiaz
+          Voldigoade
         </p>
         <p className="mt-2 text-sm font-black uppercase text-muted-foreground sm:text-base">
           Loading workspace
@@ -257,7 +182,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Required to set theme class before hydration and prevent flash */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <link
           rel="preconnect"
@@ -275,21 +199,11 @@ export default function RootLayout({
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteJsonLd) }}
         />
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: serializeJsonLd(organizationJsonLd),
-          }}
-        />
       </head>
       <body
         className={`${spaceGrotesk.variable} ${bungee.variable} ${pressStart.variable} antialiased`}
       >
-        {shouldLoadAnalytics && gtmId ? (
-          <GoogleTagManager gtmId={gtmId} />
-        ) : null}
-        {shouldLoadAnalytics && gaId ? <GoogleAnalytics gaId={gaId} /> : null}
+        <AnalyticsManager gaId={gaId} gtmId={gtmId} cfToken={cfToken} />
         <Suspense fallback={shellFallback}>
           <ThemeProvider>
             <RouteProgressBar />
@@ -300,16 +214,11 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
-              {/* Summer offer popup disabled on root layout: offer is no longer active. */}
-              {/* <BusinessScaleNotice /> */}
-              {/* <BusinessInquiryPopup /> */}
               <CookieNotice />
               <ReleaseUpdateNotice />
             </div>
           </ThemeProvider>
         </Suspense>
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

@@ -3,26 +3,42 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/retroui/Button";
-
-const CONSENT_KEY = "mf-cookie-consent-v1";
+import {
+  VOLDIGOADE_CONSENT_EVENT,
+  VOLDIGOADE_CONSENT_KEY,
+} from "./analytics-manager";
 
 export function CookieNotice() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(CONSENT_KEY);
-    if (!stored) {
-      setVisible(true);
+    try {
+      const stored = window.localStorage.getItem(VOLDIGOADE_CONSENT_KEY);
+      if (!stored) {
+        setVisible(true);
+      }
+    } catch {
+      setVisible(false);
     }
   }, []);
 
   const accept = () => {
-    window.localStorage.setItem(CONSENT_KEY, "accepted");
+    try {
+      window.localStorage.setItem(VOLDIGOADE_CONSENT_KEY, "accepted");
+      window.dispatchEvent(new Event(VOLDIGOADE_CONSENT_EVENT));
+    } catch {
+      // storage unavailable
+    }
     setVisible(false);
   };
 
   const dismiss = () => {
-    window.localStorage.setItem(CONSENT_KEY, "dismissed");
+    try {
+      window.localStorage.setItem(VOLDIGOADE_CONSENT_KEY, "dismissed");
+      window.dispatchEvent(new Event(VOLDIGOADE_CONSENT_EVENT));
+    } catch {
+      // storage unavailable
+    }
     setVisible(false);
   };
 
@@ -39,9 +55,9 @@ export function CookieNotice() {
     >
       <p className="font-display text-lg uppercase">Cookie Notice</p>
       <p className="mt-2 text-sm font-medium leading-relaxed">
-        This site uses cookies and analytics tools (including Google Analytics
-        and Tag Manager) to improve performance and understand usage. By
-        continuing, you agree to this use.
+        This site uses privacy-focused metrics and optional analytics to
+        understand readership and performance. Google Analytics is only
+        initialized if you accept.
       </p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         <Button

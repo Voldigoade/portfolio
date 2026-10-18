@@ -5,6 +5,9 @@ type GoogleAnalyticsProps = {
 };
 
 export function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
+  if (!gaId || gaId.trim() === "") {
+    return null;
+  }
   return (
     <>
       <Script

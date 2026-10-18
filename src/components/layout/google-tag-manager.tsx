@@ -5,6 +5,9 @@ type GoogleTagManagerProps = {
 };
 
 export function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
+  if (!gtmId || gtmId.trim() === "") {
+    return null;
+  }
   return (
     <>
       <Script id="gtm-init" strategy="lazyOnload">
