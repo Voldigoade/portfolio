@@ -15,6 +15,7 @@ export interface GithubRepo {
   full_name: string;
   description: string | null;
   language: string | null;
+  private?: boolean;
   fork?: boolean;
   archived?: boolean;
   stargazers_count: number;
@@ -26,15 +27,28 @@ export interface GithubRepo {
   updated_at: string;
 }
 
+export type WritingType =
+  | "Article"
+  | "Write-up"
+  | "Research"
+  | "Note"
+  | "Project Log";
+
 export interface BlogPost {
   id: string;
+  slug: string;
   title: string;
   excerpt: string;
   url: string;
-  source: "Hashnode" | "Dev.to" | "Medium";
+  type: WritingType;
+  source?: string;
   tags: string[];
   publishedAt: string;
+  updatedAt?: string;
   readingMinutes: number;
+  draft?: boolean;
+  cover?: string;
+  canonical?: string;
 }
 
 export interface HackatimePayload {

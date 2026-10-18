@@ -160,7 +160,7 @@ export function GithubOverviewBento({
           <div className="mt-4 overflow-hidden border-4 border-black bg-muted p-2 shadow-retro-sm sm:p-3">
             <Image
               src={githubSnakeGraphUrl}
-              alt="Muhammad Fiaz GitHub contribution snake graph"
+              alt="Voldigoade GitHub contribution snake graph"
               width={1200}
               height={260}
               className="h-auto w-full border-2 border-black bg-card"

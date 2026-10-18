@@ -62,9 +62,7 @@ export const useContactFormStore = create<ContactFormState>()(
     }),
     {
       name: "contact-form-store",
-      partialize: (state) => ({
-        cooldownByEmail: state.cooldownByEmail,
-      }),
+      partialize: () => ({}),
     },
   ),
 );

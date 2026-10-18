@@ -1,5 +1,6 @@
 import "server-only";
 import { cacheLife } from "next/cache";
+import { getBlogPostsForListing } from "@/lib/blog";
 import type {
   BlogPost,
   GitHubOverviewPayload,
@@ -12,8 +13,6 @@ interface GitHubUserResponse {
   followers?: number;
   following?: number;
   public_repos?: number;
-  total_private_repos?: number;
-  owned_private_repos?: number;
 }
 
 interface GitHubContributionsResponse {
@@ -31,36 +30,6 @@ interface GitHubContributionsResponse {
       };
     };
   };
-}
-
-interface HashnodeResponse {
-  data?: {
-    publication?: {
-      posts?: {
-        edges?: Array<{
-          node: {
-            id: string;
-            title: string;
-            brief: string;
-            url: string;
-            publishedAt: string;
-            readTimeInMinutes: number;
-            tags: Array<{ name: string }>;
-          };
-        }>;
-      };
-    };
-  };
-}
-
-interface DevToPost {
-  id: number;
-  title: string;
-  description: string;
-  url: string;
-  published_at: string;
-  reading_time_minutes: number;
-  tag_list: string[];
 }
 
 interface HackatimeStatsResponse {
@@ -119,24 +88,129 @@ async function safeJsonParse<T>(response: Response): Promise<T | null> {
   }
 }
 
-const DEFAULT_GITHUB_USER =
-  process.env.GITHUB_USER ??
-  process.env.NEXT_PUBLIC_GITHUB_USER ??
-  "muhammad-fiaz";
-const DEVTO_USER = "muhammadfiaz";
-const HASHNODE_HOST = "muhammadfiaz.hashnode.dev";
+export const DEFAULT_GITHUB_USER = "Voldigoade";
 const GITHUB_CACHE_REVALIDATE_SECONDS = 60 * 60 * 12;
+
+export interface CuratedProject {
+  id: number;
+  name: string;
+  full_name: string;
+  description: string;
+  language: string;
+  topics: string[];
+  html_url: string;
+  homepage: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  watchers_count: number;
+  updated_at: string;
+  fork: boolean;
+  archived: boolean;
+  private: boolean;
+}
+
+export const CURATED_PROJECT_MANIFEST: CuratedProject[] = [
+  {
+    id: 101,
+    name: "spoor",
+    full_name: "Voldigoade/spoor",
+    description:
+      "Terminal-first GitHub public-footprint inspection tool in Rust with HTTP/SSE API, structured reports and exports.",
+    language: "Rust",
+    topics: ["rust", "cli", "github", "osint", "security", "http-sse"],
+    html_url: "https://github.com/Voldigoade/spoor",
+    homepage: "https://voldigoade.xyz/#spoor",
+    stargazers_count: 0,
+    forks_count: 0,
+    watchers_count: 0,
+    updated_at: "2026-10-16T12:00:00Z",
+    fork: false,
+    archived: false,
+    private: false,
+  },
+  {
+    id: 102,
+    name: "recherche-messageries",
+    full_name: "Voldigoade/recherche-messageries",
+    description:
+      "Independent research comparing secure messaging apps: Signal, SimpleX, Session, Olvid, Threema, Briar and more across threat models, metadata, and evidence.",
+    language: "Python",
+    topics: [
+      "privacy",
+      "security",
+      "messaging",
+      "metadata",
+      "threat-models",
+      "research",
+    ],
+    html_url: "https://github.com/Voldigoade/recherche-messageries",
+    homepage: "https://voldigoade.github.io/recherche-messageries/",
+    stargazers_count: 0,
+    forks_count: 0,
+    watchers_count: 0,
+    updated_at: "2026-10-15T12:00:00Z",
+    fork: false,
+    archived: false,
+    private: false,
+  },
+  {
+    id: 103,
+    name: "ide-research",
+    full_name: "Voldigoade/ide-research",
+    description:
+      "Source-driven comparison of IDEs and development environments across stacks, platforms, remote workflows, AI tooling, security, privacy and licensing.",
+    language: "Python",
+    topics: ["developer-tools", "ide", "research", "privacy", "tooling"],
+    html_url: "https://github.com/Voldigoade/ide-research",
+    homepage: "https://voldigoade.github.io/ide-research/",
+    stargazers_count: 0,
+    forks_count: 0,
+    watchers_count: 0,
+    updated_at: "2026-10-16T12:00:00Z",
+    fork: false,
+    archived: false,
+    private: false,
+  },
+  {
+    id: 104,
+    name: "crukst",
+    full_name: "Voldigoade/crukst",
+    description: "Semantic firmware diff and triage, built in Rust.",
+    language: "Rust",
+    topics: ["rust", "firmware", "diff", "triage", "systems"],
+    html_url: "https://github.com/Voldigoade/crukst",
+    homepage: null,
+    stargazers_count: 0,
+    forks_count: 0,
+    watchers_count: 0,
+    updated_at: "2026-10-18T17:00:00Z",
+    fork: false,
+    archived: false,
+    private: false,
+  },
+  {
+    id: 105,
+    name: "diskboot",
+    full_name: "Voldigoade/diskboot",
+    description: "Experimental USB boot and system recovery utilities.",
+    language: "Shell",
+    topics: ["linux", "boot", "usb", "systems", "utilities"],
+    html_url: "https://github.com/Voldigoade/diskboot",
+    homepage: null,
+    stargazers_count: 0,
+    forks_count: 0,
+    watchers_count: 0,
+    updated_at: "2026-10-16T12:00:00Z",
+    fork: false,
+    archived: true,
+    private: false,
+  },
+];
 
 async function getCurrentTimestamp() {
   "use cache";
   cacheLife("hours");
   return Date.now();
-}
-
-function resolveGithubUser(user?: string): string {
-  const normalized = (user ?? DEFAULT_GITHUB_USER).trim();
-  const isValid = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(normalized);
-  return isValid ? normalized : DEFAULT_GITHUB_USER;
 }
 
 function getGithubHeaders(): HeadersInit {
@@ -151,116 +225,105 @@ function getGithubHeaders(): HeadersInit {
   return headers;
 }
 
-async function getAuthenticatedGithubLogin(
-  headers: HeadersInit,
-): Promise<string | null> {
-  if (!process.env.GITHUB_TOKEN) {
-    return null;
-  }
-
-  const response = await fetch("https://api.github.com/user", {
-    headers,
-    cache: "force-cache",
-    next: {
-      revalidate: GITHUB_CACHE_REVALIDATE_SECONDS,
-      tags: ["github-auth-user"],
-    },
-  });
-
-  if (!response.ok) {
-    return null;
-  }
-
-  const payload = await safeJsonParse<GitHubUserResponse>(response);
-  return payload?.login?.trim() || null;
-}
-
 function toHours(value: number): number {
   if (Number.isNaN(value)) return 0;
   return Math.max(0, value / 3600);
 }
 
-export async function getGithubRepos(user?: string): Promise<GithubRepo[]> {
-  const username = resolveGithubUser(user);
+export async function getGithubRepos(
+  _userOverride?: string,
+): Promise<GithubRepo[]> {
+  const username = DEFAULT_GITHUB_USER;
   const headers = getGithubHeaders();
-  const authenticatedLogin = await getAuthenticatedGithubLogin(headers);
-  const canReadOwnerPrivateRepos =
-    authenticatedLogin?.toLowerCase() === username.toLowerCase();
 
-  const allRepos: GithubRepo[] = [];
-
-  for (let page = 1; page <= 10; page += 1) {
-    const endpoint = canReadOwnerPrivateRepos
-      ? `https://api.github.com/user/repos?visibility=all&affiliation=owner&sort=updated&per_page=100&page=${page}`
-      : `https://api.github.com/users/${username}/repos?sort=updated&per_page=100&type=owner&page=${page}`;
+  try {
+    const endpoint = `https://api.github.com/users/${username}/repos?sort=updated&per_page=100&type=owner`;
 
     const response = await fetch(endpoint, {
       headers,
       cache: "force-cache",
       next: {
         revalidate: GITHUB_CACHE_REVALIDATE_SECONDS,
-        tags: [`github-repos-${username}`, `github-repos-${username}-p${page}`],
+        tags: [`github-repos-${username}`],
       },
     });
 
     if (!response.ok) {
-      break;
+      return CURATED_PROJECT_MANIFEST;
     }
 
-    const pageRepos = await safeJsonParse<GithubRepo[]>(response);
-    if (!pageRepos) {
-      break;
+    const fetchedRepos = await safeJsonParse<GithubRepo[]>(response);
+    if (!fetchedRepos || !Array.isArray(fetchedRepos)) {
+      return CURATED_PROJECT_MANIFEST;
     }
-    allRepos.push(...pageRepos);
 
-    if (pageRepos.length < 100) {
-      break;
+    // Defensive security filter: strictly exclude any private repositories
+    const publicRepos = fetchedRepos.filter(
+      (repo) => repo.private !== true && !repo.name.startsWith("."),
+    );
+
+    // Filter against curated manifest allowlist
+    const manifestMap = new Map(
+      CURATED_PROJECT_MANIFEST.map((m) => [m.name.toLowerCase(), m]),
+    );
+    const matchedRepos: GithubRepo[] = [];
+
+    for (const repo of publicRepos) {
+      const match = manifestMap.get(repo.name.toLowerCase());
+      if (match) {
+        matchedRepos.push({
+          ...match,
+          ...repo,
+          id: repo.id || match.id,
+          description: repo.description?.trim() || match.description,
+          topics: Array.from(
+            new Set([...(repo.topics ?? []), ...match.topics]),
+          ),
+          language: repo.language || match.language,
+          homepage: repo.homepage || match.homepage,
+          private: false,
+        });
+        manifestMap.delete(repo.name.toLowerCase());
+      }
     }
+
+    // Include remaining curated projects
+    for (const remaining of manifestMap.values()) {
+      matchedRepos.push(remaining);
+    }
+
+    return matchedRepos;
+  } catch {
+    return CURATED_PROJECT_MANIFEST;
   }
-
-  const dedupedById = new Map<number, GithubRepo>();
-  for (const repo of allRepos) {
-    dedupedById.set(repo.id, repo);
-  }
-
-  return Array.from(dedupedById.values()).filter(
-    (repo) => !repo.name.startsWith("."),
-  );
 }
 
 export async function getGithubOverview(
-  githubUser?: string,
+  _githubUser?: string,
 ): Promise<GitHubOverviewPayload | null> {
-  const username = resolveGithubUser(githubUser);
-  const repos = await getGithubRepos(username);
+  const username = DEFAULT_GITHUB_USER;
+  const repos = await getGithubRepos();
   if (repos.length === 0) {
     return null;
   }
 
   const headers = getGithubHeaders();
-  const authenticatedLogin = await getAuthenticatedGithubLogin(headers);
-  const canReadOwnerPrivateRepos =
-    authenticatedLogin?.toLowerCase() === username.toLowerCase();
 
-  const userResponse = await fetch(
-    canReadOwnerPrivateRepos
-      ? "https://api.github.com/user"
-      : `https://api.github.com/users/${username}`,
-    {
-      headers,
-      cache: "force-cache",
-      next: {
-        revalidate: GITHUB_CACHE_REVALIDATE_SECONDS,
-        tags: [`github-profile-${username}`],
-      },
+  // Strictly use public endpoint: never call /user
+  const userResponse = await fetch(`https://api.github.com/users/${username}`, {
+    headers,
+    cache: "force-cache",
+    next: {
+      revalidate: GITHUB_CACHE_REVALIDATE_SECONDS,
+      tags: [`github-profile-${username}`],
     },
-  );
+  }).catch(() => null);
 
-  const profile = userResponse.ok
+  const profile = userResponse?.ok
     ? ((await safeJsonParse<GitHubUserResponse>(userResponse)) ?? {})
     : {};
 
-  const responseDateHeader = userResponse.headers.get("date");
+  const responseDateHeader = userResponse?.headers.get("date");
   const referenceDate = new Date(
     responseDateHeader ?? repos[0]?.updated_at ?? "1970-01-01T00:00:00Z",
   );
@@ -279,7 +342,7 @@ export async function getGithubOverview(
   // Focus stats/charts on active owned projects.
   const projectRepos = repos.filter((repo) => !repo.fork && !repo.archived);
 
-  // Use GraphQL contribution calendar when token is available for accurate yearly commits.
+  // Use GraphQL contribution calendar when token is available
   if (process.env.GITHUB_TOKEN) {
     const contributionResponse = await fetch("https://api.github.com/graphql", {
       method: "POST",
@@ -315,9 +378,9 @@ export async function getGithubOverview(
         revalidate: GITHUB_CACHE_REVALIDATE_SECONDS,
         tags: [`github-contributions-${username}-${commitYear}`],
       },
-    });
+    }).catch(() => null);
 
-    if (contributionResponse.ok) {
+    if (contributionResponse?.ok) {
       const payload =
         await safeJsonParse<GitHubContributionsResponse>(contributionResponse);
 
@@ -409,15 +472,9 @@ export async function getGithubOverview(
     Array.from({ length: Math.max(0, entry.commits) }, () => entry.date),
   );
 
+  // Only public repos are counted
   const publicRepoCount = profile.public_repos ?? projectRepos.length;
-  const privateRepoCount = canReadOwnerPrivateRepos
-    ? (profile.owned_private_repos ?? profile.total_private_repos ?? 0)
-    : 0;
-  const profileTotalRepoCount = publicRepoCount + privateRepoCount;
-  const totalRepositories = Math.max(
-    profileTotalRepoCount,
-    projectRepos.length,
-  );
+  const totalRepositories = projectRepos.length;
 
   return {
     username: profile.login ?? username,
@@ -439,93 +496,8 @@ export async function getGithubOverview(
   };
 }
 
-async function fetchHashnodePosts(): Promise<BlogPost[]> {
-  const query = `
-    query PublicationPosts($host: String!) {
-      publication(host: $host) {
-        posts(first: 50) {
-          edges {
-            node {
-              id
-              title
-              brief
-              url
-              publishedAt
-              readTimeInMinutes
-              tags {
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
-
-  const response = await fetch("https://gql.hashnode.com", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query, variables: { host: HASHNODE_HOST } }),
-    cache: "force-cache",
-    next: { revalidate: 3600, tags: ["blogs", "hashnode"] },
-  });
-
-  if (!response.ok) return [];
-
-  const payload = await safeJsonParse<HashnodeResponse>(response);
-
-  const edges = payload?.data?.publication?.posts?.edges ?? [];
-  return edges.map(({ node }) => ({
-    id: node.id,
-    title: node.title,
-    excerpt: node.brief,
-    url: node.url,
-    source: "Hashnode",
-    tags: node.tags.map((tag) => tag.name),
-    publishedAt: node.publishedAt,
-    readingMinutes: node.readTimeInMinutes,
-  }));
-}
-
-async function fetchDevToPosts(): Promise<BlogPost[]> {
-  const response = await fetch(
-    `https://dev.to/api/articles?username=${DEVTO_USER}&per_page=100`,
-    {
-      cache: "force-cache",
-      next: { revalidate: 3600, tags: ["blogs", "devto"] },
-    },
-  );
-
-  if (!response.ok) return [];
-
-  const payload = await safeJsonParse<DevToPost[]>(response);
-
-  return (payload ?? []).map((post) => ({
-    id: `devto-${post.id}`,
-    title: post.title,
-    excerpt: post.description,
-    url: post.url,
-    source: "Dev.to",
-    tags: post.tag_list,
-    publishedAt: post.published_at,
-    readingMinutes: post.reading_time_minutes,
-  }));
-}
-
-async function fetchMediumPosts(): Promise<BlogPost[]> {
-  return [];
-}
-
 export async function getBlogPosts(): Promise<BlogPost[]> {
-  const [hashnode, devto, medium] = await Promise.all([
-    fetchHashnodePosts(),
-    fetchDevToPosts(),
-    fetchMediumPosts(),
-  ]);
-
-  return [...hashnode, ...devto, ...medium].sort(
-    (a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt),
-  );
+  return getBlogPostsForListing();
 }
 
 export async function getHackatimeStats(): Promise<HackatimePayload | null> {
@@ -692,14 +664,12 @@ export async function getHackatimeStats(): Promise<HackatimePayload | null> {
   const last7Days =
     daysFromStats.length > 0 ? daysFromStats : hackatimeLast7Days;
 
-  const topLanguagesFromStats = (sevenDay.data?.languages ?? [])
+  const topLanguages = (sevenDay.data?.languages ?? [])
     .slice(0, 5)
     .map((lang) => ({
       name: lang.name,
       hours: Number(toHours(lang.total_seconds).toFixed(1)),
     }));
-
-  const topLanguages = topLanguagesFromStats;
 
   const last7DaysTotalSeconds = Math.round(
     last7Days.reduce((sum, day) => sum + day.hours * 3600, 0),

@@ -36,9 +36,12 @@ export function HackatimeBento({ stats }: { stats: HackatimePayload | null }) {
   const isWakatime =
     process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER !== "hackatime";
   const providerName = isWakatime ? "Wakatime" : "Hackatime";
+  const providerUser =
+    process.env.NEXT_PUBLIC_CODING_STATS_USERNAME || "Voldigoade";
   const providerLink = isWakatime
-    ? "https://wakatime.com/@muhammadfiaz"
-    : "https://hackatime.hackclub.com/@muhammadfiaz";
+    ? `https://wakatime.com/@${providerUser}`
+    : `https://hackatime.hackclub.com/@${providerUser}`;
+  const heatmapUrl = process.env.NEXT_PUBLIC_HEATMAP_URL;
 
   if (!stats) {
     return (
@@ -183,24 +186,24 @@ export function HackatimeBento({ stats }: { stats: HackatimePayload | null }) {
 
       <BentoCard className="sm:col-span-2 lg:col-span-2">
         <p className="font-display text-2xl uppercase">
-          {providerName} Profile
+          {providerName} Metrics
         </p>
         <p className="mt-2 text-xs font-black uppercase text-muted-foreground">
-          {isWakatime
-            ? "View my public Wakatime profile."
-            : "Live streak heatmap (UTC) from Hackatime user 30609."}
+          {heatmapUrl
+            ? "Live streak heatmap (UTC)."
+            : "Coding activity and project time tracking."}
         </p>
-        {!isWakatime && (
+        {heatmapUrl ? (
           <Link
-            href="https://heatmap.shymike.dev/?id=30609&timezone=UTC"
+            href={heatmapUrl}
             target="_blank"
             rel="noreferrer noopener"
             className="mt-4 block border-4 border-black bg-muted p-2 shadow-retro-sm"
-            aria-label="Open Hack Club streak heatmap"
+            aria-label="Open streak heatmap"
           >
             <Image
-              src="https://heatmap.shymike.dev/?id=30609&timezone=UTC"
-              alt="Muhammad Fiaz Hack Club streak heatmap"
+              src={heatmapUrl}
+              alt="Coding streak heatmap"
               width={1200}
               height={260}
               className="h-auto w-full border-2 border-black bg-card"
@@ -208,10 +211,10 @@ export function HackatimeBento({ stats }: { stats: HackatimePayload | null }) {
               unoptimized
             />
           </Link>
-        )}
+        ) : null}
         <Button asChild className="mt-4 w-full border-4 border-black uppercase">
           <Link href={providerLink} target="_blank" rel="noreferrer noopener">
-            View {providerName} Profile
+            View {providerName} Activity
           </Link>
         </Button>
       </BentoCard>
