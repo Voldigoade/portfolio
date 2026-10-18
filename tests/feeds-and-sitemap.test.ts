@@ -1,21 +1,22 @@
 import { describe, expect, it, spyOn } from "bun:test";
 import fs from "node:fs/promises";
 import Parser from "rss-parser";
+import { GET as getRssEn } from "../src/app/en/rss.xml/route";
 import { GET as getAtom } from "../src/app/feed.xml/route";
-import { GET as getRss } from "../src/app/rss.xml/route";
+import { GET as getRssFr } from "../src/app/rss.xml/route";
 import sitemap from "../src/app/sitemap";
 import { withWritingFiles } from "./helpers/writing";
 
-function source(slug: string, draft: boolean) {
-  return `---\ntitle: 'Fixture <title> & "quotes"'\nslug: ${slug}\nsummary: 'A & B <summary>'\ntype: Note\ntags: ['A&B', '<tag>']\npublishedAt: "2026-10-18"\ndraft: ${draft}\n---\nFixture body`;
+function source(draft: boolean) {
+  return `---\ntitle: 'Fixture <title> & "quotes"'\nsummary: 'A & B <summary>'\ncategory: Systèmes\ntags: ['A&B', '<tag>']\npublishedAt: "2026-10-18"\ndraft: ${draft}\n---\nFixture body`;
 }
 
 describe("public writing XML", () => {
   it("serves valid empty RSS, Atom and sitemap for a controlled draft-only collection", async () => {
     await withWritingFiles(
-      { "internal-fixture.md": source("internal-fixture", true) },
+      { "internal-fixture.md": source(true) },
       async () => {
-        const rss = await getRss();
+        const rss = await getRssFr();
         const atom = await getAtom();
         const rssXml = await rss.text();
         const atomXml = await atom.text();
@@ -49,11 +50,11 @@ describe("public writing XML", () => {
   it("includes published fixtures with escaped XML and real dates, excluding drafts", async () => {
     await withWritingFiles(
       {
-        "published-fixture.md": source("published-fixture", false),
-        "internal-fixture.md": source("internal-fixture", true),
+        "published-fixture.md": source(false),
+        "internal-fixture.md": source(true),
       },
       async () => {
-        const rss = await (await getRss()).text();
+        const rss = await (await getRssFr()).text();
         const atom = await (await getAtom()).text();
         for (const xml of [rss, atom]) {
           expect(xml).toContain(
@@ -89,12 +90,28 @@ describe("public writing XML", () => {
     );
   });
 
+  it("serves English RSS feed correctly for English articles", async () => {
+    await withWritingFiles(
+      {
+        "en/english-fixture.md": `---\ntitle: 'English Post'\nsummary: 'English summary'\ncategory: Systems\ntags: ['systems']\npublishedAt: '2026-10-18'\ndraft: false\n---\nBody`,
+      },
+      async () => {
+        const rss = await getRssEn();
+        expect(rss.status).toBe(200);
+        const xml = await rss.text();
+        expect(xml).toContain("<language>en-us</language>");
+        expect(xml).toContain("https://voldigoade.xyz/en/blog/english-fixture");
+        expect(xml).toContain("English Post");
+      },
+    );
+  });
+
   it("returns valid empty feeds when the writing directory is missing", async () => {
     const list = spyOn(fs, "readdir").mockRejectedValue(
       Object.assign(new Error("Missing"), { code: "ENOENT" }),
     );
     try {
-      expect(await (await getRss()).text()).not.toContain("<item>");
+      expect(await (await getRssFr()).text()).not.toContain("<item>");
       const xml = await (await getAtom()).text();
       expect(xml).toContain('<feed xmlns="http://www.w3.org/2005/Atom">');
       expect(xml).not.toContain("<entry>");

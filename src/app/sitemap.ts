@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getPublishedArticles } from "@/lib/blog";
+import { getAllArticles } from "@/lib/blog";
 import { siteUrl } from "@/lib/site-config";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -23,11 +23,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}/blog`,
       changeFrequency: "daily",
       priority: 0.9,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}/blog`,
+          en: `${siteUrl}/en/blog`,
+        },
+      },
     },
     {
-      url: `${siteUrl}/contact`,
-      changeFrequency: "monthly",
-      priority: 0.7,
+      url: `${siteUrl}/en/blog`,
+      changeFrequency: "daily",
+      priority: 0.8,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}/blog`,
+          en: `${siteUrl}/en/blog`,
+        },
+      },
     },
     {
       url: `${siteUrl}/privacy-policy`,
@@ -39,25 +51,49 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.3,
     },
-    {
-      url: `${siteUrl}/terms-of-service`,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
   ];
 
   try {
-    const articles = await getPublishedArticles();
-    const articleRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
+    const [frArticles, enArticles] = await Promise.all([
+      getAllArticles({ locale: "fr", includeDrafts: false }),
+      getAllArticles({ locale: "en", includeDrafts: false }),
+    ]);
+
+    const frRoutes: MetadataRoute.Sitemap = frArticles.map((article) => ({
       url: `${siteUrl}/blog/${article.slug}`,
       lastModified: new Date(
         article.updatedAt || article.publishedAt,
       ).toISOString(),
       changeFrequency: "monthly",
       priority: 0.8,
+      alternates: {
+        languages: {
+          fr: `${siteUrl}/blog/${article.slug}`,
+          ...(article.translationSlug
+            ? { en: `${siteUrl}/en/blog/${article.translationSlug}` }
+            : {}),
+        },
+      },
     }));
 
-    return [...staticRoutes, ...articleRoutes];
+    const enRoutes: MetadataRoute.Sitemap = enArticles.map((article) => ({
+      url: `${siteUrl}/en/blog/${article.slug}`,
+      lastModified: new Date(
+        article.updatedAt || article.publishedAt,
+      ).toISOString(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+      alternates: {
+        languages: {
+          en: `${siteUrl}/en/blog/${article.slug}`,
+          ...(article.translationSlug
+            ? { fr: `${siteUrl}/blog/${article.translationSlug}` }
+            : {}),
+        },
+      },
+    }));
+
+    return [...staticRoutes, ...frRoutes, ...enRoutes];
   } catch {
     return staticRoutes;
   }

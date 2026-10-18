@@ -6,39 +6,41 @@ import { siteUrl } from "@/lib/site-config";
 const aboutOgImageUrl = `${siteUrl}/about/opengraph-image`;
 
 export const metadata: Metadata = {
-  title: "About",
-  description: "Public projects and technical interests of Voldigoade.",
+  title: "À propos",
+  description:
+    "Projets publics, démarche technique et axes de recherche de Voldigoade.",
   alternates: {
     canonical: "/about",
   },
   keywords: [
-    "about voldigoade",
-    "systems engineering",
+    "à propos de voldigoade",
+    "ingénierie systèmes",
     "rust",
-    "security research",
-    "public projects",
+    "recherche sécurité",
+    "projets open source",
     "spoor",
   ],
   openGraph: {
-    title: "About Voldigoade",
+    title: "À propos de Voldigoade",
     description:
-      "Explore public Rust tools and source-linked research into messaging and development environments.",
+      "Outils d'inspection en Rust, modélisation de menaces et recherches comparatives documentées.",
     url: `${siteUrl}/about`,
     type: "profile",
+    locale: "fr_FR",
     images: [
       {
         url: aboutOgImageUrl,
         width: 1200,
         height: 630,
-        alt: "About Voldigoade",
+        alt: "À propos de Voldigoade",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "About Voldigoade",
+    title: "À propos de Voldigoade",
     description:
-      "Explore public Rust tools and source-linked research into messaging and development environments.",
+      "Outils d'inspection en Rust, modélisation de menaces et recherches comparatives documentées.",
     images: [aboutOgImageUrl],
   },
 };
@@ -49,50 +51,50 @@ function serializeJsonLd(value: unknown): string {
 
 const timelineItems: TimelineItem[] = [
   {
-    period: "Rust tooling",
+    period: "Outillage Rust",
     title: "Spoor",
     url: "https://github.com/Voldigoade/spoor",
     description:
-      "A terminal-first tool for inspecting public GitHub profiles, repositories, commit identities, and keys.",
+      "Outil en ligne de commande pour inspecter les profils publics GitHub, les dépôts, les identités de commit et les clés publiques.",
     highlights: [
-      "Reports distinguish observed data, derived values, and inferences.",
-      "Command-line exports and an HTTP lookup service are documented in the repository.",
-      "Scan bounds, cache age, and provider availability limit the results.",
+      "Les rapports distinguent formellement les données observées, valeurs calculées et inférences.",
+      "Export de rapports structurés et service de consultation HTTP documentés dans le dépôt.",
+      "Limites d'analyse explicitées : bornes d'analyse, fraîcheur du cache et quotas de l'API.",
     ],
   },
   {
-    period: "Messaging research",
+    period: "Recherche messageries",
     title: "Recherche Messageries",
     url: "https://github.com/Voldigoade/recherche-messageries",
     description:
-      "A source-driven comparison of secure messaging systems across content security, metadata, pseudonymity, network exposure, and threat models.",
+      "Comparaison méthodique des protocoles de communication sécurisée : chiffrement du contenu, métadonnées, pseudonymat, exposition réseau et modèles de menaces.",
     highlights: [
-      "Links public documentation, audits, advisories, and other evidence.",
-      "Recommendations depend on the platform, configuration, and adversary.",
-      "The study explicitly describes its limits; it is not a security certification.",
+      "Traçabilité documentaire : audits publics, avis de sécurité et spécifications officielles.",
+      "Recommandations conditionnées selon la plateforme, la configuration et le profil d'adversaire.",
+      "Périmètre transparent : l'étude documente ses propres limites et ne constitue pas une certification.",
     ],
   },
   {
-    period: "Developer environments",
+    period: "Environnements développeur",
     title: "IDE Research",
     url: "https://github.com/Voldigoade/ide-research",
     description:
-      "A source-linked comparison of development environments across stacks, remote work, AI tooling, security, privacy, and licensing.",
+      "Étude comparative des environnements de développement intégrés : flux distants, intégration d'agents IA, sécurité, vie privée et licences.",
     highlights: [
-      "Includes a method, evidence register, chooser, and comparator.",
-      "Editorial scores are conditional comparisons, not benchmark results.",
-      "Research content and code have separate license terms.",
+      "Méthode d'évaluation, registre de preuves, sélecteur guidé et matrice de comparaison.",
+      "Évaluations conditionnelles basées sur des critères déclarés, distinctes de simples benchmarks.",
+      "Licences séparées pour les données de recherche et le code des outils.",
     ],
   },
   {
-    period: "Experimental foundation",
+    period: "Fondation expérimentale",
     title: "Crukst",
     url: "https://github.com/Voldigoade/crukst",
     description:
-      "An early Rust project foundation and proposed design for semantic firmware comparison and triage.",
+      "Ébauche d'architecture et fondation Rust pour la comparaison sémantique et le tri de firmwares.",
     highlights: [
-      "Firmware and filesystem comparison are not implemented yet.",
-      "The README separates planned features from current behavior.",
+      "Moteur de comparaison de firmwares et systèmes de fichiers encore en phase exploratoire.",
+      "Le README distingue strictement les fonctionnalités planifiées de l'état actuel du code.",
     ],
   },
 ];
@@ -101,8 +103,9 @@ export default function AboutPage() {
   const aboutJsonLd = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    name: "About Voldigoade",
+    name: "À propos de Voldigoade",
     url: `${siteUrl}/about`,
+    inLanguage: "fr",
     mainEntity: {
       "@type": "Person",
       name: "Voldigoade",
@@ -112,7 +115,10 @@ export default function AboutPage() {
 
   return (
     <>
-      <script type="application/ld+json">{serializeJsonLd(aboutJsonLd)}</script>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(aboutJsonLd) }}
+      />
       <AboutPageClient timelineItems={timelineItems} />
     </>
   );

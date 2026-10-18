@@ -5,22 +5,24 @@ import { siteUrl } from "@/lib/site-config";
 const cookiesPolicyOgImageUrl = `${siteUrl}/cookies-policy/opengraph-image`;
 
 export const metadata: Metadata = {
-  title: "Cookies Policy",
-  description: "Cookies and local storage policy for voldigoade.xyz.",
+  title: "Politique des cookies",
+  description:
+    "Politique relative aux cookies et au stockage local sur voldigoade.xyz.",
   alternates: { canonical: "/cookies-policy" },
   openGraph: {
-    title: "Cookies Policy | Voldigoade",
+    title: "Politique des cookies | Voldigoade",
     description:
-      "How cookies, local storage, and consent preferences are managed on voldigoade.xyz.",
+      "Gestion des cookies, du stockage local et des préférences de consentement sur voldigoade.xyz.",
     url: `${siteUrl}/cookies-policy`,
     type: "website",
+    locale: "fr_FR",
     images: [cookiesPolicyOgImageUrl],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cookies Policy | Voldigoade",
+    title: "Politique des cookies | Voldigoade",
     description:
-      "How cookies, local storage, and consent preferences are managed on voldigoade.xyz.",
+      "Gestion des cookies, du stockage local et des préférences de consentement sur voldigoade.xyz.",
     images: [cookiesPolicyOgImageUrl],
   },
 };
@@ -28,41 +30,42 @@ export const metadata: Metadata = {
 export default function CookiesPolicyPage() {
   return (
     <PolicyPageClient
-      pageTitle="Cookies & Storage Policy"
-      intro="This policy explains how voldigoade.xyz utilizes cookies and browser local storage to maintain functionality and respect user choices."
+      pageTitle="Politique des Cookies & Stockage Local"
+      intro="Ce document détaille l'utilisation des témoins de connexion (cookies) et du stockage local du navigateur sur voldigoade.xyz."
       sections={[
         {
-          title: "Our Approach to Cookies",
+          title: "Notre Approche des Témoins de Connexion",
           content: [
-            "Browsing the portfolio does not require accepting Google analytics. Configured Google services load after explicit acceptance and may use cookies or browser storage.",
-            "Default browsing and navigation of all projects, articles, and documentation does not require tracking cookies.",
+            "La navigation sur ce portfolio ne requiert aucun cookie publicitaire ni traceur commercial. L'accès complet aux projets, articles et documentations fonctionne sans cookie de traçage.",
+            "L'activation de Google Analytics 4 est strictement subordonnée à votre accord préalable via le bandeau de consentement.",
           ],
         },
         {
-          title: "Consent Gating & Storage",
+          title: "Consentement & Clés de Stockage",
           content: [
-            "voldigoade_cookie_consent: Stores whether you accepted or dismissed the Cookie Notice. Only explicit acceptance enables the configured Google analytics scripts.",
-            "Dismissing the notice leaves Google Analytics and Google Tag Manager disabled. Cloudflare Web Analytics, when configured, operates independently without cookies.",
+            "voldigoade_cookie_consent : Mémorise si vous avez accepté ou refusé l'activation des métriques d'audience Google Analytics.",
+            "En cas de refus, aucun script Google Analytics n'est chargé. Cloudflare Web Analytics, s'il est configuré, fonctionne de façon entièrement découplée et sans aucun cookie.",
           ],
         },
         {
-          title: "Functional Local Storage",
+          title: "Stockage Local Fonctionnel (localStorage)",
           content: [
-            "theme: Stores your dark mode or light mode appearance preference.",
-            "voldigoade-blog-store, home-store, and projects-store: Remember writing and project filters across visits. showcase-store remembers interactive display preferences; system-pages-store remembers the last visited system page and retry count.",
-            "The application does not persist contact-form fields or service credentials in local storage.",
+            "theme : Conserve votre préférence d'apparence (mode clair, sombre ou automatique).",
+            "voldigoade-blog-store, home-store, projects-store : Mémorisent l'état de vos filtres actifs pour simplifier votre navigation.",
+            "Aucun identifiant secret, mot de passe ou donnée sensible n'est stocké dans votre navigateur.",
           ],
         },
         {
-          title: "Cookieless Analytics",
+          title: "Mesure Sans Cookie (Cloudflare Analytics)",
           content: [
-            "Cloudflare Web Analytics may be enabled through site configuration. According to Cloudflare, its Web Analytics beacon does not use cookies, local storage, or browser fingerprinting for analytics.",
+            "Cloudflare Web Analytics peut être activé au niveau de l'infrastructure. Ce service ne recourt à aucun cookie, aucun stockage local et aucune technique d'empreinte numérique (fingerprinting).",
           ],
         },
         {
-          title: "How to Revoke or Clear",
+          title: "Modification et Révocation du Consentement",
           content: [
-            "To reset your choice, clear browser storage for voldigoade.xyz and reload the site. Google analytics will remain disabled until you accept again. Use your browser’s controls to remove any existing Google cookies as well.",
+            "Vous pouvez à tout instant rouvrir le panneau de consentement et modifier votre choix en cliquant sur « Gérer les préférences » dans le pied de page du site.",
+            "Vous pouvez également effacer les données de stockage local de votre navigateur à tout moment via les paramètres de confidentialité de celui-ci.",
           ],
         },
       ]}

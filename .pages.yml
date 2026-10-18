@@ -12,40 +12,99 @@ media:
     - avif
 
 content:
-  - name: writing
-    label: Writing
+  - name: writing_fr
+    label: "ARTICLES — FRANÇAIS"
     type: collection
-    path: content/writing
+    path: content/writing/fr
     format: yaml-frontmatter
     subfolders: false
-    filename: "{fields.slug}.md"
+    filename: "{primary}.md"
+    fields:
+      - name: title
+        label: Titre
+        type: string
+        required: true
+      - name: summary
+        label: Résumé
+        type: text
+        required: true
+      - name: category
+        label: Catégorie
+        type: string
+        default: "Systèmes"
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+      - name: series
+        label: Série
+        type: string
+      - name: publishedAt
+        label: Date de publication
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: updatedAt
+        label: Date de mise à jour
+        type: date
+        options:
+          format: yyyy-MM-dd
+      - name: eventDate
+        label: Date d'événement
+        type: date
+        options:
+          format: yyyy-MM-dd
+      - name: draft
+        label: Brouillon (Draft)
+        type: boolean
+        required: true
+        default: true
+      - name: cover
+        label: Image de couverture
+        type: image
+      - name: canonical
+        label: URL canonique
+        type: string
+      - name: body
+        label: Corps de l'article
+        type: rich-text
+        options:
+          format: markdown
+          rename: safe
+          extensions: [png, jpg, jpeg, webp, avif]
+
+  - name: writing_en
+    label: "ARTICLES — ENGLISH"
+    type: collection
+    path: content/writing/en
+    format: yaml-frontmatter
+    subfolders: false
+    filename: "{primary}.md"
     fields:
       - name: title
         label: Title
         type: string
         required: true
-      - name: slug
-        label: Slug
-        type: string
-        required: true
-        pattern:
-          regex: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
-          message: Use lowercase letters, numbers and single hyphens.
+      - name: frenchVersion
+        label: Source French Article
+        type: reference
+        collection: writing_fr
       - name: summary
         label: Summary
         type: text
         required: true
-      - name: type
-        label: Type
-        type: select
-        required: true
-        options:
-          values: [Article, Write-up, Research, Note, Project Log]
+      - name: category
+        label: Category
+        type: string
+        default: "Systems"
       - name: tags
         label: Tags
         type: string
         list: true
-        required: true
+      - name: series
+        label: Series
+        type: string
       - name: publishedAt
         label: Published Date
         type: date
@@ -55,7 +114,11 @@ content:
       - name: updatedAt
         label: Updated Date
         type: date
-        default: ""
+        options:
+          format: yyyy-MM-dd
+      - name: eventDate
+        label: Event Date
+        type: date
         options:
           format: yyyy-MM-dd
       - name: draft

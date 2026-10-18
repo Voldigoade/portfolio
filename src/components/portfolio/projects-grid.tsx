@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   normalizeTag,
   ResponsiveTagFilter,
@@ -12,15 +12,16 @@ import { Card } from "@/components/retroui/Card";
 import { Input } from "@/components/retroui/Input";
 import { Search } from "@/components/retroui/icons";
 import { usePortfolioReposQuery } from "@/lib/client/portfolio-queries";
+import type { GithubRepo } from "@/lib/portfolio-types";
 import { useProjectsStore } from "@/store/projects-store";
 
-const PROJECT_SKELETON_KEYS = ["p1", "p2", "p3", "p4", "p5", "p6"] as const;
-const PROJECT_STAT_SKELETON_KEYS = ["s1", "s2", "s3", "s4"] as const;
+const PROJECTS_SKELETON_KEYS = ["p1", "p2", "p3", "p4", "p5", "p6"] as const;
+const PROJECTS_TAG_SKELETON_KEYS = ["pt1", "pt2", "pt3"] as const;
 
 function ProjectsSkeletonGrid() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {PROJECT_SKELETON_KEYS.map((key) => (
+      {PROJECTS_SKELETON_KEYS.map((key) => (
         <Card
           key={key}
           className="border-4 border-black bg-card p-4 shadow-retro-md"
@@ -29,11 +30,11 @@ function ProjectsSkeletonGrid() {
             <div className="h-5 w-2/3 border-2 border-black bg-muted" />
             <div className="h-4 w-full border-2 border-black bg-muted" />
             <div className="h-4 w-5/6 border-2 border-black bg-muted" />
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {PROJECT_STAT_SKELETON_KEYS.map((statKey) => (
+            <div className="flex gap-2">
+              {PROJECTS_TAG_SKELETON_KEYS.map((tagKey) => (
                 <div
-                  key={statKey}
-                  className="h-7 border-2 border-black bg-muted"
+                  key={tagKey}
+                  className="h-6 w-14 border-2 border-black bg-muted"
                 />
               ))}
             </div>
@@ -48,7 +49,7 @@ function ProjectsSkeletonGrid() {
 type ProjectsGridProps = {
   compact?: boolean;
   limit?: number;
-  initialRepos?: import("@/lib/portfolio-types").GithubRepo[];
+  initialRepos?: GithubRepo[];
 };
 
 export function ProjectsGrid({
@@ -70,8 +71,16 @@ export function ProjectsGrid({
   const setSelectedTag = useProjectsStore((state) => state.setSelectedTag);
   const setSortBy = useProjectsStore((state) => state.setSortBy);
 
+  useEffect(() => {
+    if (compact) {
+      return;
+    }
+
+    setSelectedTag("All");
+  }, [compact, setSelectedTag]);
+
   const tags = useMemo(() => {
-    const counts = new Map<string, { label: string; count: number }>();
+    const counts = new Map<string, number>();
 
     for (const tag of repos
       .flatMap((repo) => repo.topics ?? [])
@@ -81,16 +90,11 @@ export function ProjectsGrid({
         continue;
       }
 
-      const current = counts.get(key);
-      if (!current) {
-        counts.set(key, { label: key, count: 1 });
-      } else {
-        counts.set(key, { label: current.label, count: current.count + 1 });
-      }
+      counts.set(key, (counts.get(key) ?? 0) + 1);
     }
 
     const normalized = Array.from(counts.entries())
-      .sort((a, b) => b[1].count - a[1].count)
+      .sort((a, b) => b[1] - a[1])
       .map(([key]) => key.toUpperCase());
 
     return ["All", ...normalized];
@@ -102,28 +106,36 @@ export function ProjectsGrid({
       const normalizedTopics = (repo.topics ?? []).map((topic) =>
         normalizeTag(topic).toUpperCase(),
       );
-      const byTag = compact
-        ? true
-        : selectedTag === "All" || normalizedTopics.includes(selectedTag);
-      const haystack =
-        `${repo.name} ${repo.description ?? ""} ${(repo.topics ?? []).join(" ")}`.toLowerCase();
-      return byTag && (compact || haystack.includes(text));
+      const matchesTag =
+        compact ||
+        selectedTag === "All" ||
+        normalizedTopics.includes(selectedTag);
+
+      const haystack = [
+        repo.name,
+        repo.description ?? "",
+        repo.language ?? "",
+        ...(repo.topics ?? []),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return matchesTag && (compact || haystack.includes(text));
     });
 
     return [...filteredRepos].sort((a, b) => {
-      if (compact)
-        return (b.stargazers_count ?? -1) - (a.stargazers_count ?? -1);
-      if (sortBy === "stars-desc")
-        return (b.stargazers_count ?? -1) - (a.stargazers_count ?? -1);
-      if (sortBy === "stars-asc")
-        return (
-          (a.stargazers_count ?? Number.POSITIVE_INFINITY) -
-          (b.stargazers_count ?? Number.POSITIVE_INFINITY)
-        );
-      if (sortBy === "name-asc") return a.name.localeCompare(b.name);
+      if (sortBy === "stars-desc") {
+        return (b.stargazers_count ?? 0) - (a.stargazers_count ?? 0);
+      }
+      if (sortBy === "stars-asc") {
+        return (a.stargazers_count ?? 0) - (b.stargazers_count ?? 0);
+      }
+      if (sortBy === "name-asc") {
+        return a.name.localeCompare(b.name);
+      }
       return (
-        (b.updated_at ? Date.parse(b.updated_at) : 0) -
-        (a.updated_at ? Date.parse(a.updated_at) : 0)
+        new Date(b.updated_at ?? 0).getTime() -
+        new Date(a.updated_at ?? 0).getTime()
       );
     });
   }, [repos, query, selectedTag, sortBy, compact]);
@@ -164,9 +176,9 @@ export function ProjectsGrid({
             <Input
               value={query}
               onChange={(event) => handleSearchChange(event.target.value)}
-              placeholder="Search repositories, topics, keywords..."
-              aria-label="Search projects"
-              className="w-full border-4 border-black bg-card pl-11 py-3 font-bold shadow-retro"
+              placeholder="Rechercher par nom, description, tag..."
+              aria-label="Rechercher des projets"
+              className="w-full border-4 border-black bg-card py-3 pl-11 font-bold shadow-retro"
             />
           </div>
           <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_14rem] xl:items-start">
@@ -191,12 +203,12 @@ export function ProjectsGrid({
                   )
                 }
                 className="h-11 w-full border-4 border-black bg-card px-3 font-black uppercase shadow-retro"
-                aria-label="Sort projects"
+                aria-label="Trier les projets"
               >
-                <option value="recent">Most Recent</option>
-                <option value="stars-desc">Stars: High to Low</option>
-                <option value="stars-asc">Stars: Low to High</option>
-                <option value="name-asc">Name: A-Z</option>
+                <option value="recent">Plus récents d&apos;abord</option>
+                <option value="stars-desc">Étoiles: décroissant</option>
+                <option value="stars-asc">Étoiles: croissant</option>
+                <option value="name-asc">Nom: A-Z</option>
               </select>
             </div>
           </div>
@@ -207,7 +219,7 @@ export function ProjectsGrid({
 
       {isError ? (
         <div className="border-4 border-black bg-destructive p-5 font-black uppercase text-destructive-foreground shadow-retro-md">
-          Failed to load project data right now.
+          Impossible de charger les données des projets actuellement.
         </div>
       ) : null}
 
@@ -242,7 +254,7 @@ export function ProjectsGrid({
                           : "mt-2 text-sm leading-relaxed sm:text-base line-clamp-4"
                       }
                     >
-                      {repo.description ?? "No description provided."}
+                      {repo.description ?? "Pas de description fournie."}
                     </Card.Description>
                   </Card.Header>
                   <Card.Content className="mt-auto flex flex-col gap-4 pt-0">
@@ -266,27 +278,27 @@ export function ProjectsGrid({
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-[10px] font-black uppercase sm:grid-cols-4">
                       <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
-                        <span className="block truncate">Language</span>
+                        <span className="block truncate">Langage</span>
                         <span className="block truncate text-[11px]">
-                          {repo.language ?? "Mixed"}
+                          {repo.language ?? "Mixte"}
                         </span>
                       </span>
                       <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
-                        <span className="block truncate">Stars</span>
+                        <span className="block truncate">Étoiles</span>
                         <span className="block truncate text-[11px]">
-                          {repo.stargazers_count ?? "Unavailable"}
+                          {repo.stargazers_count ?? "N/D"}
                         </span>
                       </span>
                       <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
                         <span className="block truncate">Forks</span>
                         <span className="block truncate text-[11px]">
-                          {repo.forks_count ?? "Unavailable"}
+                          {repo.forks_count ?? "N/D"}
                         </span>
                       </span>
                       <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
-                        <span className="block truncate">Watch</span>
+                        <span className="block truncate">Suivis</span>
                         <span className="block truncate text-[11px]">
-                          {repo.watchers_count ?? "Unavailable"}
+                          {repo.watchers_count ?? "N/D"}
                         </span>
                       </span>
                     </div>
@@ -301,7 +313,7 @@ export function ProjectsGrid({
                             target="_blank"
                             rel="noreferrer noopener"
                           >
-                            Visit Repository
+                            Voir le dépôt
                           </Link>
                         </Button>
                         <Button
@@ -314,7 +326,7 @@ export function ProjectsGrid({
                             target="_blank"
                             rel="noreferrer noopener"
                           >
-                            Visit Site
+                            Consulter le site
                           </Link>
                         </Button>
                       </div>
@@ -328,7 +340,7 @@ export function ProjectsGrid({
                           target="_blank"
                           rel="noreferrer noopener"
                         >
-                          Visit Repository
+                          Voir le dépôt
                         </Link>
                       </Button>
                     )}
@@ -342,7 +354,7 @@ export function ProjectsGrid({
 
       {!isLoading && !isFetching && visible.length === 0 ? (
         <div className="border-4 border-black bg-muted p-6 text-center font-black uppercase shadow-retro">
-          No projects found for this search and tag filter.
+          Aucun projet trouvé pour cette recherche ou ce filtre.
         </div>
       ) : null}
 
@@ -354,7 +366,7 @@ export function ProjectsGrid({
             disabled={currentPage <= 1}
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
           >
-            Prev
+            Précédent
           </Button>
 
           <span className="min-w-28 border-2 border-black bg-muted px-3 py-2 text-center text-xs font-black uppercase">
@@ -369,7 +381,7 @@ export function ProjectsGrid({
               setCurrentPage((prev) => Math.min(totalPages, prev + 1))
             }
           >
-            Next
+            Suivant
           </Button>
         </div>
       ) : null}

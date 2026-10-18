@@ -4,24 +4,24 @@ import { Card } from "@/components/retroui/Card";
 
 const processSteps = [
   {
-    title: "Define Scope",
+    title: "Définir le périmètre",
     description:
-      "Start with a question, its intended use, and the limits of what the project can answer.",
+      "Partir d'une problématique concrète, de son contexte d'usage et des limites précises de ce que le projet vise à résoudre.",
   },
   {
-    title: "Investigate",
+    title: "Investiguer",
     description:
-      "Look for primary documentation and public source code; keep references for claims.",
+      "S'appuyer sur la documentation primaire et le code source public ; consigner les références de chaque analyse.",
   },
   {
-    title: "Build Minimal",
+    title: "Construire minimal",
     description:
-      "Work on a focused implementation and document what is still planned or experimental.",
+      "Développer une implémentation ciblée, documenter rigoureusement ce qui est fonctionnel et ce qui reste expérimental.",
   },
   {
-    title: "Verify",
+    title: "Vérifier",
     description:
-      "Check behavior, record limitations, and revisit conclusions when the evidence changes.",
+      "Tester les comportements réels, expliciter les compromis et réviser les conclusions à la lumière des faits.",
   },
 ] as const;
 
@@ -29,7 +29,7 @@ export function HomeDeliveryProcess() {
   return (
     <section className="space-y-4">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        Working Principles
+        Principes d&apos;ingénierie
       </h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {processSteps.map((step, index) => (

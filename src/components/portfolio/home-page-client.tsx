@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { BlogGrid } from "@/components/portfolio/blog-grid";
 import { GithubOverviewBento } from "@/components/portfolio/github-overview-bento";
-import { HackatimeBento } from "@/components/portfolio/hackatime-bento";
 import { HeroFloatingBadges } from "@/components/portfolio/hero-floating-badges";
 import { HomeDeliveryProcess } from "@/components/portfolio/home-delivery-process";
 import { HomeEngagementModel } from "@/components/portfolio/home-engagement-model";
@@ -13,47 +12,45 @@ import { MorphScrollShowcase } from "@/components/portfolio/morph-scroll-showcas
 import { ProjectsGrid } from "@/components/portfolio/projects-grid";
 import { RetroCodeShowcase } from "@/components/portfolio/retro-code-showcase";
 import { RetroTerminalSection } from "@/components/portfolio/retro-terminal-section";
-import { StatsMarquee } from "@/components/portfolio/stats-marquee";
 import { BentoCard, BentoGrid } from "@/components/retroui/Bento";
 import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
-import { Github, Link2, Mail } from "@/components/retroui/icons";
+import { Github, Link2 } from "@/components/retroui/icons";
 
 import { links } from "@/lib/link-items";
 import type {
   BlogPost,
   GitHubOverviewPayload,
   GithubRepo,
-  HackatimePayload,
 } from "@/lib/portfolio-types";
-import { githubUrl, linkHubUrl, siteHost } from "@/lib/site-config";
+import { githubUrl, linkHubUrl } from "@/lib/site-config";
 import { useHomeStore } from "@/store/home-store";
 
 const traits = [
   {
-    title: "Systems & Security Questions",
-    text: "Exploring how software behaves, what it exposes, and where its assumptions need to be made explicit.",
+    title: "Systèmes & Sécurité",
+    text: "Comprendre le comportement intime des logiciels, ce qu'ils exposent, et expliciter leurs hypothèses sous-jacentes.",
   },
   {
-    title: "Rust & Systems Tooling",
-    text: "Building terminal-first tools in Rust and learning from their implementation, tests, and limitations.",
+    title: "Rust & Outillage CLI",
+    text: "Concevoir des outils rapides et résilients en ligne de commande en apprenant de leur implémentation et de leurs limites.",
   },
   {
-    title: "Local-First & Privacy",
-    text: "Interested in local control, privacy trade-offs, and understanding which external services software depends on.",
+    title: "Local-First & Confidentialité",
+    text: "Privilégier le contrôle local, évaluer les compromis d'exposition et minimiser la dépendance aux services tiers.",
   },
   {
-    title: "Open Source Engineering",
-    text: "Sharing code and source-linked comparisons so readers can inspect the evidence and project scope.",
+    title: "Ingénierie Open Source",
+    text: "Partager le code et des comparatifs sourcés pour permettre à chacun de vérifier les preuves et le périmètre d'action.",
   },
 ];
 
 const focusFilters = [
-  "All",
-  "Systems",
-  "Security",
+  "Tous",
+  "Systèmes",
+  "Sécurité",
   "Open Source",
-  "Tooling",
+  "Outillage",
 ] as const;
 
 type FaqItem = {
@@ -65,128 +62,108 @@ type FaqItem = {
 
 const faqItems: readonly FaqItem[] = [
   {
-    question: "What are you working on?",
+    question: "Sur quoi travaillez-vous ?",
     answer:
-      "I am building Rust tools and researching secure messaging and development environments. The public repositories show each project’s current scope and limitations.",
+      "Je développe des outils d'inspection en Rust et mène des recherches comparatives sur les messageries sécurisées et les environnements de travail. Les dépôts publics présentent le périmètre et les limites réelles de chaque projet.",
   },
   {
-    question: "What is Spoor?",
+    question: "Qu'est-ce que Spoor ?",
     answer:
-      "Spoor is a terminal-first tool for inspecting public GitHub profiles, repositories, commit identities, and keys. Its reports distinguish observed data, derived values, and inferences.",
+      "Spoor est un outil en ligne de commande permettant d'auditer les profils publics GitHub, les dépôts, les identités de commit et les clés de signature. Ses rapports distinguent données observées, valeurs dérivées et inférences.",
     ctaHref: "https://github.com/Voldigoade/spoor",
-    ctaLabel: "View Spoor",
+    ctaLabel: "Voir Spoor",
   },
   {
-    question: "What technologies appear in the projects?",
+    question: "Quelles technologies composent vos projets ?",
     answer:
-      "Spoor uses Rust and a SQLite cache. The research sites use Python and web tooling. This portfolio uses Next.js, React, and TypeScript.",
+      "Spoor est écrit en Rust avec cache SQLite. Les travaux de recherche exploitent Python et l'outillage web moderne. Ce portfolio utilise Next.js, React et TypeScript.",
   },
   {
-    question: "Are your projects open source?",
+    question: "Vos projets sont-ils open source ?",
     answer:
-      "The projects linked here have public repositories. Check each repository’s license: research text, data, and code can have different terms.",
+      "Les projets présentés disposent de dépôts publics vérifiables. Consultez la licence de chaque dépôt sur GitHub : code, données et documentation font l'objet de termes explicites.",
     ctaHref: githubUrl,
-    ctaLabel: "GitHub Profile",
+    ctaLabel: "Profil GitHub",
   },
   {
-    question: "How can I get in touch?",
+    question: "Comment poser une question technique ou contribuer ?",
     answer:
-      "Use the contact page for a message, or the relevant GitHub repository for public project questions and feedback.",
-    ctaHref: "/contact",
-    ctaLabel: "Contact Page",
+      "Pour toute question technique, suggestion ou signalement, ouvrez une issue ou une discussion directement sur le dépôt GitHub correspondant.",
+    ctaHref: "/project",
+    ctaLabel: "Explorer les projets",
   },
   {
-    question: "Do you publish technical write-ups?",
+    question: "Publiez-vous des analyses techniques ?",
     answer:
-      "The Writing section is available for future articles and notes. For now, the linked research repositories contain the public documentation.",
+      "La section Blog regroupe des articles approfondis, des retours d'expérience d'ingénierie et des notes de recherche accessibles en français et en anglais.",
     ctaHref: "/blog",
-    ctaLabel: "View Writing",
+    ctaLabel: "Lire le blog",
   },
 ] as const;
 
 type HomePageClientProps = {
   initialRepos?: GithubRepo[];
   initialPosts?: BlogPost[];
-  initialHackatime?: HackatimePayload | null;
   initialGitHubOverview?: GitHubOverviewPayload | null;
 };
 
 export function HomePageClient({
   initialRepos,
   initialPosts,
-  initialHackatime,
   initialGitHubOverview,
 }: HomePageClientProps) {
-  const hackatime = initialHackatime ?? null;
   const githubOverview = initialGitHubOverview ?? null;
-  const codingStatsProvider =
-    process.env.NEXT_PUBLIC_CODING_STATS_PROVIDER === "hackatime"
-      ? "Hackatime"
-      : "WakaTime";
-  const codingStatsProfileUrl =
-    process.env.NEXT_PUBLIC_CODING_STATS_PROFILE_URL;
   const focus = useHomeStore((state) => state.focus);
   const setFocus = useHomeStore((state) => state.setFocus);
 
   const focusItems = [
     {
-      key: "Systems",
-      title: "Systems & Infrastructure",
-      body: "Working on Rust command-line tools, including Spoor and the experimental Crukst project foundation.",
+      key: "Systèmes",
+      title: "Systèmes & Infrastructure",
+      body: "Développement d'outils CLI performants en Rust, incluant Spoor et la fondation expérimentale du projet Crukst.",
     },
     {
-      key: "Security",
-      title: "Security & Threat Research",
-      body: "Comparing messaging systems through public sources, threat models, metadata exposure, and documented limitations.",
+      key: "Sécurité",
+      title: "Sécurité & Analyse de Menaces",
+      body: "Comparaison rigoureuse des messageries chiffrées selon les modèles de menaces, l'exposition des métadonnées et les limites documentées.",
     },
     {
       key: "Open Source",
-      title: "Open Source & Reproducibility",
-      body: "Sharing public code and source-linked research. Each repository documents its own scope, evidence, and licensing.",
+      title: "Recherche Ouverte & Vérifiable",
+      body: "Documentation publique avec références primaires, registres de preuves et critères d'évaluation transparents.",
     },
     {
-      key: "Tooling",
-      title: "Developer & CLI Tooling",
-      body: "Exploring terminal interfaces and comparing development environments, remote workflows, privacy, and licensing.",
+      key: "Outillage",
+      title: "Environnements Développeur",
+      body: "Étude critique des flux d'ingénierie : intégration d'agents, télémétrie, contraintes de licence et contrôle local.",
     },
-  ] as const;
+  ];
 
   const visibleFocusItems =
-    focus === "All"
+    focus === "Tous" || focus === "All"
       ? focusItems
-      : focusItems.filter((item) => item.key === focus);
+      : focusItems.filter(
+          (item) =>
+            item.key === focus ||
+            (focus === "Systems" && item.key === "Systèmes") ||
+            (focus === "Security" && item.key === "Sécurité") ||
+            (focus === "Tooling" && item.key === "Outillage"),
+        );
 
   return (
-    <div className="-mt-3 space-y-8 pb-16 sm:mt-0 sm:space-y-14">
-      <StatsMarquee />
+    <div className="space-y-12 pb-16">
+      <HeroFloatingBadges />
 
-      <section
-        className="relative overflow-visible border-4 border-black bg-card shadow-retro-lg"
-        data-home-reveal
-      >
-        <div
-          aria-hidden
-          className="retro-stripes pointer-events-none absolute inset-0 opacity-20"
-        />
-        <div className="hidden sm:block">
-          <HeroFloatingBadges />
-        </div>
-
-        <div className="relative z-10 overflow-hidden border-4 border-black bg-card">
-          <div className="flex items-center justify-between border-b-4 border-black bg-[#d7d7d7] px-2 py-2 text-black sm:px-3 dark:bg-[#2f2f2f] dark:text-white">
-            <p className="font-pixel text-[11px] font-black sm:text-xs">
-              {siteHost}
-            </p>
-            <div className="flex gap-2">
-              <span className="inline-flex h-5 w-5 items-center justify-center border-2 border-black bg-[#ffd146] text-[#5c3d00] font-black text-[10px] shadow-retro-sm sm:h-6 sm:w-6 sm:text-xs">
-                -
-              </span>
-              <span className="inline-flex h-5 w-5 items-center justify-center border-2 border-black bg-[#52d46b] text-[#0d4f1a] font-black text-[10px] shadow-retro-sm sm:h-6 sm:w-6 sm:text-xs">
-                +
-              </span>
-              <span className="inline-flex h-5 w-5 items-center justify-center border-2 border-black bg-[#ff6e6e] text-[#6b1010] font-black text-[10px] shadow-retro-sm sm:h-6 sm:w-6 sm:text-xs">
-                x
-              </span>
+      <section className="relative" data-home-reveal>
+        <div className="relative border-4 border-black bg-card shadow-retro-lg">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b-4 border-black bg-muted px-4 py-3">
+            <span className="font-pixel text-xs uppercase sm:text-sm">
+              workspace://voldigoade
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="h-3 w-3 border-2 border-black bg-[#ff5f56]" />
+              <span className="h-3 w-3 border-2 border-black bg-[#ffbd2e]" />
+              <span className="h-3 w-3 border-2 border-black bg-[#27c93f]" />
             </div>
           </div>
 
@@ -194,7 +171,7 @@ export function HomePageClient({
             <div className="order-2 space-y-4 md:order-1 md:space-y-6">
               <h1 className="font-display uppercase leading-[1.1]">
                 <span className="block text-[clamp(0.95rem,6vw,2.5rem)] sm:text-[clamp(1.7rem,5.2vw,3.8rem)]">
-                  Hey There! I&apos;M
+                  BONJOUR, JE SUIS
                 </span>
                 <span className="mt-1 block text-[clamp(1.05rem,8vw,3rem)] sm:text-[clamp(1.8rem,5.6vw,4.4rem)]">
                   <span className="retro-curve-underline">
@@ -203,8 +180,9 @@ export function HomePageClient({
                 </span>
               </h1>
               <p className="max-w-2xl border-l-4 border-black pl-3 text-xs font-medium leading-relaxed sm:pl-4 sm:text-sm md:text-lg">
-                Building software and exploring systems, security, privacy, and
-                developer tools through public projects.
+                Ingénierie logicielle et recherche appliquée sur les systèmes,
+                la sécurité, la confidentialité numérique et les outils pour
+                développeurs.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
@@ -212,7 +190,7 @@ export function HomePageClient({
                   asChild
                   className="w-full border-4 border-black px-4 py-2 text-sm font-black uppercase tracking-wide shadow-retro retro-press sm:w-auto sm:px-6 sm:py-3 sm:text-base"
                 >
-                  <Link href="/contact">Contact Me</Link>
+                  <Link href="/project">Voir les projets</Link>
                 </Button>
                 <Button
                   variant="secondary"
@@ -220,7 +198,7 @@ export function HomePageClient({
                   asChild
                   className="w-full border-4 border-black px-4 py-2 text-sm font-black uppercase tracking-wide shadow-retro retro-press sm:w-auto sm:px-6 sm:py-3 sm:text-base"
                 >
-                  <Link href="/project">View Projects</Link>
+                  <Link href="/blog">Voir le blog</Link>
                 </Button>
               </div>
             </div>
@@ -229,7 +207,7 @@ export function HomePageClient({
               <div className="border-4 border-black bg-card p-0">
                 <Image
                   src="/images/avatar.png"
-                  alt="Voldigoade"
+                  alt="Emblème Voldigoade"
                   width={384}
                   height={384}
                   loading="eager"
@@ -246,23 +224,23 @@ export function HomePageClient({
                   target="_blank"
                   rel="noreferrer noopener"
                   className="retro-social-icon"
-                  aria-label="GitHub profile"
+                  aria-label="Profil GitHub"
                 >
                   <Github className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/project"
                   className="retro-social-icon"
-                  aria-label="Explore projects"
+                  aria-label="Explorer les projets"
                 >
                   <Link2 className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/contact"
+                  href="/blog"
                   className="retro-social-icon"
-                  aria-label="Contact Voldigoade"
+                  aria-label="Lire le blog"
                 >
-                  <Mail className="h-4 w-4" />
+                  <Link2 className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -272,64 +250,46 @@ export function HomePageClient({
 
       <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Mission Control
+          Centre de contrôle
         </h2>
         <BentoGrid>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase sm:text-2xl">
-              Rust & Systems Projects
+              Projets Rust & Systèmes
             </p>
-            <p className="mt-3 font-medium leading-relaxed">
-              Working on terminal-first tools in Rust, from public GitHub
-              footprint inspection with Spoor to the early foundation of a
-              firmware comparison tool in Crukst.
+            <p className="mt-2 text-sm font-medium">
+              Spoor inspecte les profils publics GitHub, dépôts, identités de
+              commit et clés de signature. Les rapports séparent rigoureusement
+              faits observés et inférences.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Messaging & Threat Models
+              Confidentialité & Contrôle Local
             </p>
             <p className="mt-2 text-sm font-medium">
-              Comparing secure messaging systems using public documentation,
-              threat models, metadata exposure, and available audit evidence.
+              Analyse de l&apos;impact des choix d&apos;architecture sur
+              l&apos;exposition des métadonnées, la dépendance aux plateformes
+              cloud et le contrôle des données en local.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Open Source Tools & Spoor
+              Environnements de Développement
             </p>
             <p className="mt-2 text-sm font-medium">
-              Spoor inspects public GitHub profiles, repositories, commit
-              identities, and keys. Reports keep source references and
-              distinguish observations from inferences.
+              IDE Research compare les outils de développement sur plusieurs
+              dimensions : flux distants, agents IA, souveraineté des données et
+              licences logicielles.
             </p>
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              Privacy & Local Control
+              Publications & Recherche
             </p>
             <p className="mt-2 text-sm font-medium">
-              Exploring how software choices affect metadata exposure, reliance
-              on external services, and control over local workflows.
-            </p>
-          </BentoCard>
-          <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
-            <p className="font-display text-xl uppercase">
-              Development Environments
-            </p>
-            <p className="mt-2 text-sm font-medium">
-              IDE Research compares development environments across stacks,
-              remote workflows, AI tools, security, privacy, and licensing.
-            </p>
-          </BentoCard>
-          <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
-            <p className="font-display text-xl uppercase">
-              Technical Writing & Research
-            </p>
-            <p className="mt-2 text-sm font-medium">
-              Sharing source-linked comparisons in public research repositories.
-              This site&apos;s Writing section is ready for future articles and
-              notes.
+              Articles techniques originaux et documentation structurée publiés
+              avec traçabilité des sources.
             </p>
           </BentoCard>
         </BentoGrid>
@@ -337,7 +297,7 @@ export function HomePageClient({
 
       <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Core Traits
+          Principes Clés
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {traits.map((trait) => (
@@ -402,14 +362,14 @@ export function HomePageClient({
       <section className="space-y-4" data-home-reveal>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            Featured Projects
+            Projets en vedette
           </h2>
           <Button
             asChild
             variant="secondary"
             className="w-full sm:w-auto uppercase"
           >
-            <Link href="/project">View All</Link>
+            <Link href="/project">Voir tous les projets</Link>
           </Button>
         </div>
         <ProjectsGrid compact limit={3} initialRepos={initialRepos} />
@@ -418,23 +378,23 @@ export function HomePageClient({
       <section className="space-y-4" data-home-reveal>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            Latest Writing
+            Dernières publications
           </h2>
           <Button
             asChild
             variant="secondary"
             className="w-full sm:w-auto uppercase"
           >
-            <Link href="/blog">View All</Link>
+            <Link href="/blog">Voir tout le blog</Link>
           </Button>
         </div>
-        <BlogGrid compact limit={3} initialPosts={initialPosts} />
+        <BlogGrid compact limit={3} initialPosts={initialPosts} locale="fr" />
       </section>
 
       <section className="space-y-4" data-home-reveal>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            Github Stats
+            Statistiques GitHub
           </h2>
           <Button
             asChild
@@ -442,63 +402,34 @@ export function HomePageClient({
             className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
           >
             <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
-              View Full GitHub Profile
+              Voir le profil GitHub
             </Link>
           </Button>
         </div>
         <p className="font-bold uppercase text-muted-foreground">
-          Followers, following, stars, forks, watchers, repositories, and GitHub
-          activity analytics.
+          Abonnés, abonnements, étoiles, forks, dépôts et activités publiques
+          sur GitHub.
         </p>
         <GithubOverviewBento stats={githubOverview ?? null} />
       </section>
 
       <section className="space-y-4" data-home-reveal>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            {hackatime ? `${codingStatsProvider} Insights` : "Coding Activity"}
-          </h2>
-          <Button
-            asChild
-            variant="secondary"
-            className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
-          >
-            <Link
-              href={codingStatsProfileUrl || githubUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              {codingStatsProfileUrl
-                ? `View ${codingStatsProvider} Profile`
-                : "View GitHub Profile"}
-            </Link>
-          </Button>
-        </div>
-        <p className="font-bold uppercase text-muted-foreground">
-          {hackatime
-            ? `Tracked coding activity reported by ${codingStatsProvider}.`
-            : "Tracked coding statistics are not available. Public project activity can be explored on GitHub."}
-        </p>
-        <HackatimeBento stats={hackatime ?? null} />
-      </section>
-
-      <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Research Questions
+          Questions de recherche
         </h2>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           {[
             {
-              body: "What can public GitHub metadata reveal, and where do observations stop and inferences begin?",
-              title: "Public Footprints",
+              body: "Que révèlent concrètement les métadonnées publiques GitHub, et où s'arrêtent les faits vérifiés face aux déductions ?",
+              title: "Empreinte Publique",
             },
             {
-              body: "Which messaging app fits a particular threat model, and what metadata remains visible?",
-              title: "Messaging Trade-offs",
+              body: "Quelle application de messagerie répond à un modèle de menace spécifique, et quelles métadonnées demeurent exposées ?",
+              title: "Compromis de Messagerie",
             },
             {
-              body: "How do development environments differ across remote work, AI tooling, privacy, and licensing?",
-              title: "Developer Workflows",
+              body: "Comment les environnements de développement se distinguent-ils sur le travail distant, l'outillage IA et la vie privée ?",
+              title: "Flux de Travail Développeur",
             },
           ].map((item) => (
             <Card
@@ -518,27 +449,27 @@ export function HomePageClient({
 
       <section className="space-y-4" data-home-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Explore & Contribute
+          Explorer & Vérifier
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Card className="w-full border-4 border-black bg-card shadow-retro-md retro-press">
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                Explore the Source
+                Explorer le Code Source
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-4">
               <p className="font-medium">
-                Browse public repositories, read their documentation, and check
-                what is implemented or still being explored.
+                Parcourez les dépôts publics, consultez leur documentation
+                technique et examinez les implémentations effectives.
               </p>
-              <Button asChild className="w-full sm:w-auto">
+              <Button asChild className="w-full sm:w-auto uppercase">
                 <Link
                   href={githubUrl}
                   target="_blank"
                   rel="noreferrer noopener"
                 >
-                  View Public Repositories
+                  Voir les dépôts publics
                 </Link>
               </Button>
             </Card.Content>
@@ -547,16 +478,20 @@ export function HomePageClient({
           <Card className="w-full border-4 border-black bg-card shadow-retro-md retro-press">
             <Card.Header>
               <Card.Title className="font-display text-2xl uppercase">
-                Share Project Feedback
+                Lire les Recherches
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-4">
               <p className="font-medium">
-                Found a bug, an unclear explanation, or a source that needs an
-                update? Feedback helps make the projects more useful.
+                Consultez les articles techniques, comparatifs méthodologiques
+                et analyses d&apos;architecture sur le blog.
               </p>
-              <Button asChild variant="secondary" className="w-full sm:w-auto">
-                <Link href="/contact">Get In Touch</Link>
+              <Button
+                asChild
+                variant="secondary"
+                className="w-full sm:w-auto uppercase"
+              >
+                <Link href="/blog">Consulter le blog</Link>
               </Button>
             </Card.Content>
           </Card>
@@ -566,7 +501,7 @@ export function HomePageClient({
       <section className="space-y-4" data-home-reveal>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase sm:text-4xl">
-            Connect Hub
+            Ressources & Liens
           </h2>
           <Button
             asChild
@@ -574,7 +509,7 @@ export function HomePageClient({
             className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
           >
             <Link href={linkHubUrl} target="_blank" rel="noreferrer noopener">
-              Open Link Hub
+              Profil GitHub
             </Link>
           </Button>
         </div>
@@ -602,7 +537,7 @@ export function HomePageClient({
                     target="_blank"
                     rel="noreferrer noopener"
                   >
-                    Open Link
+                    Ouvrir le lien
                   </Link>
                 </Button>
               </Card.Content>
@@ -618,12 +553,12 @@ export function HomePageClient({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-3">
             <h2 className="font-display text-3xl uppercase text-primary-foreground sm:text-4xl md:text-5xl">
-              Let&apos;s Connect
+              Projets & Publications
             </h2>
             <p className="max-w-xl text-sm font-medium leading-relaxed text-primary-foreground/90 sm:text-base">
-              Have a question about a public project or an idea to explore? Send
-              a message through the contact page or find the relevant repository
-              on GitHub.
+              Une question technique ou une suggestion sur un projet public ?
+              Consultez les dépôts correspondants sur GitHub ou découvrez les
+              articles sur le blog.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -632,7 +567,7 @@ export function HomePageClient({
               asChild
               className="w-full border-4 border-black bg-card text-card-foreground px-6 py-3 font-black uppercase shadow-retro retro-press sm:w-auto"
             >
-              <Link href="/contact">Contact Me</Link>
+              <Link href="/blog">Voir le blog</Link>
             </Button>
             <Button
               size="lg"

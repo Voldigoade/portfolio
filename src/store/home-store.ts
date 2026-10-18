@@ -1,7 +1,16 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type HomeFocus = "All" | "Systems" | "Security" | "Open Source" | "Tooling";
+export type HomeFocus =
+  | "Tous"
+  | "Systèmes"
+  | "Sécurité"
+  | "Open Source"
+  | "Outillage"
+  | "All"
+  | "Systems"
+  | "Security"
+  | "Tooling";
 
 type HomeState = {
   focus: HomeFocus;
@@ -11,7 +20,7 @@ type HomeState = {
 export const useHomeStore = create<HomeState>()(
   persist(
     (set) => ({
-      focus: "All",
+      focus: "Tous",
       setFocus: (focus) => set({ focus }),
     }),
     {

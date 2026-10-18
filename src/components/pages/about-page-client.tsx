@@ -10,7 +10,7 @@ import {
 } from "@/components/portfolio/about-timeline";
 import { Button } from "@/components/retroui/Button";
 import { Card } from "@/components/retroui/Card";
-import { Github, Link2, Mail } from "@/components/retroui/icons";
+import { Github, Link2 } from "@/components/retroui/icons";
 import { githubUrl } from "@/lib/site-config";
 
 type AboutPageClientProps = {
@@ -69,7 +69,7 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
             <div className="border-4 border-black bg-card p-0">
               <Image
                 src="/images/avatar.png"
-                alt="Voldigoade"
+                alt="Emblème Voldigoade"
                 width={420}
                 height={420}
                 className="block h-full w-full object-cover"
@@ -81,46 +81,50 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
                 target="_blank"
                 rel="noreferrer noopener"
                 className="retro-social-icon"
-                aria-label="GitHub profile"
+                aria-label="Profil GitHub"
               >
                 <Github className="h-4 w-4" />
               </Link>
               <Link
                 href="/project"
                 className="retro-social-icon"
-                aria-label="Explore projects"
+                aria-label="Explorer les projets"
               >
                 <Link2 className="h-4 w-4" />
               </Link>
               <Link
-                href="/contact"
+                href="/blog"
                 className="retro-social-icon"
-                aria-label="Contact Voldigoade"
+                aria-label="Consulter le blog"
               >
-                <Mail className="h-4 w-4" />
+                <Link2 className="h-4 w-4" />
               </Link>
             </div>
           </div>
 
           <div>
             <h1 className="font-pixel text-3xl uppercase sm:text-4xl md:text-5xl">
-              About
+              À propos
             </h1>
             <div className="mt-5 space-y-4 text-sm font-medium leading-relaxed sm:text-base md:text-lg">
               <p>
-                Hey there, I&apos;m Voldigoade. I&apos;m building software and
-                exploring systems, security, privacy, and developer tools
-                through public projects.
+                Bonjour, je suis Voldigoade. Je conçois des logiciels et mène
+                des recherches appliquées sur les systèmes, la sécurité, la
+                confidentialité numérique et les outils pour développeurs à
+                travers des projets open source.
               </p>
               <p>
-                My projects include Spoor, a GitHub public-footprint inspection
-                tool, and source-driven comparisons of secure messaging apps and
-                development environments.
+                Mes travaux incluent notamment Spoor, un outil d&apos;inspection
+                de l&apos;empreinte publique sur GitHub, ainsi que des analyses
+                comparatives documentées sur les messageries sécurisées et les
+                environnements de travail.
               </p>
               <p>
-                I&apos;m learning through implementation and research. Each
-                repository documents its own scope, evidence, and limitations,
-                including work that is still experimental.
+                J&apos;apprends par l&apos;implémentation directe et
+                l&apos;analyse empirique. Chaque dépôt explicite son propre
+                périmètre, son registre de preuves et ses limites, en
+                distinguant clairement les aspects stabilisés des travaux
+                expérimentaux.
               </p>
             </div>
 
@@ -129,14 +133,14 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
                 asChild
                 className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
               >
-                <Link href="/project">Explore Projects</Link>
+                <Link href="/project">Explorer les projets</Link>
               </Button>
               <Button
                 asChild
                 variant="secondary"
                 className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
               >
-                <Link href="/contact">Get In Touch</Link>
+                <Link href="/blog">Lire le blog</Link>
               </Button>
             </div>
           </div>
@@ -145,24 +149,24 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
 
       <section className="space-y-4" data-about-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Project Snapshot
+          Aperçu des Projets
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[
             {
-              title: "Rust Tooling",
+              title: "Outillage Rust",
               detail:
-                "Building terminal-first tools with Rust; Spoor inspects public GitHub profiles, repositories, commit identities, and keys.",
+                "Conception d'outils CLI rapides et fiables en Rust. Spoor analyse les profils, dépôts, identités de commit et clés publiques sur GitHub.",
             },
             {
-              title: "Messaging Research",
+              title: "Recherche Messageries",
               detail:
-                "Comparing messaging systems through public sources, threat models, metadata exposure, audits, and documented limitations.",
+                "Comparaison méthodique des applications sécurisées : modèles de menaces, métadonnées réseau, audits publics et limites attestées.",
             },
             {
-              title: "Developer Environments",
+              title: "Environnements Développeur",
               detail:
-                "Comparing IDEs, remote workflows, AI tooling, privacy, and licensing using source-linked evidence.",
+                "Étude comparative des IDEs : flux distants, outillage IA, gestion des dépendances cloud et garanties de vie privée.",
             },
           ].map((item) => (
             <Card
@@ -187,14 +191,14 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
 
       <section className="space-y-4" data-about-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          Developer DNA
+          ADN d&apos;ingénierie
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {[
-            "Security questions: What information is exposed, who can observe it, and which assumptions matter?",
-            "Learning through Rust: Build focused command-line tools and make their behavior easier to inspect.",
-            "Privacy as a design question: Consider local control, external services, and the information a tool needs.",
-            "Public evidence: Keep source references and distinguish observed data from assumptions and inferences.",
+            "Sécurité par la conception : Quelles données sont exposées, qui peut les intercepter et quelles hypothèses sont formulées ?",
+            "Apprentissage par Rust : Développer des outils ciblés, sûrs pour la mémoire et simples à auditer.",
+            "Vie privée par défaut : Privilégier le traitement local et minimiser strictement la transmission d'informations externes.",
+            "Preuves vérifiables : Maintenir une traçabilité documentaire et séparer observations réelles et déductions logiques.",
           ].map((point) => (
             <Card
               key={point}
@@ -211,13 +215,13 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
 
       <section className="space-y-4" data-about-reveal>
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
-          How I Work
+          Méthode de travail
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[
-            "Start with scope: identify the question, intended use, and limits of a project.",
-            "Build iteratively: work on focused changes and check them against the intended behavior.",
-            "Document uncertainty: link evidence and make unfinished or unverified behavior visible.",
+            "Définir le périmètre : Cerner avec précision la problématique, les cas d'usage et les contraintes techniques du projet.",
+            "Construire itérativement : Développer par étapes vérifiables et confronter le code aux spécifications attendues.",
+            "Documenter les limites : Référencer les sources et expliciter en toute transparence les travaux encore non stabilisés.",
           ].map((item) => (
             <Card
               key={item}
@@ -238,7 +242,7 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl uppercase text-primary-foreground sm:text-4xl">
-            Public Project Map
+            Carte des Projets Publics
           </h2>
           <Button
             asChild
@@ -246,7 +250,7 @@ export function AboutPageClient({ timelineItems }: AboutPageClientProps) {
             className="w-full border-4 border-black shadow-retro-sm sm:w-auto uppercase"
           >
             <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
-              View on GitHub
+              Voir sur GitHub
             </Link>
           </Button>
         </div>

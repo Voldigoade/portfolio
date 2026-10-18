@@ -23,8 +23,6 @@ export const siteHost = new URL(`${siteUrl}/`).host;
 export const siteName = "Voldigoade";
 export const githubUser = "Voldigoade";
 export const githubUrl = "https://github.com/Voldigoade";
-export const githubSnakeGraphUrl =
-  "https://raw.githubusercontent.com/Voldigoade/voldigoade/output/github-contribution-grid-snake.svg";
 
 // Technical project references
 export const spoorUrl = "https://github.com/Voldigoade/spoor";

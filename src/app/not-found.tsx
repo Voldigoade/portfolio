@@ -7,9 +7,9 @@ import { siteUrl } from "@/lib/site-config";
 const notFoundOgImageUrl = `${siteUrl}/404/opengraph-image`;
 
 export const metadata: Metadata = {
-  title: "404 | Route Not Found",
+  title: "404 | Page Introuvable",
   description:
-    "The requested route was not found. Continue browsing Voldigoade Portfolio.",
+    "La page demandée n'existe pas. Continuez votre navigation sur le portfolio de Voldigoade.",
   alternates: {
     canonical: "/404",
   },
@@ -18,25 +18,26 @@ export const metadata: Metadata = {
     follow: true,
   },
   openGraph: {
-    title: "404 | Voldigoade Portfolio",
+    title: "404 | Page Introuvable - Voldigoade",
     description:
-      "The requested route is not available. Use retro navigation to continue.",
+      "La page demandée n'est pas disponible. Utilisez la navigation pour continuer.",
     url: `${siteUrl}/404`,
     type: "website",
+    locale: "fr_FR",
     images: [
       {
         url: notFoundOgImageUrl,
         width: 1200,
         height: 630,
-        alt: "404 page for Voldigoade Portfolio",
+        alt: "Page 404 Portfolio Voldigoade",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "404 | Voldigoade Portfolio",
+    title: "404 | Voldigoade",
     description:
-      "The requested route is not available. Use retro navigation to continue.",
+      "La page demandée n'est pas disponible. Utilisez la navigation pour continuer.",
     images: [notFoundOgImageUrl],
   },
 };
@@ -49,21 +50,23 @@ export default function NotFoundPage() {
   const notFoundJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "404 Route Not Found",
+    name: "404 Page Introuvable",
     url: `${siteUrl}/404`,
+    inLanguage: "fr",
     isPartOf: {
       "@type": "WebSite",
-      name: "Voldigoade Portfolio",
+      name: "Portfolio Voldigoade",
       url: siteUrl,
     },
-    description: "Custom route-not-found page for Voldigoade Portfolio.",
+    description: "Page d'erreur 404 du portfolio Voldigoade.",
   };
 
   return (
     <div className="space-y-6 pb-16">
-      <script type="application/ld+json">
-        {serializeJsonLd(notFoundJsonLd)}
-      </script>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(notFoundJsonLd) }}
+      />
 
       <section className="relative overflow-hidden border-4 border-black bg-card p-5 shadow-retro-lg sm:p-7 md:p-9">
         <div
@@ -72,25 +75,26 @@ export default function NotFoundPage() {
         />
         <div className="relative z-10 space-y-3">
           <p className="inline-flex border-2 border-black bg-primary px-3 py-1 font-pixel text-xs uppercase text-primary-foreground sm:text-sm">
-            Error 404
+            Erreur 404
           </p>
           <h1 className="font-display text-4xl uppercase leading-none sm:text-5xl md:text-6xl">
-            Route Not Found
+            Page Introuvable
           </h1>
           <p className="max-w-3xl text-sm font-semibold leading-relaxed sm:text-base">
-            This page does not exist in the current build. Use the retro
-            navigation controls below to jump back to active sections.
+            Cette ressource n&apos;existe pas ou a été déplacée. Utilisez les
+            commandes de navigation ci-dessous pour revenir aux sections
+            actives.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <Button asChild className="border-4 border-black uppercase">
-              <Link href="/">Back To Home</Link>
+              <Link href="/">Retour à l&apos;accueil</Link>
             </Button>
             <Button
               asChild
               variant="secondary"
               className="border-4 border-black uppercase"
             >
-              <Link href="/project">Open Projects</Link>
+              <Link href="/project">Voir les projets</Link>
             </Button>
           </div>
         </div>

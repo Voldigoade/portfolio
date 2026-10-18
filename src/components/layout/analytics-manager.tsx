@@ -3,22 +3,17 @@
 import { useEffect, useState } from "react";
 import { CloudflareAnalytics } from "./cloudflare-analytics";
 import { GoogleAnalytics } from "./google-analytics";
-import { GoogleTagManager } from "./google-tag-manager";
 
 export const VOLDIGOADE_CONSENT_KEY = "voldigoade_cookie_consent";
 export const VOLDIGOADE_CONSENT_EVENT = "voldigoade_consent_updated";
+export const VOLDIGOADE_MANAGE_COOKIES_EVENT = "voldigoade_manage_cookies";
 
 interface AnalyticsManagerProps {
   gaId?: string;
-  gtmId?: string;
   cfToken?: string;
 }
 
-export function AnalyticsManager({
-  gaId,
-  gtmId,
-  cfToken,
-}: AnalyticsManagerProps) {
+export function AnalyticsManager({ gaId, cfToken }: AnalyticsManagerProps) {
   const [hasGoogleConsent, setHasGoogleConsent] = useState(false);
 
   useEffect(() => {
@@ -46,7 +41,6 @@ export function AnalyticsManager({
   return (
     <>
       {cfToken ? <CloudflareAnalytics token={cfToken} /> : null}
-      {hasGoogleConsent && gtmId ? <GoogleTagManager gtmId={gtmId} /> : null}
       {hasGoogleConsent && gaId ? <GoogleAnalytics gaId={gaId} /> : null}
     </>
   );

@@ -1,14 +1,3 @@
-export type Web3FormsSubmissionValues = {
-  name: string;
-  email: string;
-  country: string;
-  phone?: string;
-  businessInquiry: string;
-  projectDetails: string;
-  expectedStartDate?: string;
-  expectedEndDate?: string;
-};
-
 export interface GithubRepo {
   id: number;
   name: string;
@@ -27,41 +16,28 @@ export interface GithubRepo {
   updated_at?: string;
 }
 
-export type WritingType =
-  | "Article"
-  | "Write-up"
-  | "Research"
-  | "Note"
-  | "Project Log";
+export type WritingLocale = "fr" | "en";
 
 export interface BlogPost {
   id: string;
   slug: string;
+  locale: WritingLocale;
   title: string;
   excerpt: string;
   url: string;
-  type: WritingType;
-  source?: string;
+  category?: string;
+  series?: string;
   tags: string[];
   publishedAt: string;
   updatedAt?: string;
+  eventDate?: string;
   readingMinutes: number;
+  readingTimeText: string;
   draft?: boolean;
   cover?: string;
   canonical?: string;
-}
-
-export interface HackatimePayload {
-  totalHours: string | null;
-  last7DaysTotalHours: string;
-  dailyAverage: string;
-  dailyAverageHours: number;
-  todayHours: string;
-  todaySeconds: number;
-  activeDaysLast7: number;
-  topLanguages: Array<{ name: string; hours: number }>;
-  last7Days: Array<{ day: string; hours: number }>;
-  hasActivity: boolean;
+  frenchVersion?: string;
+  translationSlug?: string;
 }
 
 export interface GitHubOverviewPayload {

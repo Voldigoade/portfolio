@@ -1,10 +1,9 @@
 import { getPublishedArticles } from "@/lib/blog";
 import { siteName, siteUrl } from "@/lib/site-config";
-
 import { escapeXml } from "@/lib/writing-xml";
 
 export async function GET() {
-  const articles = await getPublishedArticles();
+  const articles = await getPublishedArticles("fr");
 
   const itemsXml = articles
     .map((article) => {
@@ -25,10 +24,10 @@ export async function GET() {
   const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${escapeXml(siteName)} - Writing</title>
+    <title>${escapeXml(siteName)} - Publications</title>
     <link>${siteUrl}/blog</link>
-    <description>Technical notes and project writing by Voldigoade.</description>
-    <language>en-us</language>
+    <description>Articles techniques, retours d'expérience et notes de recherche par Voldigoade.</description>
+    <language>fr</language>
     <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>
 ${itemsXml}
   </channel>

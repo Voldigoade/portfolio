@@ -25,14 +25,14 @@ type SystemStatusPanelProps = {
 
 const tipsByMode = {
   "not-found": [
-    "Try navigation from the main menu to locate live pages.",
-    "Use the Projects page to browse active repositories and product links.",
-    "Open Connect Hub for all social and service destinations.",
+    "Utilisez la navigation principale pour accéder aux pages actives.",
+    "Consultez la page Projets pour explorer les dépôts publics et le code source.",
+    "Visitez le Blog pour découvrir les articles d'ingénierie et notes de recherche.",
   ],
   error: [
-    "Tap recovery once to retry this route safely.",
-    "If it keeps failing, open Contact and share the digest code.",
-    "You can continue browsing Home and Projects while this route recovers.",
+    "Cliquez sur Réessayer pour tenter de recharger cette route en toute sécurité.",
+    "Si l'erreur persiste, signalez-la sur GitHub en joignant le code d'erreur.",
+    "Vous pouvez continuer à naviguer sur l'Accueil et les Projets pendant la résolution.",
   ],
 } as const;
 
@@ -73,7 +73,7 @@ export function SystemStatusPanel({
   const reportMutation = useMutation({
     mutationKey: ["system-status-report", mode],
     mutationFn: async () =>
-      `Route: ${pathname || "/"}${errorDigest ? `; error digest: ${errorDigest}` : ""}`,
+      `Route: ${pathname || "/"}${errorDigest ? `; code d'erreur : ${errorDigest}` : ""}`,
   });
 
   const handleRetry = () => {
@@ -95,34 +95,34 @@ export function SystemStatusPanel({
             size="sm"
             className="border-2 border-black font-black uppercase"
           >
-            {mode === "not-found" ? "Route Missing" : "Runtime Guard"}
+            {mode === "not-found" ? "Route Introuvable" : "Garde d'Exécution"}
           </Badge>
           <Badge
             variant="outline"
             size="sm"
             className="border-2 border-black bg-muted font-black uppercase"
           >
-            Retries {retryCount}
+            Tentatives : {retryCount}
           </Badge>
           <Badge
             variant="outline"
             size="sm"
             className="border-2 border-black bg-muted font-black uppercase"
           >
-            Path {lastPath}
+            Chemin : {lastPath}
           </Badge>
         </div>
 
         <div className="space-y-2">
           <h2 className="font-display text-2xl uppercase sm:text-3xl">
             {mode === "not-found"
-              ? "Retro Route Scanner"
-              : "Retro Recovery Console"}
+              ? "Scanner de Route"
+              : "Console de Récupération"}
           </h2>
           <p className="text-sm font-semibold leading-relaxed sm:text-base">
             {mode === "not-found"
-              ? "This path is not indexed in the current portfolio release."
-              : "A runtime issue was detected on this route. Recovery controls are ready."}
+              ? "Cette adresse n'est pas indexée dans la version actuelle du portfolio."
+              : "Une anomalie d'exécution a été interceptée sur cette route."}
           </p>
         </div>
       </Card.Header>
@@ -134,20 +134,23 @@ export function SystemStatusPanel({
             className="border-2 border-black bg-accent text-accent-foreground"
           >
             <Alert.Title className="font-black uppercase">
-              Error Digest
+              Détails de l&apos;erreur
             </Alert.Title>
             <Alert.Description className="mt-1 text-sm font-semibold">
-              {errorDigest ?? "No digest available in this environment."}
+              {errorDigest ??
+                "Aucun code d'erreur disponible dans cet environnement."}
             </Alert.Description>
           </Alert>
         ) : null}
 
         <div className="space-y-2 border-4 border-black bg-muted p-3 sm:p-4">
           <p className="font-pixel text-xs uppercase sm:text-sm">
-            System Navigation Tips
+            Conseils de navigation
           </p>
           {isLoading ? (
-            <p className="text-sm font-semibold uppercase">Loading tips...</p>
+            <p className="text-sm font-semibold uppercase">
+              Chargement des conseils...
+            </p>
           ) : (
             <ul className="space-y-2">
               {(tips ?? []).map((tip) => (
@@ -167,7 +170,7 @@ export function SystemStatusPanel({
           <Button asChild className="w-full border-4 border-black uppercase">
             <Link href="/">
               <Home className="h-4 w-4" />
-              Home
+              Accueil
             </Link>
           </Button>
           <Button
@@ -177,7 +180,7 @@ export function SystemStatusPanel({
           >
             <Link href="/project">
               <Compass className="h-4 w-4" />
-              Projects
+              Projets
             </Link>
           </Button>
           <Button
@@ -185,9 +188,9 @@ export function SystemStatusPanel({
             variant="outline"
             className="w-full border-4 border-black uppercase"
           >
-            <Link href="/contact">
+            <Link href="/blog">
               <LifeBuoy className="h-4 w-4" />
-              Contact
+              Blog
             </Link>
           </Button>
           <Button
@@ -197,7 +200,7 @@ export function SystemStatusPanel({
             onClick={handleRetry}
           >
             <RefreshCw className="h-4 w-4" />
-            {mode === "not-found" ? "Refresh" : "Recover"}
+            {mode === "not-found" ? "Actualiser" : "Récupérer"}
           </Button>
         </div>
 
@@ -214,8 +217,8 @@ export function SystemStatusPanel({
           >
             <AlertTriangle className="h-4 w-4" />
             {reportMutation.isPending
-              ? "Preparing Details"
-              : "Prepare Route Details"}
+              ? "Préparation des détails..."
+              : "Préparer les détails techniques"}
           </Button>
 
           <Button
@@ -225,7 +228,7 @@ export function SystemStatusPanel({
             disabled={retryCount === 0}
             onClick={clearRetryCount}
           >
-            Reset Retry Counter
+            Réinitialiser le compteur
           </Button>
         </div>
 
@@ -235,18 +238,19 @@ export function SystemStatusPanel({
             className="border-2 border-black bg-secondary text-secondary-foreground"
           >
             <Alert.Title className="font-black uppercase">
-              Local Route Details
+              Détails techniques locaux
             </Alert.Title>
             <Alert.Description className="mt-1 text-sm font-semibold">
-              {reportMutation.data}. No report has been sent; include these
-              details when contacting me.
+              {reportMutation.data}. Aucun rapport externe n&apos;a été envoyé.
+              Vous pouvez joindre ces informations lors d&apos;une issue sur
+              GitHub.
             </Alert.Description>
           </Alert>
         ) : null}
 
         {isFetching && !isLoading ? (
           <p className="text-xs font-black uppercase text-muted-foreground">
-            Updating tips...
+            Mise à jour des conseils...
           </p>
         ) : null}
       </Card.Content>
