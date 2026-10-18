@@ -1,6 +1,7 @@
 media:
   input: public/images/writing
   output: /images/writing
+  rename: safe
   categories:
     - image
   extensions:
@@ -15,7 +16,8 @@ content:
     label: Writing
     type: collection
     path: content/writing
-    format: md
+    format: yaml-frontmatter
+    subfolders: false
     filename: "{fields.slug}.md"
     fields:
       - name: title
@@ -26,6 +28,9 @@ content:
         label: Slug
         type: string
         required: true
+        pattern:
+          regex: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          message: Use lowercase letters, numbers and single hyphens.
       - name: summary
         label: Summary
         type: text
@@ -35,26 +40,29 @@ content:
         type: select
         required: true
         options:
-          - Article
-          - Write-up
-          - Research
-          - Note
-          - Project Log
+          values: [Article, Write-up, Research, Note, Project Log]
       - name: tags
         label: Tags
-        type: list
+        type: string
+        list: true
         required: true
       - name: publishedAt
         label: Published Date
         type: date
         required: true
+        options:
+          format: yyyy-MM-dd
       - name: updatedAt
         label: Updated Date
         type: date
+        default: ""
+        options:
+          format: yyyy-MM-dd
       - name: draft
         label: Draft
         type: boolean
-        default: false
+        required: true
+        default: true
       - name: cover
         label: Cover Image
         type: image
@@ -64,3 +72,7 @@ content:
       - name: body
         label: Body
         type: rich-text
+        options:
+          format: markdown
+          rename: safe
+          extensions: [png, jpg, jpeg, webp, avif]

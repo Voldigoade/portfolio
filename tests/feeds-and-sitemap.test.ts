@@ -1,57 +1,105 @@
-import { describe, expect, it } from "bun:test";
-import { GET as getFeed } from "../src/app/feed.xml/route";
+import { describe, expect, it, spyOn } from "bun:test";
+import fs from "node:fs/promises";
+import Parser from "rss-parser";
+import { GET as getAtom } from "../src/app/feed.xml/route";
 import { GET as getRss } from "../src/app/rss.xml/route";
 import sitemap from "../src/app/sitemap";
+import { withWritingFiles } from "./helpers/writing";
 
-describe("Feeds & Sitemap Privacy", () => {
-  it("generates sitemap with canonical static routes and published articles", async () => {
-    const entries = await sitemap();
-    const urls = entries.map((e) => e.url);
+function source(slug: string, draft: boolean) {
+  return `---\ntitle: 'Fixture <title> & "quotes"'\nslug: ${slug}\nsummary: 'A & B <summary>'\ntype: Note\ntags: ['A&B', '<tag>']\npublishedAt: "2026-10-18"\ndraft: ${draft}\n---\nFixture body`;
+}
 
-    expect(urls).toContain("https://voldigoade.xyz");
-    expect(urls).toContain("https://voldigoade.xyz/about");
-    expect(urls).toContain("https://voldigoade.xyz/project");
-    expect(urls).toContain("https://voldigoade.xyz/blog");
-    expect(urls).toContain("https://voldigoade.xyz/contact");
-    expect(urls).toContain("https://voldigoade.xyz/privacy-policy");
-    expect(urls).toContain("https://voldigoade.xyz/terms-of-service");
-    expect(urls).toContain("https://voldigoade.xyz/cookies-policy");
-
-    // Must contain published article
-    expect(urls).toContain(
-      "https://voldigoade.xyz/blog/spoor-github-footprint-inspection",
-    );
-
-    // Must NEVER contain draft post
-    expect(urls).not.toContain(
-      "https://voldigoade.xyz/blog/draft-example-post",
+describe("public writing XML", () => {
+  it("serves valid empty RSS, Atom and sitemap for a controlled draft-only collection", async () => {
+    await withWritingFiles(
+      { "internal-fixture.md": source("internal-fixture", true) },
+      async () => {
+        const rss = await getRss();
+        const atom = await getAtom();
+        const rssXml = await rss.text();
+        const atomXml = await atom.text();
+        expect(rss.status).toBe(200);
+        expect(atom.status).toBe(200);
+        expect(rss.headers.get("Content-Type")).toContain("xml");
+        expect(atom.headers.get("Content-Type")).toContain("xml");
+        expect(rssXml).toContain('<rss version="2.0"');
+        expect(rssXml).not.toContain("<item>");
+        expect(atomXml).toContain('<feed xmlns="http://www.w3.org/2005/Atom">');
+        expect(atomXml).not.toContain("<entry>");
+        expect(atomXml).toContain("<updated>");
+        for (const xml of [rssXml, atomXml]) {
+          expect(xml).not.toContain("internal-fixture");
+          expect((await new Parser().parseString(xml)).items).toEqual([]);
+        }
+        const entries = await sitemap();
+        expect(entries.map((entry) => entry.url)).toContain(
+          "https://voldigoade.xyz/blog",
+        );
+        expect(entries.some((entry) => entry.url.includes("/blog/"))).toBe(
+          false,
+        );
+        expect(entries.every((entry) => entry.lastModified === undefined)).toBe(
+          true,
+        );
+      },
     );
   });
 
-  it("serves valid RSS 2.0 feed without draft posts", async () => {
-    const response = await getRss();
-    expect(response.status).toBe(200);
-    expect(response.headers.get("Content-Type")).toContain("application/xml");
-
-    const xml = await response.text();
-    expect(xml).toContain('<rss version="2.0"');
-    expect(xml).toContain("<title>Voldigoade");
-    expect(xml).toContain(
-      "https://voldigoade.xyz/blog/spoor-github-footprint-inspection",
+  it("includes published fixtures with escaped XML and real dates, excluding drafts", async () => {
+    await withWritingFiles(
+      {
+        "published-fixture.md": source("published-fixture", false),
+        "internal-fixture.md": source("internal-fixture", true),
+      },
+      async () => {
+        const rss = await (await getRss()).text();
+        const atom = await (await getAtom()).text();
+        for (const xml of [rss, atom]) {
+          expect(xml).toContain(
+            "https://voldigoade.xyz/blog/published-fixture",
+          );
+          expect(xml).toContain(
+            "Fixture &lt;title&gt; &amp; &quot;quotes&quot;",
+          );
+          expect(xml).toContain("A &amp; B &lt;summary&gt;");
+          expect(xml).not.toContain("internal-fixture");
+          expect(xml).not.toContain("<summary>");
+          const parsed = await new Parser().parseString(xml);
+          expect(parsed.items).toHaveLength(1);
+          expect(parsed.items[0]?.title).toBe('Fixture <title> & "quotes"');
+        }
+        expect(rss).toContain(
+          "<pubDate>Sun, 18 Oct 2026 00:00:00 GMT</pubDate>",
+        );
+        expect(atom).toContain(
+          "<published>2026-10-18T00:00:00.000Z</published>",
+        );
+        const entries = await sitemap();
+        expect(entries).toContainEqual(
+          expect.objectContaining({
+            url: "https://voldigoade.xyz/blog/published-fixture",
+            lastModified: "2026-10-18T00:00:00.000Z",
+          }),
+        );
+        expect(
+          entries.some((entry) => entry.url.includes("internal-fixture")),
+        ).toBe(false);
+      },
     );
-    expect(xml).not.toContain("draft-example-post");
   });
 
-  it("serves valid Atom feed without draft posts", async () => {
-    const response = await getFeed();
-    expect(response.status).toBe(200);
-    expect(response.headers.get("Content-Type")).toContain("application/xml");
-
-    const xml = await response.text();
-    expect(xml).toContain('<rss version="2.0"');
-    expect(xml).toContain(
-      "https://voldigoade.xyz/blog/spoor-github-footprint-inspection",
+  it("returns valid empty feeds when the writing directory is missing", async () => {
+    const list = spyOn(fs, "readdir").mockRejectedValue(
+      Object.assign(new Error("Missing"), { code: "ENOENT" }),
     );
-    expect(xml).not.toContain("draft-example-post");
+    try {
+      expect(await (await getRss()).text()).not.toContain("<item>");
+      const xml = await (await getAtom()).text();
+      expect(xml).toContain('<feed xmlns="http://www.w3.org/2005/Atom">');
+      expect(xml).not.toContain("<entry>");
+    } finally {
+      list.mockRestore();
+    }
   });
 });

@@ -3,12 +3,12 @@
 import { animate } from "animejs";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { Github, Link2, Linkedin, Twitter } from "@/components/retroui/icons";
+import { Github, Link2, Mail } from "@/components/retroui/icons";
 import {
   CURRENT_PORTFOLIO_VERSION,
   PORTFOLIO_REPO_URL,
 } from "@/lib/portfolio-version";
-import { githubUrl, linkedinUrl, linkHubUrl, xUrl } from "@/lib/site-config";
+import { githubUrl } from "@/lib/site-config";
 
 export function Footer() {
   const footerRef = useRef<HTMLElement>(null);
@@ -59,12 +59,12 @@ export function Footer() {
         <div className="flex w-full flex-col items-center gap-3 text-center lg:w-auto lg:items-start lg:text-left">
           <div data-footer-version>
             <Link
-              href={`${PORTFOLIO_REPO_URL}/releases/latest`}
+              href={PORTFOLIO_REPO_URL}
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center justify-center border-4 border-black bg-primary px-3 py-1.5 text-xs font-black uppercase text-primary-foreground shadow-retro-sm transition hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
             >
-              Portfolio v{CURRENT_PORTFOLIO_VERSION}
+              Source v{CURRENT_PORTFOLIO_VERSION}
             </Link>
           </div>
 
@@ -89,31 +89,31 @@ export function Footer() {
               <Github className="h-4 w-4" />
             </Link>
             <Link
-              href={xUrl}
+              href="/project"
               className="retro-social-icon"
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="Twitter"
+              aria-label="Explore projects"
               data-footer-social
             >
-              <Twitter className="h-4 w-4" />
+              <Link2 className="h-4 w-4" />
             </Link>
             <Link
-              href={linkedinUrl}
+              href="/contact"
               className="retro-social-icon"
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="LinkedIn"
+              aria-label="Contact Voldigoade"
               data-footer-social
             >
-              <Linkedin className="h-4 w-4" />
+              <Mail className="h-4 w-4" />
             </Link>
             <Link
-              href={linkHubUrl}
+              href="/blog"
               className="retro-social-icon"
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="Link Hub"
+              aria-label="Technical writing"
               data-footer-social
             >
               <Link2 className="h-4 w-4" />

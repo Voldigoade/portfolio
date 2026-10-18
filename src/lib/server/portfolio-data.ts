@@ -1,5 +1,4 @@
 import "server-only";
-import { cacheLife } from "next/cache";
 import { getBlogPostsForListing } from "@/lib/blog";
 import type {
   BlogPost,
@@ -8,128 +7,28 @@ import type {
   HackatimePayload,
 } from "@/lib/portfolio-types";
 
-interface GitHubUserResponse {
-  login?: string;
-  followers?: number;
-  following?: number;
-  public_repos?: number;
-}
-
-interface GitHubContributionsResponse {
-  data?: {
-    user?: {
-      contributionsCollection?: {
-        contributionCalendar?: {
-          weeks?: Array<{
-            contributionDays?: Array<{
-              date: string;
-              contributionCount: number;
-            }>;
-          }>;
-        };
-      };
-    };
-  };
-}
-
-interface HackatimeStatsResponse {
-  data?: {
-    username?: string;
-    human_readable_daily_average_including_other_language?: string;
-    human_readable_total_including_other_language?: string;
-    human_readable_total?: string;
-    human_readable_daily_average?: string;
-    daily_average?: number;
-    languages?: Array<{ name: string; total_seconds: number }>;
-    days?: Array<{
-      date: string;
-      grand_total: {
-        total_seconds: number;
-      };
-    }>;
-    total_seconds?: number;
-  };
-}
-
-interface WakaTimeAllTimeResponse {
-  data?: {
-    total_seconds?: number;
-    text?: string;
-  };
-}
-
-interface WakaTimeTodayResponse {
-  data?: {
-    grand_total?: {
-      total_seconds?: number;
-      text?: string;
-    };
-  };
-}
-
-interface HackatimeClubStatsResponse {
-  data?: {
-    grand_total?: {
-      total_seconds?: number;
-      text?: string;
-    };
-    total_seconds?: number;
-    human_readable_total?: string;
-    text?: string;
-  };
-}
-
-async function safeJsonParse<T>(response: Response): Promise<T | null> {
-  try {
-    const text = await response.text();
-    return JSON.parse(text) as T;
-  } catch {
-    return null;
-  }
-}
-
 export const DEFAULT_GITHUB_USER = "Voldigoade";
 const GITHUB_CACHE_REVALIDATE_SECONDS = 60 * 60 * 12;
+const REQUEST_TIMEOUT_MS = 8_000;
+export type CuratedProject = Omit<
+  GithubRepo,
+  "stargazers_count" | "forks_count" | "watchers_count" | "updated_at"
+>;
 
-export interface CuratedProject {
-  id: number;
-  name: string;
-  full_name: string;
-  description: string;
-  language: string;
-  topics: string[];
-  html_url: string;
-  homepage: string | null;
-  stargazers_count: number;
-  forks_count: number;
-  watchers_count: number;
-  updated_at: string;
-  fork: boolean;
-  archived: boolean;
-  private: boolean;
-}
-
-export const CURATED_PROJECT_MANIFEST: CuratedProject[] = [
+// Independently curated public metadata. Never copy arbitrary remote repository fields.
+export const CURATED_PROJECT_MANIFEST: ReadonlyArray<CuratedProject> = [
   {
-    id: 101,
+    id: 1419669309,
     name: "spoor",
     full_name: "Voldigoade/spoor",
-    description:
-      "Terminal-first GitHub public-footprint inspection tool in Rust with HTTP/SSE API, structured reports and exports.",
+    description: "Terminal-first GitHub public-footprint inspection tool.",
     language: "Rust",
-    topics: ["rust", "cli", "github", "osint", "security", "http-sse"],
+    topics: ["cli", "github", "osint", "privacy", "rust"],
     html_url: "https://github.com/Voldigoade/spoor",
-    homepage: "https://voldigoade.xyz/#spoor",
-    stargazers_count: 0,
-    forks_count: 0,
-    watchers_count: 0,
-    updated_at: "2026-10-16T12:00:00Z",
-    fork: false,
-    archived: false,
-    private: false,
+    homepage: null,
   },
   {
-    id: 102,
+    id: 1418158504,
     name: "recherche-messageries",
     full_name: "Voldigoade/recherche-messageries",
     description:
@@ -137,369 +36,185 @@ export const CURATED_PROJECT_MANIFEST: CuratedProject[] = [
     language: "Python",
     topics: [
       "privacy",
-      "security",
-      "messaging",
-      "metadata",
-      "threat-models",
-      "research",
+      "secure-messaging",
+      "threat-modeling",
+      "mkdocs",
+      "english",
+      "french",
     ],
     html_url: "https://github.com/Voldigoade/recherche-messageries",
     homepage: "https://voldigoade.github.io/recherche-messageries/",
-    stargazers_count: 0,
-    forks_count: 0,
-    watchers_count: 0,
-    updated_at: "2026-10-15T12:00:00Z",
-    fork: false,
-    archived: false,
-    private: false,
   },
   {
-    id: 103,
+    id: 1421132812,
     name: "ide-research",
     full_name: "Voldigoade/ide-research",
     description:
       "Source-driven comparison of IDEs and development environments across stacks, platforms, remote workflows, AI tooling, security, privacy and licensing.",
     language: "Python",
-    topics: ["developer-tools", "ide", "research", "privacy", "tooling"],
+    topics: [
+      "developer-tools",
+      "ide",
+      "research",
+      "comparison",
+      "remote-development",
+    ],
     html_url: "https://github.com/Voldigoade/ide-research",
     homepage: "https://voldigoade.github.io/ide-research/",
-    stargazers_count: 0,
-    forks_count: 0,
-    watchers_count: 0,
-    updated_at: "2026-10-16T12:00:00Z",
-    fork: false,
-    archived: false,
-    private: false,
   },
   {
-    id: 104,
+    id: 1424431996,
     name: "crukst",
     full_name: "Voldigoade/crukst",
-    description: "Semantic firmware diff and triage, built in Rust.",
+    description:
+      "Early design and implementation work toward semantic firmware comparison and triage in Rust.",
     language: "Rust",
-    topics: ["rust", "firmware", "diff", "triage", "systems"],
+    topics: [
+      "rust",
+      "firmware",
+      "diff",
+      "firmware-analysis",
+      "reverse-engineering",
+    ],
     html_url: "https://github.com/Voldigoade/crukst",
     homepage: null,
-    stargazers_count: 0,
-    forks_count: 0,
-    watchers_count: 0,
-    updated_at: "2026-10-18T17:00:00Z",
-    fork: false,
-    archived: false,
-    private: false,
-  },
-  {
-    id: 105,
-    name: "diskboot",
-    full_name: "Voldigoade/diskboot",
-    description: "Experimental USB boot and system recovery utilities.",
-    language: "Shell",
-    topics: ["linux", "boot", "usb", "systems", "utilities"],
-    html_url: "https://github.com/Voldigoade/diskboot",
-    homepage: null,
-    stargazers_count: 0,
-    forks_count: 0,
-    watchers_count: 0,
-    updated_at: "2026-10-16T12:00:00Z",
-    fork: false,
-    archived: true,
-    private: false,
   },
 ];
 
-async function getCurrentTimestamp() {
-  "use cache";
-  cacheLife("hours");
-  return Date.now();
+function record(value: unknown): Record<string, unknown> | null {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
 }
-
-function getGithubHeaders(): HeadersInit {
-  const headers: HeadersInit = {
-    Accept: "application/vnd.github+json",
-  };
-
-  if (process.env.GITHUB_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+function count(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0
+    ? value
+    : undefined;
+}
+function seconds(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? value
+    : undefined;
+}
+async function fetchJson(
+  url: string,
+  options: RequestInit & {
+    next?: { revalidate: number; tags?: string[] };
+  } = {},
+): Promise<unknown> {
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+    return response.ok ? await response.json() : null;
+  } catch {
+    return null;
   }
-
-  return headers;
 }
-
-function toHours(value: number): number {
-  if (Number.isNaN(value)) return 0;
-  return Math.max(0, value / 3600);
+function publicOptions(tag: string) {
+  return {
+    // No credentials: token permissions cannot affect the public data boundary.
+    headers: { Accept: "application/vnd.github+json" },
+    cache: "force-cache" as const,
+    next: { revalidate: GITHUB_CACHE_REVALIDATE_SECONDS, tags: [tag] },
+  };
 }
-
 export async function getGithubRepos(
   _userOverride?: string,
 ): Promise<GithubRepo[]> {
-  const username = DEFAULT_GITHUB_USER;
-  const headers = getGithubHeaders();
-
-  try {
-    const endpoint = `https://api.github.com/users/${username}/repos?sort=updated&per_page=100&type=owner`;
-
-    const response = await fetch(endpoint, {
-      headers,
-      cache: "force-cache",
-      next: {
-        revalidate: GITHUB_CACHE_REVALIDATE_SECONDS,
-        tags: [`github-repos-${username}`],
-      },
-    });
-
-    if (!response.ok) {
-      return CURATED_PROJECT_MANIFEST;
+  const payload = await fetchJson(
+    `https://api.github.com/users/${DEFAULT_GITHUB_USER}/repos?sort=updated&per_page=100&type=owner`,
+    publicOptions("github-public-projects"),
+  );
+  const entries = Array.isArray(payload)
+    ? payload.map(record).filter((item) => item !== null)
+    : [];
+  return CURATED_PROJECT_MANIFEST.map((project) => {
+    const candidates = entries.filter((repo) => repo.name === project.name);
+    // Reject ambiguous, private, moved, forked, archived or malformed objects.
+    const repo = candidates.length === 1 ? candidates[0] : undefined;
+    if (
+      repo?.private !== false ||
+      repo.archived !== false ||
+      repo.fork !== false ||
+      record(repo.owner)?.login !== DEFAULT_GITHUB_USER ||
+      repo.full_name !== project.full_name ||
+      repo.html_url !== project.html_url
+    ) {
+      return { ...project, topics: [...project.topics] };
     }
-
-    const fetchedRepos = await safeJsonParse<GithubRepo[]>(response);
-    if (!fetchedRepos || !Array.isArray(fetchedRepos)) {
-      return CURATED_PROJECT_MANIFEST;
-    }
-
-    // Defensive security filter: strictly exclude any private repositories
-    const publicRepos = fetchedRepos.filter(
-      (repo) => repo.private !== true && !repo.name.startsWith("."),
-    );
-
-    // Filter against curated manifest allowlist
-    const manifestMap = new Map(
-      CURATED_PROJECT_MANIFEST.map((m) => [m.name.toLowerCase(), m]),
-    );
-    const matchedRepos: GithubRepo[] = [];
-
-    for (const repo of publicRepos) {
-      const match = manifestMap.get(repo.name.toLowerCase());
-      if (match) {
-        matchedRepos.push({
-          ...match,
-          ...repo,
-          id: repo.id || match.id,
-          description: repo.description?.trim() || match.description,
-          topics: Array.from(
-            new Set([...(repo.topics ?? []), ...match.topics]),
-          ),
-          language: repo.language || match.language,
-          homepage: repo.homepage || match.homepage,
-          private: false,
-        });
-        manifestMap.delete(repo.name.toLowerCase());
-      }
-    }
-
-    // Include remaining curated projects
-    for (const remaining of manifestMap.values()) {
-      matchedRepos.push(remaining);
-    }
-
-    return matchedRepos;
-  } catch {
-    return CURATED_PROJECT_MANIFEST;
-  }
+    const date =
+      typeof repo.updated_at === "string" &&
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(repo.updated_at) &&
+      Number.isFinite(Date.parse(repo.updated_at)) &&
+      new Date(repo.updated_at).toISOString().replace(".000Z", "Z") ===
+        repo.updated_at
+        ? repo.updated_at
+        : undefined;
+    return {
+      ...project,
+      topics: [...project.topics],
+      stargazers_count: count(repo.stargazers_count),
+      forks_count: count(repo.forks_count),
+      watchers_count: count(repo.watchers_count),
+      updated_at: date,
+    };
+  });
 }
-
 export async function getGithubOverview(
   _githubUser?: string,
 ): Promise<GitHubOverviewPayload | null> {
-  const username = DEFAULT_GITHUB_USER;
   const repos = await getGithubRepos();
-  if (repos.length === 0) {
-    return null;
-  }
-
-  const headers = getGithubHeaders();
-
-  // Strictly use public endpoint: never call /user
-  const userResponse = await fetch(`https://api.github.com/users/${username}`, {
-    headers,
-    cache: "force-cache",
-    next: {
-      revalidate: GITHUB_CACHE_REVALIDATE_SECONDS,
-      tags: [`github-profile-${username}`],
-    },
-  }).catch(() => null);
-
-  const profile = userResponse?.ok
-    ? ((await safeJsonParse<GitHubUserResponse>(userResponse)) ?? {})
-    : {};
-
-  const responseDateHeader = userResponse?.headers.get("date");
-  const referenceDate = new Date(
-    responseDateHeader ?? repos[0]?.updated_at ?? "1970-01-01T00:00:00Z",
+  const payload = record(
+    await fetchJson(
+      `https://api.github.com/users/${DEFAULT_GITHUB_USER}`,
+      publicOptions("github-public-profile"),
+    ),
   );
-  const rangeEndDate = Number.isNaN(referenceDate.getTime())
-    ? new Date("1970-01-01T00:00:00Z")
-    : new Date(referenceDate);
-  const commitYear = rangeEndDate.getUTCFullYear();
-  rangeEndDate.setUTCHours(23, 59, 59, 999);
-  const rangeStartDate = new Date(rangeEndDate);
-  rangeStartDate.setUTCDate(rangeStartDate.getUTCDate() - 364);
-  rangeStartDate.setUTCHours(0, 0, 0, 0);
-  const rangeStart = rangeStartDate.toISOString();
-  const rangeEnd = rangeEndDate.toISOString();
-  let commitHistory: Array<{ date: string; commits: number }> = [];
-
-  // Focus stats/charts on active owned projects.
-  const projectRepos = repos.filter((repo) => !repo.fork && !repo.archived);
-
-  // Use GraphQL contribution calendar when token is available
-  if (process.env.GITHUB_TOKEN) {
-    const contributionResponse = await fetch("https://api.github.com/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-          query ContributionCalendar($login: String!, $from: DateTime!, $to: DateTime!) {
-            user(login: $login) {
-              contributionsCollection(from: $from, to: $to) {
-                contributionCalendar {
-                  weeks {
-                    contributionDays {
-                      date
-                      contributionCount
-                    }
-                  }
-                }
-              }
-            }
-          }
-        `,
-        variables: {
-          login: username,
-          from: rangeStart,
-          to: rangeEnd,
-        },
-      }),
-      cache: "force-cache",
-      next: {
-        revalidate: GITHUB_CACHE_REVALIDATE_SECONDS,
-        tags: [`github-contributions-${username}-${commitYear}`],
-      },
-    }).catch(() => null);
-
-    if (contributionResponse?.ok) {
-      const payload =
-        await safeJsonParse<GitHubContributionsResponse>(contributionResponse);
-
-      const days =
-        payload?.data?.user?.contributionsCollection?.contributionCalendar?.weeks
-          ?.flatMap((week) => week.contributionDays ?? [])
-          .filter((day) => typeof day.date === "string") ?? [];
-
-      commitHistory = days.map((day) => ({
-        date: day.date,
-        commits: day.contributionCount,
-      }));
-    }
-  }
-
-  const totalStars = projectRepos.reduce(
-    (sum, repo) => sum + (repo.stargazers_count ?? 0),
-    0,
-  );
-  const totalForks = projectRepos.reduce(
-    (sum, repo) => sum + (repo.forks_count ?? 0),
-    0,
-  );
-  const totalWatchers = projectRepos.reduce(
-    (sum, repo) => sum + (repo.watchers_count ?? 0),
-    0,
-  );
-
-  const topRepositories = [...projectRepos]
-    .sort((a, b) => b.stargazers_count - a.stargazers_count)
-    .slice(0, 7)
-    .map((repo) => ({
-      name: repo.name,
-      stars: repo.stargazers_count,
-    }));
-
+  const profile = payload?.login === DEFAULT_GITHUB_USER ? payload : null;
+  const total = (key: "stargazers_count" | "forks_count" | "watchers_count") =>
+    repos.every((repo) => repo[key] !== undefined)
+      ? repos.reduce((sum, repo) => sum + (repo[key] ?? 0), 0)
+      : null;
   const languageMap = new Map<string, number>();
-  for (const repo of projectRepos) {
-    const language = repo.language?.trim();
-    if (!language) {
-      continue;
-    }
-
-    const value = languageMap.get(language) ?? 0;
-    languageMap.set(language, value + 1);
-  }
-
-  const languages = Array.from(languageMap.entries())
-    .sort((a, b) => b[1] - a[1])
-    .map(([language, count]) => ({
-      language,
-      repos: count,
-    }));
-
-  const monthOrder = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const monthlyMap = new Map<string, number>();
-
-  for (const day of commitHistory) {
-    const date = new Date(day.date);
-    if (Number.isNaN(date.getTime())) {
-      continue;
-    }
-
-    const month = monthOrder[date.getUTCMonth()] ?? "Unknown";
-    monthlyMap.set(month, (monthlyMap.get(month) ?? 0) + day.commits);
-  }
-
-  const monthlyActivity = monthOrder
-    .filter((month) => monthlyMap.has(month))
-    .map((month) => ({
-      month,
-      repos: monthlyMap.get(month) ?? 0,
-    }));
-
-  const updateDates = commitHistory.flatMap((entry) =>
-    Array.from({ length: Math.max(0, entry.commits) }, () => entry.date),
-  );
-
-  // Only public repos are counted
-  const publicRepoCount = profile.public_repos ?? projectRepos.length;
-  const totalRepositories = projectRepos.length;
-
+  for (const repo of repos)
+    if (repo.language)
+      languageMap.set(repo.language, (languageMap.get(repo.language) ?? 0) + 1);
   return {
-    username: profile.login ?? username,
-    commitYear,
-    commitRangeStart: rangeStart,
-    commitRangeEnd: rangeEnd,
-    followers: profile.followers ?? 0,
-    following: profile.following ?? 0,
-    publicRepos: publicRepoCount,
-    totalRepositories,
-    totalStars,
-    totalForks,
-    totalWatchers,
-    topRepositories,
-    languages,
-    monthlyActivity,
-    updateDates,
-    commitHistory,
+    username: DEFAULT_GITHUB_USER,
+    followers: count(profile?.followers) ?? null,
+    following: count(profile?.following) ?? null,
+    publicRepos: count(profile?.public_repos) ?? null,
+    totalRepositories: repos.length,
+    projects: repos.map(({ name, html_url, language }) => ({
+      name,
+      url: html_url,
+      language,
+    })),
+    totalStars: total("stargazers_count"),
+    totalForks: total("forks_count"),
+    totalWatchers: total("watchers_count"),
+    topRepositories: repos
+      .flatMap((repo) =>
+        repo.stargazers_count === undefined
+          ? []
+          : [{ name: repo.name, stars: repo.stargazers_count }],
+      )
+      .sort((a, b) => b.stars - a.stars),
+    languages: [...languageMap].map(([language, repos]) => ({
+      language,
+      repos,
+    })),
+    // Authenticated contribution calendars can contain private activity. Never request them.
+    monthlyActivity: [],
+    updateDates: [],
+    commitHistory: [],
   };
 }
-
 export async function getBlogPosts(): Promise<BlogPost[]> {
   return getBlogPostsForListing();
 }
-
 export async function getHackatimeStats(): Promise<HackatimePayload | null> {
   const provider =
     process.env.CODING_STATS_PROVIDER === "hackatime"
@@ -508,247 +223,116 @@ export async function getHackatimeStats(): Promise<HackatimePayload | null> {
   const apiKey =
     provider === "hackatime"
       ? process.env.HACKATIME_API_KEY
-      : process.env.WAKATIME_API_KEY;
-
+      : (process.env.WAKATIME_ACCESS_TOKEN ?? process.env.WAKATIME_API_KEY);
   if (!apiKey) return null;
-
   const baseUrl =
-    provider === "wakatime"
-      ? "https://wakatime.com"
-      : (
+    provider === "hackatime"
+      ? (
           process.env.HACKATIME_API_BASE_URL ?? "https://hackatime.hackclub.com"
-        ).replace(/\/$/, "");
-
-  const sevenDayUrl =
+        ).replace(/\/$/, "")
+      : "https://api.wakatime.com";
+  const prefix = provider === "hackatime" ? "/api/hackatime/v1" : "/api/v1";
+  const options = {
+    headers: { Authorization: `Bearer ${apiKey}` },
+    cache: "force-cache" as const,
+    next: { revalidate: 1800, tags: ["coding-time"] },
+  };
+  const weeklyPayload = await fetchJson(
+    `${baseUrl}${prefix}/users/current/stats/last_7_days`,
+    options,
+  );
+  const weekly = record(record(weeklyPayload)?.data);
+  if (
+    !weekly ||
+    typeof weekly.start !== "string" ||
+    typeof weekly.end !== "string" ||
+    !Array.isArray(weekly.languages)
+  )
+    return null;
+  const startDate = weekly.start.slice(0, 10);
+  const endDate = weekly.end.slice(0, 10);
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(startDate) ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(endDate) ||
+    !Number.isFinite(Date.parse(startDate)) ||
+    !Number.isFinite(Date.parse(endDate))
+  )
+    return null;
+  // Match the provider's calendar, including its timezone, instead of inventing zero-filled heartbeats.
+  const [summaryPayload, totalPayload, todayPayload] = await Promise.all([
+    fetchJson(
+      `${baseUrl}${prefix}/users/current/summaries?start=${startDate}&end=${endDate}`,
+      options,
+    ),
     provider === "wakatime"
-      ? `${baseUrl}/api/v1/users/current/stats/last_7_days?api_key=${apiKey}`
-      : `${baseUrl}/api/hackatime/v1/users/current/stats/last_7_days?api_key=${apiKey}`;
-
-  const allTimeUrl =
-    provider === "wakatime"
-      ? `${baseUrl}/api/v1/users/current/all_time_since_today?api_key=${apiKey}`
-      : `${baseUrl}/api/hackatime/v1/users/current/all_time_since_today?api_key=${apiKey}`;
-
-  const todayStatusUrl =
-    provider === "wakatime"
-      ? `${baseUrl}/api/v1/users/current/statusbar/today?api_key=${apiKey}`
-      : `${baseUrl}/api/hackatime/v1/users/current/statusbar/today?api_key=${apiKey}`;
-
-  const [sevenDayResponse, allTimeResponse, todayStatusResponse] =
-    await Promise.all([
-      fetch(sevenDayUrl, {
-        cache: "force-cache",
-        next: {
-          revalidate: 1800,
-          tags: ["coding-time", "coding-time-seven-days"],
-        },
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
+      ? fetchJson(
+          `${baseUrl}${prefix}/users/current/all_time_since_today`,
+          options,
+        )
+      : Promise.resolve(null),
+    fetchJson(
+      `${baseUrl}${prefix}/users/current/${provider === "hackatime" ? "statusbar" : "status_bar"}/today`,
+      options,
+    ),
+  ]);
+  const days = record(summaryPayload)?.data;
+  const allTime = record(record(totalPayload)?.data);
+  const today = record(record(record(todayPayload)?.data)?.grand_total);
+  const totalSeconds = seconds(allTime?.total_seconds);
+  const todaySeconds = seconds(today?.total_seconds);
+  const weeklySeconds = seconds(weekly.total_seconds);
+  const dailyAverageSeconds = seconds(weekly.daily_average);
+  // Incomplete provider responses are unavailable, never synthetic zero activity.
+  if (
+    todaySeconds === undefined ||
+    weeklySeconds === undefined ||
+    dailyAverageSeconds === undefined ||
+    !Array.isArray(days)
+  )
+    return null;
+  const last7Days: HackatimePayload["last7Days"] = [];
+  for (const value of days) {
+    const day = record(value);
+    const duration = seconds(record(day?.grand_total)?.total_seconds);
+    const date = record(day?.range)?.date;
+    if (
+      typeof date !== "string" ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+      !Number.isFinite(Date.parse(date)) ||
+      duration === undefined
+    )
+      return null;
+    last7Days.push({
+      day: new Date(`${date}T12:00:00Z`).toLocaleDateString("en-US", {
+        weekday: "short",
+        timeZone: "UTC",
       }),
-      fetch(allTimeUrl, {
-        cache: "force-cache",
-        next: {
-          revalidate: 1800,
-          tags: ["coding-time", "coding-time-total"],
-        },
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-      }).catch(() => null),
-      fetch(todayStatusUrl, {
-        cache: "force-cache",
-        next: {
-          revalidate: 300,
-          tags: ["coding-time", "coding-time-today"],
-        },
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-      }).catch(() => null),
-    ]);
-
-  if (!sevenDayResponse.ok) {
-    return null;
-  }
-
-  const sevenDay =
-    await safeJsonParse<HackatimeStatsResponse>(sevenDayResponse);
-
-  if (!sevenDay) {
-    return null;
-  }
-
-  const allTime = allTimeResponse?.ok
-    ? ((await safeJsonParse<WakaTimeAllTimeResponse>(allTimeResponse)) ?? {
-        data: { total_seconds: undefined },
-      })
-    : { data: { total_seconds: undefined } };
-
-  const todayStatus = todayStatusResponse?.ok
-    ? ((await safeJsonParse<WakaTimeTodayResponse>(todayStatusResponse)) ?? {
-        data: {
-          grand_total: {
-            total_seconds: 0,
-            text: "0h today",
-          },
-        },
-      })
-    : {
-        data: {
-          grand_total: {
-            total_seconds: 0,
-            text: "0h today",
-          },
-        },
-      };
-
-  const daysFromStats = (sevenDay.data?.days ?? []).map((day) => ({
-    day: new Date(day.date).toLocaleDateString("en-US", { weekday: "short" }),
-    hours: Number(toHours(day.grand_total?.total_seconds ?? 0).toFixed(2)),
-  }));
-
-  const hackatimeLast7Days = await (async () => {
-    const now = new Date(await getCurrentTimestamp());
-    const requests = Array.from({ length: 7 }, (_, index) => {
-      const date = new Date(now);
-      date.setUTCDate(date.getUTCDate() - (6 - index));
-
-      return fetch(
-        `${baseUrl}/api/v1/users/current/heartbeats?date=${date.toISOString().slice(0, 10)}&api_key=${apiKey}`,
-        {
-          cache: "force-cache",
-          next: {
-            revalidate: 1800,
-            tags: ["coding-time", "coding-time-heartbeats"],
-          },
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-          },
-        },
-      )
-        .then(async (response) => {
-          if (!response.ok) {
-            return {
-              day: date.toLocaleDateString("en-US", { weekday: "short" }),
-              hours: 0,
-            };
-          }
-
-          const payload = (await response.json()) as {
-            data?: Array<{
-              duration?: number;
-            }>;
-          };
-
-          const durationSeconds =
-            payload.data?.reduce(
-              (acc, curr) => acc + (curr.duration ?? 0),
-              0,
-            ) ?? 0;
-
-          return {
-            day: date.toLocaleDateString("en-US", { weekday: "short" }),
-            hours: Number(toHours(durationSeconds).toFixed(2)),
-          };
-        })
-        .catch(() => ({
-          day: date.toLocaleDateString("en-US", { weekday: "short" }),
-          hours: 0,
-        }));
+      hours: duration / 3600,
     });
-
-    return Promise.all(requests);
-  })();
-
-  const last7Days =
-    daysFromStats.length > 0 ? daysFromStats : hackatimeLast7Days;
-
-  const topLanguages = (sevenDay.data?.languages ?? [])
-    .slice(0, 5)
-    .map((lang) => ({
-      name: lang.name,
-      hours: Number(toHours(lang.total_seconds).toFixed(1)),
-    }));
-
-  const last7DaysTotalSeconds = Math.round(
-    last7Days.reduce((sum, day) => sum + day.hours * 3600, 0),
-  );
-  const last7DaysTotalHours = `${toHours(last7DaysTotalSeconds).toFixed(1)}h`;
-
-  let totalSeconds =
-    sevenDay.data?.total_seconds ??
-    allTime.data?.total_seconds ??
-    last7DaysTotalSeconds;
-  let totalHours = `${toHours(totalSeconds).toFixed(1)}h`;
-
-  const hackatimeUsername =
-    sevenDay.data?.username?.trim() ||
-    process.env.HACKATIME_USERNAME ||
-    DEFAULT_GITHUB_USER;
-
-  if (hackatimeUsername && provider === "hackatime") {
-    const allTimeHackclubResponse = await fetch(
-      `${baseUrl}/api/v1/users/${encodeURIComponent(hackatimeUsername)}/stats?api_key=${apiKey}`,
-      {
-        cache: "force-cache",
-        next: {
-          revalidate: 1800,
-          tags: ["coding-time", "coding-time-hackclub-total"],
-        },
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-      },
-    ).catch(() => null);
-
-    if (allTimeHackclubResponse?.ok) {
-      const allTimeHackclubPayload =
-        await safeJsonParse<HackatimeClubStatsResponse>(
-          allTimeHackclubResponse,
-        );
-
-      if (allTimeHackclubPayload) {
-        const allTimeHackclubSeconds =
-          allTimeHackclubPayload.data?.grand_total?.total_seconds ??
-          allTimeHackclubPayload.data?.total_seconds ??
-          totalSeconds;
-        totalSeconds = allTimeHackclubSeconds;
-        totalHours =
-          allTimeHackclubPayload.data?.human_readable_total ??
-          allTimeHackclubPayload.data?.grand_total?.text ??
-          allTimeHackclubPayload.data?.text ??
-          `${toHours(allTimeHackclubSeconds).toFixed(1)}h`;
-      }
-    }
   }
-
-  const hasActivity =
-    last7Days.some((day) => day.hours > 0) ||
-    topLanguages.some((language) => language.hours > 0);
-
-  const dailyAverageHours = Number(
-    toHours(sevenDay.data?.daily_average ?? 0).toFixed(2),
-  );
-  const activeDaysLast7 = last7Days.filter((day) => day.hours > 0).length;
-  const todaySeconds = todayStatus.data?.grand_total?.total_seconds ?? 0;
-  const todayHours =
-    todayStatus.data?.grand_total?.text ??
-    `${toHours(todaySeconds).toFixed(1)}h today`;
-
+  // A partial day list cannot truthfully imply zero activity on missing days.
+  if (last7Days.length !== 7) return null;
+  const languages: HackatimePayload["topLanguages"] = [];
+  for (const value of weekly.languages) {
+    const language = record(value);
+    const duration = seconds(language?.total_seconds);
+    if (typeof language?.name !== "string" || duration === undefined)
+      return null;
+    languages.push({ name: language.name, hours: duration / 3600 });
+  }
   return {
-    totalHours,
-    last7DaysTotalHours,
-    dailyAverage:
-      sevenDay.data?.human_readable_daily_average_including_other_language ??
-      sevenDay.data?.human_readable_daily_average ??
-      `${toHours(sevenDay.data?.daily_average ?? 0).toFixed(2)} h/day`,
-    dailyAverageHours,
-    todayHours,
+    totalHours:
+      totalSeconds === undefined
+        ? null
+        : `${(totalSeconds / 3600).toFixed(1)}h`,
+    last7DaysTotalHours: `${(weeklySeconds / 3600).toFixed(1)}h`,
+    dailyAverage: `${(dailyAverageSeconds / 3600).toFixed(2)} h/day`,
+    dailyAverageHours: dailyAverageSeconds / 3600,
+    todayHours: `${(todaySeconds / 3600).toFixed(1)}h today`,
     todaySeconds,
-    activeDaysLast7,
-    topLanguages,
+    activeDaysLast7: last7Days.filter((day) => day.hours > 0).length,
+    topLanguages: languages.slice(0, 5),
     last7Days,
-    hasActivity,
+    hasActivity: weeklySeconds > 0,
   };
 }

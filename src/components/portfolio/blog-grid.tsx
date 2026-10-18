@@ -182,6 +182,7 @@ export function BlogGrid({
               value={query}
               onChange={(event) => handleSearchChange(event.target.value)}
               placeholder="Search by title, tags, description..."
+              aria-label="Search writing"
               className="w-full border-4 border-black bg-card py-3 pl-11 font-bold shadow-retro"
             />
           </div>
@@ -239,6 +240,46 @@ export function BlogGrid({
       {isError ? (
         <div className="border-4 border-black bg-destructive p-5 font-black uppercase text-destructive-foreground shadow-retro-md">
           Failed to load writing feed right now.
+        </div>
+      ) : null}
+
+      {!isLoading && !isFetching && !isError && visible.length === 0 ? (
+        <div
+          className="border-4 border-black bg-card p-6 shadow-retro-md sm:p-8"
+          role="status"
+        >
+          <h2 className="font-display text-xl uppercase sm:text-2xl">
+            {posts.length === 0
+              ? "No published writing yet"
+              : "No matching writing"}
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-muted-foreground sm:text-base">
+            {posts.length === 0
+              ? "Published articles and project notes will appear here. You can explore the public projects in the meantime."
+              : "Try another search or clear the filters to see all published writing."}
+          </p>
+          {posts.length === 0 ? (
+            <Button
+              asChild
+              variant="secondary"
+              className="mt-5 border-4 border-black uppercase shadow-retro-sm"
+            >
+              <Link href="/project">Explore projects</Link>
+            </Button>
+          ) : (
+            <Button
+              variant="secondary"
+              className="mt-5 border-4 border-black uppercase shadow-retro-sm"
+              onClick={() => {
+                setCurrentPage(1);
+                setQuery("");
+                setSource("All");
+                setSelectedTag("All");
+              }}
+            >
+              Clear filters
+            </Button>
+          )}
         </div>
       ) : null}
 

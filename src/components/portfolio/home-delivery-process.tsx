@@ -4,24 +4,24 @@ import { Card } from "@/components/retroui/Card";
 
 const processSteps = [
   {
-    title: "Threat Model",
+    title: "Define Scope",
     description:
-      "Examine problem boundaries, trust assumptions, and operational constraints before committing to code.",
+      "Start with a question, its intended use, and the limits of what the project can answer.",
   },
   {
     title: "Investigate",
     description:
-      "Cross-check primary documentation, network traces, and public source code to expose the underlying mechanics.",
+      "Look for primary documentation and public source code; keep references for claims.",
   },
   {
     title: "Build Minimal",
     description:
-      "Implement focused, lightweight tools in Rust, Python, or TypeScript with deliberate dependency boundaries.",
+      "Work on a focused implementation and document what is still planned or experimental.",
   },
   {
     title: "Verify",
     description:
-      "Validate through automated test suites, structured output verification, and transparent evidence registers.",
+      "Check behavior, record limitations, and revisit conclusions when the evidence changes.",
   },
 ] as const;
 
@@ -29,7 +29,7 @@ export function HomeDeliveryProcess() {
   return (
     <section className="space-y-4">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        Engineering Workflow
+        Working Principles
       </h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {processSteps.map((step, index) => (

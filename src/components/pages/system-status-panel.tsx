@@ -41,11 +41,6 @@ async function getSystemTips(mode: "not-found" | "error") {
   return tipsByMode[mode];
 }
 
-async function createIncidentTicket() {
-  await new Promise((resolve) => setTimeout(resolve, 250));
-  return `VG-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-}
-
 export function SystemStatusPanel({
   mode,
   onReset,
@@ -77,7 +72,8 @@ export function SystemStatusPanel({
 
   const reportMutation = useMutation({
     mutationKey: ["system-status-report", mode],
-    mutationFn: createIncidentTicket,
+    mutationFn: async () =>
+      `Route: ${pathname || "/"}${errorDigest ? `; error digest: ${errorDigest}` : ""}`,
   });
 
   const handleRetry = () => {
@@ -217,7 +213,9 @@ export function SystemStatusPanel({
             }}
           >
             <AlertTriangle className="h-4 w-4" />
-            {reportMutation.isPending ? "Creating Ticket" : "Create Ticket"}
+            {reportMutation.isPending
+              ? "Preparing Details"
+              : "Prepare Route Details"}
           </Button>
 
           <Button
@@ -237,10 +235,11 @@ export function SystemStatusPanel({
             className="border-2 border-black bg-secondary text-secondary-foreground"
           >
             <Alert.Title className="font-black uppercase">
-              Ticket Created
+              Local Route Details
             </Alert.Title>
             <Alert.Description className="mt-1 text-sm font-semibold">
-              Incident reference {reportMutation.data}
+              {reportMutation.data}. No report has been sent; include these
+              details when contacting me.
             </Alert.Description>
           </Alert>
         ) : null}

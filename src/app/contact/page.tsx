@@ -7,7 +7,7 @@ const contactOgImageUrl = `${siteUrl}/contact/opengraph-image`;
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Contact Voldigoade for systems engineering, security research, and collaborations.",
+    "Contact Voldigoade with project questions, feedback, and collaboration ideas.",
   alternates: {
     canonical: "/contact",
   },
@@ -53,7 +53,7 @@ export default function ContactPage() {
     name: "Contact Voldigoade",
     url: `${siteUrl}/contact`,
     description:
-      "Contact page for systems engineering, security research, and open source collaboration.",
+      "Contact page for public project questions, feedback, and collaboration ideas.",
   };
 
   return (

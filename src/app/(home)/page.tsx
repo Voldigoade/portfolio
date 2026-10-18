@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     absolute: "Voldigoade | Software, Systems, Security and Privacy",
   },
   description:
-    "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript by Voldigoade.",
+    "Public software projects and source-linked research into systems, security, privacy, and developer tools by Voldigoade.",
   alternates: {
     canonical: "/",
   },
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Voldigoade | Software, Systems, Security and Privacy",
     description:
-      "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript.",
+      "Public software projects and source-linked research into systems, security, privacy, and developer tools.",
     url: siteUrl,
     type: "website",
     images: [
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Voldigoade",
     description:
-      "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript.",
+      "Public software projects and source-linked research into systems, security, privacy, and developer tools.",
     images: [ogImageUrl],
   },
 };
@@ -94,7 +94,6 @@ export default async function HomePage() {
         name: "Voldigoade GitHub Portfolio Stats",
         description:
           "Public GitHub repository, stars, forks, and language metrics.",
-        license: "https://opensource.org/licenses/MIT",
         creator: {
           "@type": "Person",
           name: siteName,

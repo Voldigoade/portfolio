@@ -18,13 +18,13 @@ export interface GithubRepo {
   private?: boolean;
   fork?: boolean;
   archived?: boolean;
-  stargazers_count: number;
-  forks_count: number;
-  watchers_count: number;
+  stargazers_count?: number;
+  forks_count?: number;
+  watchers_count?: number;
   html_url: string;
   homepage: string | null;
   topics: string[];
-  updated_at: string;
+  updated_at?: string;
 }
 
 export type WritingType =
@@ -52,7 +52,7 @@ export interface BlogPost {
 }
 
 export interface HackatimePayload {
-  totalHours: string;
+  totalHours: string | null;
   last7DaysTotalHours: string;
   dailyAverage: string;
   dailyAverageHours: number;
@@ -66,16 +66,14 @@ export interface HackatimePayload {
 
 export interface GitHubOverviewPayload {
   username: string;
-  commitYear: number;
-  commitRangeStart: string;
-  commitRangeEnd: string;
-  followers: number;
-  following: number;
-  publicRepos: number;
+  followers: number | null;
+  following: number | null;
+  publicRepos: number | null;
   totalRepositories: number;
-  totalStars: number;
-  totalForks: number;
-  totalWatchers: number;
+  projects: Array<{ name: string; url: string; language: string | null }>;
+  totalStars: number | null;
+  totalForks: number | null;
+  totalWatchers: number | null;
   topRepositories: Array<{ name: string; stars: number }>;
   languages: Array<{ language: string; repos: number }>;
   monthlyActivity: Array<{ month: string; repos: number }>;

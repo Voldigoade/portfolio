@@ -8,7 +8,7 @@ export default function Image() {
   return buildTwitterImage({
     eyebrow: "About",
     title: "About Voldigoade",
-    subtitle: "Software Engineer & Systems Researcher",
+    subtitle: "Public Projects & Technical Interests",
     accent: "accent",
   });
 }

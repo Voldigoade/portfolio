@@ -111,13 +111,20 @@ export function ProjectsGrid({
     });
 
     return [...filteredRepos].sort((a, b) => {
-      if (compact) return b.stargazers_count - a.stargazers_count;
+      if (compact)
+        return (b.stargazers_count ?? -1) - (a.stargazers_count ?? -1);
       if (sortBy === "stars-desc")
-        return b.stargazers_count - a.stargazers_count;
+        return (b.stargazers_count ?? -1) - (a.stargazers_count ?? -1);
       if (sortBy === "stars-asc")
-        return a.stargazers_count - b.stargazers_count;
+        return (
+          (a.stargazers_count ?? Number.POSITIVE_INFINITY) -
+          (b.stargazers_count ?? Number.POSITIVE_INFINITY)
+        );
       if (sortBy === "name-asc") return a.name.localeCompare(b.name);
-      return Date.parse(b.updated_at) - Date.parse(a.updated_at);
+      return (
+        (b.updated_at ? Date.parse(b.updated_at) : 0) -
+        (a.updated_at ? Date.parse(a.updated_at) : 0)
+      );
     });
   }, [repos, query, selectedTag, sortBy, compact]);
 
@@ -158,6 +165,7 @@ export function ProjectsGrid({
               value={query}
               onChange={(event) => handleSearchChange(event.target.value)}
               placeholder="Search repositories, topics, keywords..."
+              aria-label="Search projects"
               className="w-full border-4 border-black bg-card pl-11 py-3 font-bold shadow-retro"
             />
           </div>
@@ -266,19 +274,19 @@ export function ProjectsGrid({
                       <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
                         <span className="block truncate">Stars</span>
                         <span className="block truncate text-[11px]">
-                          {repo.stargazers_count}
+                          {repo.stargazers_count ?? "Unavailable"}
                         </span>
                       </span>
                       <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
                         <span className="block truncate">Forks</span>
                         <span className="block truncate text-[11px]">
-                          {repo.forks_count}
+                          {repo.forks_count ?? "Unavailable"}
                         </span>
                       </span>
                       <span className="min-w-0 rounded-none border-2 border-black bg-muted px-2 py-1 text-center">
                         <span className="block truncate">Watch</span>
                         <span className="block truncate text-[11px]">
-                          {repo.watchers_count ?? 0}
+                          {repo.watchers_count ?? "Unavailable"}
                         </span>
                       </span>
                     </div>

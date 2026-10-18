@@ -14,7 +14,7 @@ export interface TimelineItem {
 
 function extractYear(period: string) {
   const match = period.match(/(19|20)\d{2}/);
-  return match ? match[0] : "Now";
+  return match ? match[0] : period;
 }
 
 export function AboutTimeline({ items }: { items: TimelineItem[] }) {

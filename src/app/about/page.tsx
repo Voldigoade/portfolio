@@ -7,7 +7,7 @@ const aboutOgImageUrl = `${siteUrl}/about/opengraph-image`;
 
 export const metadata: Metadata = {
   title: "About",
-  description: "The background, technical focus, and milestones of Voldigoade.",
+  description: "Public projects and technical interests of Voldigoade.",
   alternates: {
     canonical: "/about",
   },
@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     "systems engineering",
     "rust",
     "security research",
-    "open source maintainer",
+    "public projects",
     "spoor",
   ],
   openGraph: {
     title: "About Voldigoade",
     description:
-      "Background, technical focus, and open-source milestones across systems, security, and developer tooling.",
+      "Explore public Rust tools and source-linked research into messaging and development environments.",
     url: `${siteUrl}/about`,
     type: "profile",
     images: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "About Voldigoade",
     description:
-      "Background, technical focus, and open-source milestones across systems, security, and developer tooling.",
+      "Explore public Rust tools and source-linked research into messaging and development environments.",
     images: [aboutOgImageUrl],
   },
 };
@@ -47,81 +47,52 @@ function serializeJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
 
-function formatPeriod(start: string, end: string): string {
-  const startDate = new Date(`${start} 01`);
-  const endDate =
-    end.toLowerCase() === "present"
-      ? new Date("2026-05-01")
-      : new Date(`${end} 01`);
-
-  let months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
-  months += endDate.getMonth() - startDate.getMonth();
-  months += 1;
-
-  const years = Math.floor(months / 12);
-  const remainingMonths = months % 12;
-
-  let durationObj = "";
-  if (years > 0) {
-    durationObj += `${years} yr${years > 1 ? "s" : ""}`;
-  }
-  if (remainingMonths > 0) {
-    if (durationObj) durationObj += " ";
-    durationObj += `${remainingMonths} mo${remainingMonths > 1 ? "s" : ""}`;
-  }
-  if (!durationObj) {
-    durationObj = "1 mo";
-  }
-
-  return `${start} - ${end} · ${durationObj}`;
-}
-
 const timelineItems: TimelineItem[] = [
   {
-    period: formatPeriod("Sep 2025", "Present"),
-    title: "Lead Maintainer & Author (Spoor · Open Source)",
+    period: "Rust tooling",
+    title: "Spoor",
     url: "https://github.com/Voldigoade/spoor",
     description:
-      "Architected and actively maintain Spoor, an open-source footprint scanner that audits developer exposure, public GitHub activity streams, and commit metadata.",
+      "A terminal-first tool for inspecting public GitHub profiles, repositories, commit identities, and keys.",
     highlights: [
-      "Designed modular CLI architecture in Rust for deterministic scanning and zero-telemetry execution.",
-      "Implemented heuristics to detect unintended token leakage and commit author exposure.",
-      "Shipped Spoor v0.1.4 release with comprehensive unit testing and multi-platform binary builds.",
+      "Reports distinguish observed data, derived values, and inferences.",
+      "Command-line exports and an HTTP lookup service are documented in the repository.",
+      "Scan bounds, cache age, and provider availability limit the results.",
     ],
   },
   {
-    period: formatPeriod("Jan 2025", "Present"),
-    title: "Security & Privacy Researcher (Recherche Messageries · Research)",
+    period: "Messaging research",
+    title: "Recherche Messageries",
     url: "https://github.com/Voldigoade/recherche-messageries",
     description:
-      "Conducting comparative audits and threat modeling of encrypted messaging architectures, metadata resistance, and peer-to-peer routing protocols.",
+      "A source-driven comparison of secure messaging systems across content security, metadata, pseudonymity, network exposure, and threat models.",
     highlights: [
-      "Evaluated Signal Protocol, Matrix Olm/Megolm, Simplex Chat, and Briar transport layers.",
-      "Published comparative matrices covering forward secrecy, metadata resistance, and trust models.",
-      "Created open benchmark suites and reproducibility scripts for protocol verification.",
+      "Links public documentation, audits, advisories, and other evidence.",
+      "Recommendations depend on the platform, configuration, and adversary.",
+      "The study explicitly describes its limits; it is not a security certification.",
     ],
   },
   {
-    period: formatPeriod("Jun 2024", "Jan 2025"),
-    title: "Developer Tooling & Environments (IDE Research · Open Source)",
+    period: "Developer environments",
+    title: "IDE Research",
     url: "https://github.com/Voldigoade/ide-research",
     description:
-      "Researched modern cloud and containerized development architectures, sandboxing techniques, and local-first developer workflows.",
+      "A source-linked comparison of development environments across stacks, remote work, AI tooling, security, privacy, and licensing.",
     highlights: [
-      "Analyzed security boundaries of remote containerized IDE environments.",
-      "Documented trade-offs between local developer control and cloud workspace orchestration.",
-      "Prototyped lightweight developer workflows emphasizing security and minimal external dependencies.",
+      "Includes a method, evidence register, chooser, and comparator.",
+      "Editorial scores are conditional comparisons, not benchmark results.",
+      "Research content and code have separate license terms.",
     ],
   },
   {
-    period: formatPeriod("Jan 2024", "May 2024"),
-    title: "Low-Level Systems Exploration (Diskboot & Crukst · Open Source)",
-    url: "https://github.com/Voldigoade/diskboot",
+    period: "Experimental foundation",
+    title: "Crukst",
+    url: "https://github.com/Voldigoade/crukst",
     description:
-      "Explored minimal system initialization, Linux storage abstractions, and low-level boot procedures.",
+      "An early Rust project foundation and proposed design for semantic firmware comparison and triage.",
     highlights: [
-      "Investigated low-level disk formatting, boot stages, and partition inspection.",
-      "Focused on deterministic, reproducible setups with minimal toolchains.",
+      "Firmware and filesystem comparison are not implemented yet.",
+      "The README separates planned features from current behavior.",
     ],
   },
 ];
@@ -136,7 +107,6 @@ export default function AboutPage() {
       "@type": "Person",
       name: "Voldigoade",
       url: siteUrl,
-      jobTitle: "Software Engineer & Systems Researcher",
     },
   };
 

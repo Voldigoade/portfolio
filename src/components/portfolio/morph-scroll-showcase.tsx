@@ -4,7 +4,7 @@ import { animate } from "animejs";
 import { useEffect, useRef } from "react";
 import { Card } from "@/components/retroui/Card";
 
-const words = ["Secure", "Audit", "Compile", "Isolate", "Verify"];
+const words = ["Build", "Read", "Compare", "Explore", "Learn"];
 
 export function MorphScrollShowcase() {
   const wordRefs = useRef<Array<HTMLSpanElement | null>>([]);
@@ -107,12 +107,12 @@ export function MorphScrollShowcase() {
   return (
     <section className="space-y-4" ref={revealRef} data-anim="item">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        Execution Engine
+        Questions Into Projects
       </h2>
       <Card className="border-4 border-black bg-card shadow-retro-md">
         <Card.Content className="space-y-4">
           <p className="font-display text-2xl uppercase sm:text-3xl">
-            We Build to
+            I Work to
             <span className="relative ml-3 inline-flex h-9 min-w-36 align-middle sm:h-10 sm:min-w-40">
               {words.map((word, idx) => (
                 <span
@@ -127,21 +127,15 @@ export function MorphScrollShowcase() {
               ))}
             </span>
           </p>
-          <p
-            data-reveal
-            className="translate-y-4 font-medium leading-relaxed opacity-0"
-          >
-            From initial threat modeling to deployment, I combine systems
-            programming, defensive engineering, and developer-first tooling to
-            build auditable, reliable software.
+          <p data-reveal className="font-medium leading-relaxed">
+            I&apos;m exploring systems and privacy through Rust tools and
+            source-linked research. Public repositories show the questions,
+            implementation choices, and limits of each project.
           </p>
-          <p
-            data-reveal
-            className="translate-y-4 font-medium leading-relaxed opacity-0"
-          >
-            This portfolio showcases real technical depth: memory-safe systems,
-            security research, reproducible benchmarks, and practical
-            open-source utilities.
+          <p data-reveal className="font-medium leading-relaxed">
+            Browse a project, follow its evidence, or share a question.
+            Experimental ideas and planned features are identified in the
+            repository documentation.
           </p>
         </Card.Content>
       </Card>

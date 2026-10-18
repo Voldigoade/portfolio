@@ -12,37 +12,37 @@ const snippetOrder = ["next", "query", "store"] as const;
 
 const stackItems = [
   {
-    title: "Threat Model",
-    body: "Map trust boundaries, data flows, and external dependencies before writing code.",
+    title: "Inspect",
+    body: "Spoor reports public GitHub metadata and records source references and inference limits.",
   },
   {
-    title: "Implement",
-    body: "Build minimal, auditable systems in Rust, Linux, and TypeScript with zero unnecessary complexity.",
+    title: "Compare",
+    body: "The research sites compare messaging systems and development environments using linked sources.",
   },
   {
-    title: "Verify",
-    body: "Validate against edge cases, enforce strict sandboxing, and publish reproducible benchmarks.",
+    title: "Explore",
+    body: "Crukst is an experimental Rust foundation; firmware comparison remains planned.",
   },
 ];
 
 const snippets = {
-  next: `// Systems & low-level tooling\nRust + C + Linux syscalls\nMemory safety, zero-cost abstractions\nCLI utilities with deterministic output`,
-  query: `// Research & data analysis\nPython + SQLite + DuckDB\nNetwork metadata & credential exposure auditing\nLocal-first data pipelines with zero telemetry`,
-  store: `// Web interfaces & tooling\nNext.js + TypeScript + Tailwind\nRetro UI systems with strict CSP & sandboxing\nClient-side verification & cryptographic tooling`,
+  next: `// Spoor: public GitHub inspection\nRust command-line tool + HTTP service\nProfiles, repositories, commit identities, keys\nObserved data, derived values, and inferences`,
+  query: `// Source-linked research\nMessaging systems + developer environments\nThreat models, metadata, workflows, licensing\nConditional comparisons with explicit limits`,
+  store: `// This portfolio\nNext.js + React + TypeScript\nPublic projects and first-party writing\nRetro components with light and dark themes`,
 } as const;
 
 const flipCards = [
   {
     front: "Integrity",
-    back: "Deterministic builds, explicit dependencies, and cryptographic verification at every step.",
+    back: "Keep sources visible and distinguish evidence from assumptions.",
   },
   {
     front: "Security",
-    back: "Defensive design with minimal attack surface, strict sandboxing, and no hidden telemetry.",
+    back: "Ask what a tool exposes and which threats it can actually address.",
   },
   {
     front: "Efficiency",
-    back: "High-performance systems programming with minimal resource footprint and predictable latency.",
+    back: "Prefer a focused scope and state unfinished behavior clearly.",
   },
 ] as const;
 
@@ -219,11 +219,11 @@ export function RetroCodeShowcase() {
   return (
     <section className="space-y-4" ref={sectionRef} data-anim="item">
       <h2 className="font-display text-3xl uppercase sm:text-4xl">
-        <MatrixBinaryText text="Services & Delivery Matrix" />
+        <MatrixBinaryText text="Project & Technology Matrix" />
       </h2>
 
       <p className="font-pixel text-sm uppercase text-muted-foreground">
-        <TypingRevealText text="Business-first software execution for founders, startups, and long-term products." />
+        <TypingRevealText text="A closer look at the tools and research linked from this portfolio." />
       </p>
 
       <div
@@ -236,7 +236,7 @@ export function RetroCodeShowcase() {
         >
           <Card.Header>
             <Card.Title className="font-display text-2xl uppercase">
-              Service Workflow
+              Project Directions
             </Card.Title>
           </Card.Header>
           <Card.Content className="relative h-48">
@@ -264,11 +264,11 @@ export function RetroCodeShowcase() {
         >
           <Card.Header>
             <Card.Title className="font-display text-2xl uppercase">
-              Frameworks & Languages I Use
+              Tools & Project Context
             </Card.Title>
             <Card.Description className="font-bold uppercase">
-              I adapt the stack to your business goals, team capacity, and
-              growth stage.
+              These summaries describe public repositories and this site;
+              implementation details live in their source.
             </Card.Description>
           </Card.Header>
           <Card.Content className="space-y-4">
@@ -278,24 +278,27 @@ export function RetroCodeShowcase() {
                 className="border-4 border-black uppercase"
                 onClick={() => setActiveSnippet("next")}
                 data-snippet-tab="next"
+                aria-pressed={activeSnippet === "next"}
               >
-                Frontend
+                Rust Tooling
               </Button>
               <Button
                 variant={activeSnippet === "query" ? "default" : "secondary"}
                 className="border-4 border-black uppercase"
                 onClick={() => setActiveSnippet("query")}
                 data-snippet-tab="query"
+                aria-pressed={activeSnippet === "query"}
               >
-                Backend
+                Research
               </Button>
               <Button
                 variant={activeSnippet === "store" ? "default" : "secondary"}
                 className="border-4 border-black uppercase"
                 onClick={() => setActiveSnippet("store")}
                 data-snippet-tab="store"
+                aria-pressed={activeSnippet === "store"}
               >
-                Cloud & Ops
+                Portfolio
               </Button>
             </div>
 
@@ -320,6 +323,7 @@ export function RetroCodeShowcase() {
               key={item.front}
               type="button"
               onClick={() => setFlippedCard(index)}
+              aria-pressed={isFlipped}
               className="group retro-flip-perspective h-40"
               data-flip-card
             >

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Voldigoade Portfolio",
     short_name: "Voldigoade",
     description:
-      "Software, systems, security and privacy. Systems software in Rust, Python, and TypeScript.",
+      "Public software projects and source-linked research into systems, security, privacy, and developer tools.",
     start_url: "/",
     display: "standalone",
     background_color: "#fff5e6",

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import "./retro-ui-variants.css";
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
 
