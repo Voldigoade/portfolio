@@ -1,0 +1,370 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #fff5e6;
+  --foreground: #0a0a0a;
+  --card: #fffef8;
+  --card-foreground: #0a0a0a;
+  --popover: #fffef8;
+  --popover-foreground: #0a0a0a;
+  --primary: #ff7a00;
+  --primary-foreground: #0a0a0a;
+  --secondary: #00d1ff;
+  --secondary-foreground: #0a0a0a;
+  --muted: #ffe9c7;
+  --muted-foreground: #3d3d3d;
+  --accent: #b6ff3b;
+  --accent-foreground: #0a0a0a;
+  --destructive: #ff2e2e;
+  --destructive-foreground: #fff;
+  --border: #000;
+  --input: #fff;
+  --ring: #000;
+  --chart-1: #ff7a00;
+  --chart-2: #00d1ff;
+  --chart-3: #b6ff3b;
+  --chart-4: #ff4fd8;
+  --chart-5: #7a5cff;
+  --radius: 0;
+}
+
+.dark {
+  --background: #121212;
+  --foreground: #f8f8f8;
+  --card: #1d1d1d;
+  --card-foreground: #f8f8f8;
+  --popover: #1d1d1d;
+  --popover-foreground: #f8f8f8;
+  --primary: #ff9d00;
+  --primary-foreground: #121212;
+  --secondary: #22e2ff;
+  --secondary-foreground: #121212;
+  --muted: #2d2d2d;
+  --muted-foreground: #d1d1d1;
+  --accent: #c9ff33;
+  --accent-foreground: #121212;
+  --destructive: #ff4d4d;
+  --destructive-foreground: #121212;
+  --border: #f8f8f8;
+  --input: #252525;
+  --ring: #f8f8f8;
+  --chart-1: #ff9d00;
+  --chart-2: #22e2ff;
+  --chart-3: #c9ff33;
+  --chart-4: #ff5fd2;
+  --chart-5: #8a73ff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply min-h-screen bg-background text-foreground;
+    font-family: var(--font-space-grotesk), sans-serif;
+    background-image:
+      radial-gradient(
+        circle at 10% 15%,
+        rgba(255, 122, 0, 0.16),
+        transparent 22%
+      ),
+      radial-gradient(
+        circle at 90% 20%,
+        rgba(0, 209, 255, 0.2),
+        transparent 28%
+      ),
+      linear-gradient(0deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04));
+  }
+
+  html,
+  body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--muted);
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 13px;
+    height: 13px;
+  }
+
+  html::-webkit-scrollbar-track,
+  body::-webkit-scrollbar-track {
+    background: var(--muted);
+    border-left: 2px solid #000;
+  }
+
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border: 2px solid #000;
+  }
+
+  html::-webkit-scrollbar-thumb:hover,
+  body::-webkit-scrollbar-thumb:hover {
+    background: #ff9d00;
+  }
+
+  .font-display {
+    font-family: var(--font-bungee), cursive;
+    letter-spacing: 0.04em;
+  }
+}
+
+@layer utilities {
+  .shadow-retro {
+    box-shadow: 6px 6px 0 0 #000;
+  }
+
+  .shadow-retro-sm {
+    box-shadow: 3px 3px 0 0 #000;
+  }
+
+  .shadow-retro-md {
+    box-shadow: 8px 8px 0 0 #000;
+  }
+
+  .shadow-retro-lg {
+    box-shadow: 12px 12px 0 0 #000;
+  }
+
+  .retro-press {
+    transition:
+      transform 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .retro-press:hover {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+  }
+
+  .retro-press:active {
+    transform: translate(8px, 8px);
+    box-shadow: none;
+  }
+
+  .retro-link {
+    border: 4px solid #000;
+    background: var(--card);
+    color: var(--card-foreground);
+    padding: 0.25rem 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    box-shadow: 6px 6px 0 0 #000;
+    transition:
+      transform 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .retro-link:hover {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+  }
+
+  .retro-link:active {
+    transform: translate(8px, 8px);
+    box-shadow: none;
+  }
+
+  .font-pixel {
+    font-family: var(--font-press-start), monospace;
+    letter-spacing: 0.02em;
+  }
+
+  .retro-stripes {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0 8px,
+      rgba(0, 0, 0, 0.2) 8px 10px
+    );
+  }
+
+  .retro-badge {
+    display: inline-flex;
+    max-width: 100%;
+    align-items: center;
+    border: 2px solid #000;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: 3px 3px 0 0 #000;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .retro-social-icon {
+    display: inline-flex;
+    height: 2.75rem;
+    width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #000;
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+    box-shadow: 4px 4px 0 0 #000;
+    transition:
+      transform 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .retro-social-icon:hover {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+  }
+
+  .retro-curve-underline {
+    position: relative;
+    display: inline-flex;
+    padding-bottom: 0.35rem;
+  }
+
+  .retro-curve-underline::after {
+    content: "";
+    position: absolute;
+    left: 0.05rem;
+    right: 0.05rem;
+    bottom: 0;
+    height: 0.8rem;
+    border-bottom: 4px solid var(--primary);
+    border-radius: 999px;
+    transform: rotate(-1.2deg);
+    box-shadow: 2px 2px 0 0 #000;
+    pointer-events: none;
+  }
+
+  .retro-flip-perspective {
+    perspective: 1000px;
+  }
+
+  .retro-flip-inner {
+    transform-style: preserve-3d;
+    transition: transform 500ms ease;
+  }
+
+  .retro-flip-inner.is-flipped {
+    transform: rotateY(180deg);
+  }
+
+  .retro-flip-face {
+    backface-visibility: hidden;
+  }
+
+  .retro-flip-back {
+    transform: rotateY(180deg);
+  }
+
+  .retro-terminal-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) #111;
+  }
+
+  .retro-terminal-scrollbar::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  .retro-terminal-scrollbar::-webkit-scrollbar-track {
+    background: #111;
+    border-left: 2px solid #000;
+  }
+
+  .retro-terminal-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border: 2px solid #000;
+  }
+
+  .retro-terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #ff9d00;
+  }
+
+  .retro-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--muted);
+  }
+
+  .retro-scrollbar::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  .retro-scrollbar::-webkit-scrollbar-track {
+    background: var(--muted);
+    border-left: 2px solid #000;
+  }
+
+  .retro-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border: 2px solid #000;
+  }
+
+  .retro-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #ff9d00;
+  }
+
+  .animate-dots::after {
+    content: ".";
+    animation: dots 1.5s infinite steps(1);
+    display: inline-block;
+    width: 1.5em;
+    text-align: left;
+  }
+
+  @keyframes dots {
+    0%,
+    20% {
+      content: ".";
+    }
+    40% {
+      content: "..";
+    }
+    60%,
+    100% {
+      content: "...";
+    }
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

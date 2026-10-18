@@ -1,55 +1,86 @@
-# Voldigoade portfolio
+<h1 align="center">🚀 Portfolio (v5.0.0)</h1>
 
-Personal portfolio in French, English and Spanish. Astro builds static pages; React and Once UI Core handle interactive controls. Geist fonts are self-hosted.
 
-## Development
 
-Use Node.js 22.12 or later.
+<p align="center">
+  <a href="https://github.com/muhammad-fiaz/portfolio/stargazers">
+    <img src="https://img.shields.io/github/stars/muhammad-fiaz/portfolio?style=for-the-badge" />
+  </a>
+  <a href="https://github.com/muhammad-fiaz/portfolio/network/members">
+    <img src="https://img.shields.io/github/forks/muhammad-fiaz/portfolio?style=for-the-badge" />
+  </a>
+  <a href="https://github.com/muhammad-fiaz/portfolio/issues">
+    <img src="https://img.shields.io/github/issues/muhammad-fiaz/portfolio?style=for-the-badge" />
+  </a>
+  <a href="https://github.com/muhammad-fiaz/portfolio/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/muhammad-fiaz/portfolio?style=for-the-badge" />
+  </a>
+  <a href="https://github.com/muhammad-fiaz/portfolio/commits/main">
+    <img src="https://img.shields.io/github/last-commit/muhammad-fiaz/portfolio?style=for-the-badge" />
+  </a>
+</p>
 
-```sh
-npm ci
-npm run dev
+
+Production-ready portfolio built with Next.js 16, React 19, TypeScript, Panda CSS, and a retro-modern UI system.
+
+## Tech Stack
+
+- Framework: Next.js 16 (App Router)
+- Language: TypeScript
+- Runtime / Package Manager: Bun
+- Styling: Tailwind CSS 4 + Panda CSS + custom utility layer
+- State Management: Zustand
+- Data Fetching: TanStack Query
+- Motion: Framer Motion + animejs
+
+## Getting Started
+
+### 1. Install dependencies
+
+```bash
+bun install
 ```
 
-```sh
-npm run check:prose
-npm run format:check
-npm run lint
-npm run check
-npm run build
-npm test
-npm run test:browser
-npm run audit:public
+### 2. Configure environment
+
+Create `.env.local` and set the required keys.
+
+Suggested keys:
+
+- `GITHUB_TOKEN` (recommended for accurate contribution calendar data)
+- `GITHUB_USER` (optional override for default username)
+- `NEXT_PUBLIC_SITE_URL`
+- `HACKATIME_API_KEY` (required for Hack Club coding insights)
+- `HACKATIME_API_BASE_URL` (optional, defaults to `https://hackatime.hackclub.com`)
+- `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (contact form)
+- `NEXT_PUBLIC_GTM_ID` and `NEXT_PUBLIC_GA_ID` (optional overrides, defaults are already configured)
+
+## Highlights
+
+- GitHub stats section includes the live contribution snake SVG from the profile output branch.
+- Hack Club coding insights are powered by Hackatime data and heatmap visuals.
+
+### 3. Run development server
+
+```bash
+bun run dev
 ```
 
-Build before running tests. Browser checks use installed Microsoft Edge and write screenshots outside the repository. Set `PORTFOLIO_BROWSER` for another Playwright channel or `PORTFOLIO_BASE_URL` for an existing server.
+### 4. Quality checks
 
-## Editing
+```bash
+bun run lint
+bunx tsc --noEmit
+```
 
-- `src/data/locales.ts`: routes, metadata and shared translations. French lives at `/`, English at `/en`, Spanish at `/es`.
-- `src/data/experience.ts`: homepage copy and selected work.
-- `src/data/projects.ts`: research detail content and source links.
-- `src/styles/global.css`: visual tokens and layout.
-- [DESIGN.md](DESIGN.md): approved composition and interaction behavior.
 
-Language links retain the current page and section. No portfolio template is used.
+## Contributing
 
-## Spoor
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before opening issues or pull requests.
 
-The browser calls the external Spoor v0.1.4 service using `fast` with `enrich: true` and report schema 1.1. SSE supplies progress; polling recovers missed completion or a dropped stream. Completion reopens the card and reveals an offscreen result heading. Copy uses the displayed summary; exports download backend files.
 
-The small client boundary lives in `src/spoor/`; presentation lives in `src/components/spoor/`. [Integration notes](docs/spoor-api.md) cover the contract, retries and privacy. Provider credentials and analysis code belong in the backend.
+## Support
 
-Development-only `/preview/spoor/:scene` routes use isolated fixtures and are omitted from production. Production errors never fall back to mock data.
+If this project helped you, please star the repository:
 
-Real E2E tests trigger backend work. Set `SPOOR_REAL_E2E=1`, `PORTFOLIO_BASE_URL` and an external `PORTFOLIO_QA_OUTPUT`, then run `npm run test:e2e`. Repeated failure-state tests use intercepted requests instead.
-
-## Privacy and deployment
-
-No analytics, cookies, visitor database or stored inputs. Motion respects reduced motion. Static content stays readable without JavaScript. Hosting providers may keep request logs.
-
-`npm run build` writes `dist/`. The canonical origin defaults to `https://voldigoade.xyz`; changing `SITE_URL` requires a rebuild. Astro generates script hashes for CSP; `vercel.json` adds security headers. The browser uses exact-origin CORS to reach Spoor directly.
-
-Run `npm run social` after changing identity copy or visual tokens. Font licenses remain in `public/licenses/`; Once UI Core is MIT-licensed. This repository has no selected license.
-
-Run `npm run audit:public` before publishing. Commits use the Voldigoade identity, its GitHub noreply address and UTC author/committer timestamps.
+https://github.com/muhammad-fiaz/portfolio
