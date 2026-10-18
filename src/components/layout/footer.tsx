@@ -3,7 +3,6 @@
 import { animate } from "animejs";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { VOLDIGOADE_MANAGE_COOKIES_EVENT } from "@/components/layout/analytics-manager";
 import { Github, Link2 } from "@/components/retroui/icons";
 import {
   CURRENT_PORTFOLIO_VERSION,
@@ -50,10 +49,6 @@ export function Footer() {
       ease: "outQuad",
     });
   }, []);
-
-  const handleOpenCookiePreferences = () => {
-    window.dispatchEvent(new Event(VOLDIGOADE_MANAGE_COOKIES_EVENT));
-  };
 
   return (
     <footer
@@ -128,21 +123,6 @@ export function Footer() {
             >
               Confidentialité
             </Link>
-            <Link
-              href="/cookies-policy"
-              className="retro-link"
-              data-footer-policy
-            >
-              Cookies
-            </Link>
-            <button
-              type="button"
-              onClick={handleOpenCookiePreferences}
-              className="retro-link underline cursor-pointer"
-              data-footer-policy
-            >
-              Gérer les préférences
-            </button>
           </div>
         </div>
       </div>
