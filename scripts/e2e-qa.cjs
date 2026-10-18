@@ -9,13 +9,15 @@ if (!fs.existsSync(SCREENSHOTS_DIR)) {
 }
 
 async function runQA() {
-  console.log("=== STARTING BROWSER E2E QA ===");
+  console.log("=== STARTING BROWSER E2E QA (CLOUDFLARE ONLY / NO GA) ===");
   const browser = await chromium.launch({
     headless: true,
     executablePath: "/home/cruck/.local/bin/google-chrome",
   });
 
   const errors = [];
+  const interceptedGoogleRequests = [];
+  const consoleErrors = [];
 
   // 1. Desktop Light & Dark Testing
   const desktopContext = await browser.newContext({
@@ -23,6 +25,31 @@ async function runQA() {
   });
 
   const page = await desktopContext.newPage();
+
+  // Monitor all outgoing network requests for forbidden Google Analytics / GTM endpoints
+  page.on("request", (req) => {
+    const url = req.url().toLowerCase();
+    if (
+      url.includes("google-analytics.com") ||
+      url.includes("googletagmanager.com") ||
+      url.includes("doubleclick.net")
+    ) {
+      console.error(
+        `[SECURITY ALERT] Intercepted forbidden Google request: ${url}`,
+      );
+      interceptedGoogleRequests.push(url);
+    }
+  });
+
+  page.on("console", (msg) => {
+    if (msg.type() === "error") {
+      const text = msg.text();
+      // Ignore favicon or benign 404 warnings from intentional test 404s
+      if (!text.includes("404") && !text.includes("favicon")) {
+        consoleErrors.push(text);
+      }
+    }
+  });
 
   // Test routes
   const routes = [
@@ -36,7 +63,13 @@ async function runQA() {
       name: "article-en",
       path: "/en/blog/introduction-to-voldigoade-projects",
     },
-    { name: "404", path: "/non-existent-page-test" },
+    { name: "privacy", path: "/privacy-policy" },
+    {
+      name: "deleted-cookies-policy",
+      path: "/cookies-policy",
+      expectedStatus: 404,
+    },
+    { name: "404", path: "/non-existent-page-test", expectedStatus: 404 },
   ];
 
   for (const route of routes) {
@@ -45,51 +78,50 @@ async function runQA() {
       waitUntil: "networkidle",
     });
 
-    if (route.name === "404") {
-      if (res.status() !== 404) {
-        errors.push(
-          `Expected 404 status for ${route.path}, got ${res.status()}`,
-        );
-      }
-    } else if (res.status() !== 200) {
-      errors.push(`Expected 200 status for ${route.path}, got ${res.status()}`);
-    }
-
-    // Check text for forbidden terms (except legal notice / license page if any)
-    const bodyText = await page.innerText("body");
-    const lowerText = bodyText.toLowerCase();
-    if (
-      lowerText.includes("muhammad") ||
-      lowerText.includes("fiaz") ||
-      lowerText.includes("mohamed")
-    ) {
+    const expectedStatus = route.expectedStatus || 200;
+    if (res.status() !== expectedStatus) {
       errors.push(
-        `Forbidden identity string found in rendered text on ${route.path}`,
+        `Expected ${expectedStatus} status for ${route.path}, got ${res.status()}`,
       );
     }
 
-    // Capture Light screenshot
-    await page.screenshot({
-      path: path.join(SCREENSHOTS_DIR, `qa-desktop-${route.name}-light.png`),
-      fullPage: false,
-    });
+    if (expectedStatus === 200) {
+      // Check text for forbidden terms (no Muhammad / Fiaz identity)
+      const bodyText = await page.innerText("body");
+      const lowerText = bodyText.toLowerCase();
+      if (
+        lowerText.includes("muhammad") ||
+        lowerText.includes("fiaz") ||
+        lowerText.includes("mohamed")
+      ) {
+        errors.push(
+          `Forbidden identity string found in rendered text on ${route.path}`,
+        );
+      }
 
-    // Toggle Dark mode via theme button
-    const themeBtn = page
-      .locator(
-        "button[aria-label*='mode'], button[aria-label*='thème'], button[aria-label*='theme'], button:has-text('☀️'), button:has-text('🌙')",
-      )
-      .first();
-    if (await themeBtn.isVisible()) {
-      await themeBtn.click();
-      await page.waitForTimeout(300);
+      // Capture Light screenshot
       await page.screenshot({
-        path: path.join(SCREENSHOTS_DIR, `qa-desktop-${route.name}-dark.png`),
+        path: path.join(SCREENSHOTS_DIR, `qa-desktop-${route.name}-light.png`),
         fullPage: false,
       });
-      // Toggle back to light
-      await themeBtn.click();
-      await page.waitForTimeout(200);
+
+      // Toggle Dark mode via theme button
+      const themeBtn = page
+        .locator(
+          "button[aria-label*='mode'], button[aria-label*='thème'], button[aria-label*='theme'], button:has-text('☀️'), button:has-text('🌙')",
+        )
+        .first();
+      if (await themeBtn.isVisible()) {
+        await themeBtn.click();
+        await page.waitForTimeout(300);
+        await page.screenshot({
+          path: path.join(SCREENSHOTS_DIR, `qa-desktop-${route.name}-dark.png`),
+          fullPage: false,
+        });
+        // Toggle back to light
+        await themeBtn.click();
+        await page.waitForTimeout(200);
+      }
     }
   }
 
@@ -100,7 +132,6 @@ async function runQA() {
     { waitUntil: "networkidle" },
   );
 
-  // Find EN button in switcher
   const enLink = page.locator(
     "nav[aria-label='Changer de langue'] a:has-text('EN')",
   );
@@ -108,9 +139,6 @@ async function runQA() {
     console.log("[QA] Clicking EN in switcher...");
     await enLink.click();
     await page.waitForURL("**/en/blog/introduction-to-voldigoade-projects");
-    console.log("[QA] Successfully navigated to English article:", page.url());
-
-    // Wait for client navigation to complete and English content to render
     await page.waitForSelector("text=min read", { timeout: 5000 });
     const enText = (await page.innerText("body")).toLowerCase();
     if (!enText.includes("read")) {
@@ -119,7 +147,6 @@ async function runQA() {
       );
     }
 
-    // Click FR in switcher
     const frLink = page.locator(
       "nav[aria-label='Switch language'] a:has-text('FR')",
     );
@@ -139,73 +166,40 @@ async function runQA() {
     errors.push("Could not find EN link on French article page");
   }
 
-  // 3. Test Cookie Notice & Preference reopen
-  console.log("[QA] Testing Cookie Notice & Footer 'Gérer les préférences'...");
+  // 3. Verify ABSENCE of Cookie Notice & Footer cookie elements
+  console.log(
+    "[QA] Verifying absence of Cookie Notice and cookie management...",
+  );
   await page.goto("http://localhost:3000/", { waitUntil: "networkidle" });
 
-  const cookieNotice = page
+  const cookieNoticeCount = await page
     .locator(
       "aside[aria-label*='consentement'], div:has-text('MESURE D\\'AUDIENCE')",
     )
-    .first();
-  const isCookieVisible = await cookieNotice.isVisible();
-  console.log(`[QA] Cookie notice initially visible: ${isCookieVisible}`);
-  if (!isCookieVisible) {
-    errors.push("Cookie notice was not visible on first visit");
+    .count();
+  console.log(`[QA] Cookie notice count: ${cookieNoticeCount}`);
+  if (cookieNoticeCount > 0) {
+    errors.push("Cookie notice should NOT be rendered anymore");
   }
 
-  // Click REFUSER
-  const refuseBtn = page.locator("button:has-text('REFUSER')");
-  if (await refuseBtn.isVisible()) {
-    await refuseBtn.click();
-    await page.waitForTimeout(400);
-    const hiddenAfterRefuse = !(await cookieNotice.isVisible());
-    console.log(
-      `[QA] Cookie notice hidden after REFUSER: ${hiddenAfterRefuse}`,
-    );
-    if (!hiddenAfterRefuse) {
-      errors.push("Cookie notice did not hide after clicking REFUSER");
-    }
-  }
-
-  // Scroll to footer and click "Gérer les préférences"
-  const manageCookiesBtn = page.locator(
-    "button:has-text('Gérer les préférences')",
+  const manageCookiesCount = await page
+    .locator("button:has-text('Gérer les préférences')")
+    .count();
+  console.log(
+    `[QA] 'Gérer les préférences' button count: ${manageCookiesCount}`,
   );
-  if (await manageCookiesBtn.isVisible()) {
-    await manageCookiesBtn.click();
-    await page.waitForTimeout(400);
-    const visibleAfterManage = await page
-      .locator("div:has-text('MESURE D\\'AUDIENCE')")
-      .first()
-      .isVisible();
-    console.log(
-      `[QA] Cookie notice visible after clicking 'Gérer les préférences': ${visibleAfterManage}`,
+  if (manageCookiesCount > 0) {
+    errors.push(
+      "Footer button 'Gérer les préférences' should NOT exist anymore",
     );
-    if (!visibleAfterManage) {
-      errors.push(
-        "Cookie notice did not reopen after clicking 'Gérer les préférences'",
-      );
-    }
+  }
 
-    // Now click ACCEPTER
-    const acceptBtn = page.locator("button:has-text('ACCEPTER')");
-    if (await acceptBtn.isVisible()) {
-      await acceptBtn.click();
-      await page.waitForTimeout(400);
-      const hiddenAfterAccept = !(await page
-        .locator("div:has-text('MESURE D\\'AUDIENCE')")
-        .first()
-        .isVisible());
-      console.log(
-        `[QA] Cookie notice hidden after ACCEPTER: ${hiddenAfterAccept}`,
-      );
-      if (!hiddenAfterAccept) {
-        errors.push("Cookie notice did not hide after clicking ACCEPTER");
-      }
-    }
-  } else {
-    errors.push("Could not find footer button 'Gérer les préférences'");
+  const cookiesPolicyLinkCount = await page
+    .locator("a[href*='cookies-policy'], a:has-text('Cookies')")
+    .count();
+  console.log(`[QA] Cookies Policy link count: ${cookiesPolicyLinkCount}`);
+  if (cookiesPolicyLinkCount > 0) {
+    errors.push("Footer link to Cookies Policy should NOT exist anymore");
   }
 
   await desktopContext.close();
@@ -221,6 +215,8 @@ async function runQA() {
 
   for (const route of [
     { name: "home", path: "/" },
+    { name: "about", path: "/about" },
+    { name: "project", path: "/project" },
     { name: "blog", path: "/blog" },
     { name: "article", path: "/blog/introduction-projets-voldigoade" },
   ]) {
@@ -249,12 +245,25 @@ async function runQA() {
   await mobileContext.close();
   await browser.close();
 
-  console.log("=== BROWSER QA FINISHED ===");
+  // 5. Final Report on Analytics Requests
+  if (interceptedGoogleRequests.length > 0) {
+    errors.push(
+      `Forbidden Google Analytics requests occurred: ${interceptedGoogleRequests.join(", ")}`,
+    );
+  }
+
+  if (consoleErrors.length > 0) {
+    console.warn("[QA] Console errors observed:", consoleErrors);
+  }
+
+  console.log("=== BROWSER E2E QA FINISHED ===");
   if (errors.length > 0) {
     console.error("QA Errors encountered:", errors);
     process.exit(1);
   } else {
-    console.log("ALL QA CHECKS PASSED PERFECTLY!");
+    console.log(
+      "ALL QA CHECKS PASSED PERFECTLY! ZERO GA REQUESTS, NO COOKIE BANNER, CLOUDFLARE ONLY.",
+    );
   }
 }
 

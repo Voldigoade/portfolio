@@ -2,9 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Bungee, Press_Start_2P, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
-import { AnalyticsManager } from "@/components/layout/analytics-manager";
 import { AnimePageAnimator } from "@/components/layout/anime-page-animator";
-import { CookieNotice } from "@/components/layout/cookie-notice";
+import { CloudflareAnalytics } from "@/components/layout/cloudflare-analytics";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { RouteProgressBar } from "@/components/layout/route-progress-bar";
@@ -110,7 +109,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const cfToken = process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN;
 
   const personJsonLd = {
@@ -176,7 +174,7 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${bungee.variable} ${pressStart.variable} antialiased`}
       >
-        <AnalyticsManager gaId={gaId} cfToken={cfToken} />
+        {cfToken ? <CloudflareAnalytics token={cfToken} /> : null}
         <Suspense fallback={shellFallback}>
           <ThemeProvider>
             <RouteProgressBar />
@@ -187,7 +185,6 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
-              <CookieNotice />
             </div>
           </ThemeProvider>
         </Suspense>
