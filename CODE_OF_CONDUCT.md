@@ -30,9 +30,7 @@ This Code of Conduct applies in all project spaces and public spaces when indivi
 
 ## Reporting
 
-To report violations, contact:
-
-- contact@muhammadfiaz.com
+To report violations, reach out via the [contact form](https://voldigoade.xyz/contact) or directly to [@Voldigoade](https://github.com/Voldigoade).
 
 Reports will be reviewed promptly and handled confidentially where possible.
 
