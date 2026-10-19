@@ -101,7 +101,7 @@ const spoorLines = [
   },
   {
     kind: "line",
-    text: "Status: clean | Mode: fast | 0 leaks detected",
+    text: "Leaks flagged in this run: 0",
     className: "text-[#64cbff]",
   },
 ];
