@@ -59,7 +59,6 @@ export function calculateReadingTimeText(
   return locale === "en" ? `${minutes} min read` : `${minutes} min de lecture`;
 }
 
-// Backwards-compatible signature
 export function calculateReadingTime(content: string): number {
   return calculateReadingMinutes(content);
 }
@@ -92,7 +91,6 @@ export function validateFrontmatter(
     errors.push(`Missing or invalid 'title' in ${filename}`);
   }
 
-  // If frontmatter provides slug, it must match the filename slug
   if (data.slug !== undefined && data.slug !== "") {
     if (typeof data.slug !== "string" || !SLUG_REGEX.test(data.slug)) {
       errors.push(
@@ -413,7 +411,6 @@ export async function getAllArticles(options?: {
   const targetLocale = options?.locale ?? "fr";
   const includeDrafts = options?.includeDrafts ?? false;
 
-  // Read both collections to wire bidirectional translations
   const [frSources, enSources] = await Promise.all([
     readDirSources(CONTENT_DIR_FR, "fr"),
     readDirSources(CONTENT_DIR_EN, "en"),

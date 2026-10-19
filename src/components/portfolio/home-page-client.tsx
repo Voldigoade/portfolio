@@ -198,9 +198,7 @@ export function HomePageClient({
         <BentoGrid>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase sm:text-2xl">
-              {isFrench
-                ? "Spoor — Empreinte GitHub"
-                : "Spoor — GitHub Footprint"}
+              {isFrench ? "Spoor: Empreinte GitHub" : "Spoor: GitHub Footprint"}
             </p>
             <p className="mt-2 text-sm font-medium">
               {isFrench
@@ -210,9 +208,7 @@ export function HomePageClient({
           </BentoCard>
           <BentoCard className="min-h-48 h-full sm:col-span-1 lg:col-span-2">
             <p className="font-display text-xl uppercase">
-              {isFrench
-                ? "Crucksware — Rootfs Diff"
-                : "Crucksware — Rootfs Diff"}
+              {isFrench ? "Crucksware: Rootfs Diff" : "Crucksware: Rootfs Diff"}
             </p>
             <p className="mt-2 text-sm font-medium">
               {isFrench

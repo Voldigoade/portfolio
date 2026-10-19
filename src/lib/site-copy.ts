@@ -576,34 +576,34 @@ export const copyFr: SiteCopy = {
   privacy: {
     title: "Politique de Confidentialité",
     intro:
-      "Cette politique explicite le traitement des données techniques, l'absence totale de cookies, la gestion des préférences locales et la mesure d'audience sur voldigoade.xyz.",
+      "Cette page détaille le traitement des données techniques, les préférences locales et la mesure d'audience sur voldigoade.xyz.",
     sections: [
       {
-        title: "Principes Fondamentaux",
+        title: "Principes Généraux",
         content: [
-          "La consultation de ce portfolio est entièrement anonyme et ne requiert aucun compte utilisateur. Ce site ne pratique aucun profilage, ne commercialise aucune donnée et ne comporte aucun formulaire ni mécanisme de collecte intrusive.",
-          "L'hébergement est assuré par Vercel et le code source ainsi que les dépôts de recherche sont hébergés sur GitHub. Les interactions avec ces plateformes externes relèvent de leurs politiques de confidentialité respectives.",
+          "La consultation de ce portfolio ne requiert aucun compte utilisateur. Le site lui-même ne pratique aucun profilage et n'effectue aucun suivi au niveau individuel.",
+          "L'hébergement est assuré par Vercel et le code source est sur GitHub. Comme pour tout service web, les prestataires d'hébergement et de réseau peuvent traiter des métadonnées de requête usuelles (adresses IP, user agents, horodatages) pour la distribution du contenu, la prévention des abus et la sécurité.",
         ],
       },
       {
-        title: "Mesure d'Audience Sans Cookie (Cloudflare Web Analytics)",
+        title: "Mesure d'Audience (Cloudflare Web Analytics)",
         content: [
-          "Ce site utilise exclusivement Cloudflare Web Analytics pour évaluer la disponibilité et la fréquentation globale de manière respectueuse de la vie privée.",
-          "Cette solution fonctionne sans aucun cookie, sans recours au stockage local du navigateur et sans aucune technique d'empreinte numérique (fingerprinting). Aucune donnée à caractère personnel n'est collectée ou transmise à des tiers publicitaires.",
+          "Ce site utilise exclusivement Cloudflare Web Analytics pour mesurer la fréquentation globale de manière agrégée.",
+          "Cette solution fonctionne sans cookies, sans recours au stockage local du navigateur et sans aucune technique d'empreinte numérique (fingerprinting). Aucune donnée à caractère personnel n'est collectée ou transmise à des tiers publicitaires.",
         ],
       },
       {
         title: "Absence de Cookies & Stockage Local (localStorage)",
         content: [
-          "Ce site n'émet et ne dépose strictement aucun cookie, qu'il soit interne ou tiers.",
-          "Le stockage local de votre navigateur (localStorage) est exclusivement sollicité pour mémoriser vos préférences d'affichage : le choix du thème (sombre ou clair) et l'état des filtres d'exploration. Ces données demeurent strictement confinées à votre appareil et ne sont jamais transmises à nos serveurs.",
+          "Ce site n'émet et ne dépose aucun cookie.",
+          "Le stockage local de votre navigateur (localStorage) sert uniquement à mémoriser vos préférences d'affichage : le choix du thème (sombre ou clair) et l'état des filtres de projets. Ces données restent strictement sur votre appareil et ne sont jamais transmises à un serveur.",
         ],
       },
       {
         title: "Sécurité & Signalements",
         content: [
-          "Le site est servi exclusivement en HTTPS avec des en-têtes de sécurité stricts (Content-Security-Policy rigoureuse, interdiction absolue de l'encapsulation en iframe via frame-ancestors 'none', HSTS).",
-          "Pour toute question relative à cette politique ou pour signaler de manière responsable une vulnérabilité de sécurité, utilisez exclusivement les avis de sécurité GitHub (GitHub Security Advisories) sur le profil officiel : https://github.com/Voldigoade.",
+          "Le site est servi en HTTPS avec des en-têtes de sécurité stricts (Content-Security-Policy, interdiction de l'encapsulation en iframe via frame-ancestors 'none', HSTS).",
+          "Pour signaler de manière responsable une vulnérabilité de sécurité, utilisez les avis de sécurité GitHub (GitHub Security Advisories) sur https://github.com/Voldigoade.",
         ],
       },
     ],
@@ -992,34 +992,34 @@ export const copyEn: SiteCopy = {
   privacy: {
     title: "Privacy Policy",
     intro:
-      "This policy details technical data processing, the complete absence of cookies, local preferences handling, and analytics on voldigoade.xyz.",
+      "This page outlines technical data processing, local preferences, and analytics on voldigoade.xyz.",
     sections: [
       {
         title: "Core Principles",
         content: [
-          "Browsing this portfolio is completely anonymous and requires no user account. This site performs no user profiling, sells no data, and contains no intrusive tracking mechanisms or forms.",
-          "Hosting is provided by Vercel, and source code alongside research repositories is hosted on GitHub. Interactions with external platforms are governed by their respective privacy policies.",
+          "Browsing this portfolio requires no user account. The site itself does not intentionally perform user-level tracking or profiling.",
+          "Hosting is provided by Vercel and source code is hosted on GitHub. Hosting and network providers may process standard request metadata such as IP addresses, user agents, and timestamps for delivery, abuse prevention, and security.",
         ],
       },
       {
-        title: "Cookieless Analytics (Cloudflare Web Analytics)",
+        title: "Aggregate Analytics (Cloudflare Web Analytics)",
         content: [
-          "This site exclusively uses Cloudflare Web Analytics to monitor availability and aggregate traffic in a privacy-respecting manner.",
-          "This solution operates without any cookies, without accessing browser local storage, and without fingerprinting techniques. No personal data is collected or shared with third-party advertisers.",
+          "This site exclusively uses Cloudflare Web Analytics to monitor availability and aggregate traffic.",
+          "This solution operates without cookies, without accessing browser local storage, and without fingerprinting techniques. No personal data is collected or shared with third-party advertisers.",
         ],
       },
       {
         title: "No Cookies & Local Storage (localStorage)",
         content: [
-          "This site sets zero first-party or third-party cookies.",
-          "Browser local storage (localStorage) is used solely to remember your client-side display preferences: theme selection (dark or light) and project filter state. This data remains strictly on your device and is never sent to our servers.",
+          "This site sets zero cookies.",
+          "Browser local storage (localStorage) is used solely to remember client-side display preferences: theme selection (dark or light) and project filter state. This data remains on your device.",
         ],
       },
       {
         title: "Security & Vulnerability Reporting",
         content: [
-          "The site is served exclusively over HTTPS with strict security headers (rigorous Content-Security-Policy, complete frame blocking via frame-ancestors 'none', HSTS).",
-          "For questions regarding this policy or to responsibly report a security vulnerability, please use GitHub Security Advisories on the official profile: https://github.com/Voldigoade.",
+          "The site is served over HTTPS with strict security headers (Content-Security-Policy, frame blocking via frame-ancestors 'none', HSTS).",
+          "To responsibly report a security vulnerability, please use GitHub Security Advisories on https://github.com/Voldigoade.",
         ],
       },
     ],
