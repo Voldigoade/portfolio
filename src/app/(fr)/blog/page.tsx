@@ -8,7 +8,7 @@ const blogOgImageUrl = `${siteUrl}/blog/opengraph-image`;
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et l'outillage par Voldigoade.",
+    "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et les outils par Voldigoade.",
   alternates: {
     canonical: "/blog",
     languages: {
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Blog | Voldigoade",
     description:
-      "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et l'outillage.",
+      "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et les outils.",
     url: `${siteUrl}/blog`,
     type: "website",
     locale: "fr_FR",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Blog | Voldigoade",
     description:
-      "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et l'outillage.",
+      "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et les outils.",
     images: [blogOgImageUrl],
   },
 };
@@ -138,7 +138,7 @@ export default async function BlogPage() {
             </h1>
             <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-muted-foreground sm:text-base">
               Notes techniques, write-ups et retours d'expérience sur les
-              systèmes, la sécurité et l'outillage.
+              systèmes, la sécurité et les outils.
             </p>
           </div>
         </div>

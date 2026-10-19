@@ -116,5 +116,40 @@ describe("bilingual site structure & metadata", () => {
     expect(allEnText).toContain("spoor");
     expect(allEnText).toContain("crucksware");
     expect(allEnText).not.toContain("crukst");
+
+    // Footer check: Sitemap replaces Plan du site
+    expect(fr.footer.links.map((l) => l.label)).toContain("Sitemap");
+    expect(fr.footer.links.map((l) => l.label)).not.toContain("Plan du site");
+
+    // About stack section: "Ce que j'utilise" / "What I Use" with 4 items
+    expect(fr.about.stackTitle).toBe("Ce que j'utilise");
+    expect(en.about.stackTitle).toBe("What I Use");
+    expect(fr.about.stackItems).toHaveLength(4);
+    expect(en.about.stackItems).toHaveLength(4);
+    expect(fr.about.stackItems.map((i) => i.title)).toEqual([
+      "Rust",
+      "Linux",
+      "Python",
+      "TypeScript / Next.js",
+    ]);
+
+    // Spoor demo metadata: real torvalds capture
+    expect(fr.home.terminal.meta.command).toBe("spoor torvalds");
+    expect(fr.home.terminal.meta.target).toBe("torvalds");
+    expect(fr.home.terminal.meta.sha).toBe(
+      "7d49428a88b86204b23ae509b0be954d9c41110b",
+    );
+    expect(fr.home.terminal.meta.date).toBe("2026-10-19 10:57:48 UTC");
+    expect(fr.home.terminal.p2).toContain("spoor torvalds");
+    expect(fr.home.terminal.p2).toContain("restitution statique");
+
+    expect(en.home.terminal.meta.command).toBe("spoor torvalds");
+    expect(en.home.terminal.meta.target).toBe("torvalds");
+    expect(en.home.terminal.meta.sha).toBe(
+      "7d49428a88b86204b23ae509b0be954d9c41110b",
+    );
+    expect(en.home.terminal.meta.date).toBe("2026-10-19 10:57:48 UTC");
+    expect(en.home.terminal.p2).toContain("spoor torvalds");
+    expect(en.home.terminal.p2).toContain("static replay");
   });
 });

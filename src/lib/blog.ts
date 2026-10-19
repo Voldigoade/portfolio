@@ -63,6 +63,25 @@ export function calculateReadingTime(content: string): number {
   return calculateReadingMinutes(content);
 }
 
+export function formatArticleDate(
+  value: string,
+  locale: WritingLocale = "fr",
+): string {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return value;
+  const year = Number.parseInt(match[1], 10);
+  const month = Number.parseInt(match[2], 10) - 1;
+  const day = Number.parseInt(match[3], 10);
+  const date = new Date(Date.UTC(year, month, day));
+  const intlLocale = locale === "en" ? "en-US" : "fr-FR";
+  return new Intl.DateTimeFormat(intlLocale, {
+    timeZone: "UTC",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
+}
+
 export function normalizeTranslationRef(value: unknown): string | undefined {
   if (typeof value !== "string" || !value.trim()) return undefined;
   const cleaned = value

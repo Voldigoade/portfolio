@@ -163,10 +163,31 @@ export async function getGithubRepos(
     };
   });
 }
+async function fetchAllPublicUserRepos(
+  username: string,
+): Promise<Record<string, unknown>[]> {
+  const allRepos: Record<string, unknown>[] = [];
+  let page = 1;
+  const perPage = 100;
+  while (true) {
+    const payload = await fetchJson(
+      `https://api.github.com/users/${username}/repos?sort=updated&per_page=${perPage}&page=${page}&type=owner`,
+      publicOptions(`github-public-repos-${page}`),
+    );
+    if (!Array.isArray(payload) || payload.length === 0) break;
+    const entries = payload
+      .map(record)
+      .filter((item): item is Record<string, unknown> => item !== null);
+    allRepos.push(...entries);
+    if (entries.length < perPage || allRepos.length >= 1000) break;
+    page += 1;
+  }
+  return allRepos;
+}
+
 export async function getGithubOverview(
   _githubUser?: string,
 ): Promise<GitHubOverviewPayload | null> {
-  const repos = await getGithubRepos();
   const payload = record(
     await fetchJson(
       `https://api.github.com/users/${DEFAULT_GITHUB_USER}`,
@@ -174,34 +195,63 @@ export async function getGithubOverview(
     ),
   );
   const profile = payload?.login === DEFAULT_GITHUB_USER ? payload : null;
-  const total = (key: "stargazers_count" | "forks_count" | "watchers_count") =>
-    repos.every((repo) => repo[key] !== undefined)
-      ? repos.reduce((sum, repo) => sum + (repo[key] ?? 0), 0)
-      : null;
+  const curatedRepos = await getGithubRepos();
+  const rawRepos = await fetchAllPublicUserRepos(DEFAULT_GITHUB_USER);
+
+  const publicOwnedRepos = rawRepos.filter((repo) => {
+    return (
+      repo.private === false &&
+      repo.fork === false &&
+      record(repo.owner)?.login === DEFAULT_GITHUB_USER
+    );
+  });
+
+  const hasRepoData = rawRepos.length > 0;
+  const totalStars = hasRepoData
+    ? publicOwnedRepos.reduce(
+        (sum, repo) => sum + (count(repo.stargazers_count) ?? 0),
+        0,
+      )
+    : null;
+  const totalForks = hasRepoData
+    ? publicOwnedRepos.reduce(
+        (sum, repo) => sum + (count(repo.forks_count) ?? 0),
+        0,
+      )
+    : null;
+
   const languageMap = new Map<string, number>();
-  for (const repo of repos)
-    if (repo.language)
+  for (const repo of publicOwnedRepos) {
+    if (typeof repo.language === "string" && repo.language.trim()) {
       languageMap.set(repo.language, (languageMap.get(repo.language) ?? 0) + 1);
+    }
+  }
+
+  const profileRepos = count(profile?.public_repos);
+  const totalRepositories =
+    profileRepos ??
+    (hasRepoData ? publicOwnedRepos.length : curatedRepos.length);
+
   return {
     username: DEFAULT_GITHUB_USER,
     followers: count(profile?.followers) ?? null,
     following: count(profile?.following) ?? null,
-    publicRepos: count(profile?.public_repos) ?? null,
-    totalRepositories: repos.length,
-    projects: repos.map(({ name, html_url, language }) => ({
+    publicRepos: profileRepos ?? null,
+    totalRepositories,
+    projects: curatedRepos.map(({ name, html_url, language }) => ({
       name,
       url: html_url,
       language,
     })),
-    totalStars: total("stargazers_count"),
-    totalForks: total("forks_count"),
-    totalWatchers: total("watchers_count"),
-    topRepositories: repos
-      .flatMap((repo) =>
-        repo.stargazers_count === undefined
-          ? []
-          : [{ name: repo.name, stars: repo.stargazers_count }],
-      )
+    totalStars,
+    totalForks,
+    totalWatchers: null,
+    topRepositories: publicOwnedRepos
+      .flatMap((repo) => {
+        const stars = count(repo.stargazers_count);
+        const name = typeof repo.name === "string" ? repo.name : null;
+        return stars !== undefined && name !== null ? [{ name, stars }] : [];
+      })
       .sort((a, b) => b.stars - a.stars),
     languages: [...languageMap].map(([language, repos]) => ({
       language,

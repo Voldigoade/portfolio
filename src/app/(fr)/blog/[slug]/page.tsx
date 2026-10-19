@@ -3,7 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleLanguageSwitcher } from "@/components/portfolio/article-language-switcher";
 import { Button } from "@/components/retroui/Button";
-import { getArticleBySlug, getPublishedArticles } from "@/lib/blog";
+import {
+  formatArticleDate,
+  getArticleBySlug,
+  getPublishedArticles,
+} from "@/lib/blog";
 import { githubUrl, siteName, siteUrl } from "@/lib/site-config";
 
 interface ArticlePageProps {
@@ -129,13 +133,17 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
       <header className="border-4 border-black bg-card p-6 shadow-retro-lg sm:p-8 md:p-10 space-y-4">
         <div className="flex flex-wrap items-center gap-3 text-xs font-black uppercase text-muted-foreground">
-          <time dateTime={article.publishedAt}>{article.publishedAt}</time>
+          <time dateTime={article.publishedAt}>
+            {formatArticleDate(article.publishedAt, "fr")}
+          </time>
           <span>•</span>
           <span>{article.readingTimeText}</span>
           {article.updatedAt ? (
             <>
               <span>•</span>
-              <span>Mis à jour : {article.updatedAt}</span>
+              <span>
+                Mis à jour : {formatArticleDate(article.updatedAt, "fr")}
+              </span>
             </>
           ) : null}
         </div>

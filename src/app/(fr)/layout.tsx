@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | Voldigoade",
   },
   description:
-    "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et l'outillage développeur par Voldigoade.",
+    "Projets open source et recherches documentées sur les systèmes, la sécurité, la confidentialité et les outils développeur par Voldigoade.",
   alternates: {
     canonical: "/",
     languages: {
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Voldigoade | Systèmes, Logiciels, Sécurité & Confidentialité",
     description:
-      "Projets logiciels open-source et recherches documentées sur les systèmes, la sécurité, la confidentialité et l'outillage développeur.",
+      "Projets open source et recherches documentées sur les systèmes, la sécurité, la confidentialité et les outils développeur.",
     url: siteUrl,
     siteName: "Voldigoade",
     type: "website",

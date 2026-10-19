@@ -10,12 +10,16 @@ import { BarChart } from "@/components/retroui/charts/BarChart";
 import { LineChart } from "@/components/retroui/charts/LineChart";
 import type { GitHubOverviewPayload } from "@/lib/portfolio-types";
 import { githubUrl } from "@/lib/site-config";
+import type { Locale } from "@/lib/site-copy";
 
 export function GithubOverviewBento({
   stats,
+  locale = "fr",
 }: {
   stats: GitHubOverviewPayload | null;
+  locale?: Locale;
 }) {
+  const isFrench = locale === "fr";
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,7 +62,9 @@ export function GithubOverviewBento({
   if (!stats) {
     return (
       <div className="border-4 border-black bg-card p-6 text-center font-black uppercase shadow-retro-md">
-        Les statistiques GitHub sont indisponibles actuellement.
+        {isFrench
+          ? "Les statistiques GitHub sont indisponibles actuellement."
+          : "GitHub statistics are currently unavailable."}
       </div>
     );
   }
@@ -66,31 +72,29 @@ export function GithubOverviewBento({
   const languageChartData = [...stats.languages].sort(
     (a, b) => b.repos - a.repos,
   );
+  const avgDenominator = Math.max(
+    stats.publicRepos ?? stats.totalRepositories,
+    1,
+  );
   const insightsData = [
     {
-      metric: "Moy. Étoiles",
+      metric: isFrench ? "Moy. Étoiles" : "Avg. Stars",
       value:
         stats.totalStars === null
           ? null
-          : Math.round(stats.totalStars / Math.max(stats.totalRepositories, 1)),
+          : Math.round(stats.totalStars / avgDenominator),
     },
     {
-      metric: "Moy. Forks",
+      metric: isFrench ? "Moy. Forks" : "Avg. Forks",
       value:
         stats.totalForks === null
           ? null
-          : Math.round(stats.totalForks / Math.max(stats.totalRepositories, 1)),
+          : Math.round(stats.totalForks / avgDenominator),
     },
     {
-      metric: "Moy. Suivis",
-      value:
-        stats.totalWatchers === null
-          ? null
-          : Math.round(
-              stats.totalWatchers / Math.max(stats.totalRepositories, 1),
-            ),
+      metric: isFrench ? "Dépôts Publics" : "Public Repos",
+      value: stats.publicRepos ?? stats.totalRepositories,
     },
-    { metric: "Dépôts Publics", value: stats.publicRepos },
   ].flatMap((item) =>
     item.value === null ? [] : [{ ...item, value: item.value }],
   );
@@ -103,54 +107,54 @@ export function GithubOverviewBento({
           className="sm:col-span-2 lg:col-span-4 self-start"
         >
           <p className="font-display text-2xl uppercase">
-            Activité GitHub publique
+            {isFrench
+              ? "Statistiques du profil GitHub"
+              : "GitHub Profile Statistics"}
           </p>
           <p className="mt-1 text-xs font-bold uppercase text-muted-foreground">
-            Données publiques agrégées sur les dépôts sélectionnés. Les
-            métriques indisponibles sont omises.
+            {isFrench
+              ? "Métadonnées publiques du compte et de l'ensemble des dépôts publics."
+              : "Public metadata from profile and all public repositories."}
           </p>
-          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
             <Badge
               data-gh-pill
               variant="surface"
               className="justify-center border-2 border-black bg-[#ffe08a] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Abonnés {stats.followers ?? "N/D"}
+              {isFrench ? "Abonnés" : "Followers"}{" "}
+              {stats.followers ?? (isFrench ? "N/D" : "N/A")}
             </Badge>
             <Badge
               data-gh-pill
               variant="surface"
               className="justify-center border-2 border-black bg-[#8cf5ff] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Abonnements {stats.following ?? "N/D"}
+              {isFrench ? "Abonnements" : "Following"}{" "}
+              {stats.following ?? (isFrench ? "N/D" : "N/A")}
             </Badge>
             <Badge
               data-gh-pill
               variant="surface"
               className="justify-center border-2 border-black bg-[#b7ff66] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Dépôts {stats.totalRepositories}
+              {isFrench ? "Dépôts" : "Repos"}{" "}
+              {stats.publicRepos ?? stats.totalRepositories}
             </Badge>
             <Badge
               data-gh-pill
               variant="surface"
               className="justify-center border-2 border-black bg-[#ffd146] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Étoiles {stats.totalStars ?? "N/D"}
+              {isFrench ? "Étoiles" : "Stars"}{" "}
+              {stats.totalStars ?? (isFrench ? "N/D" : "N/A")}
             </Badge>
             <Badge
               data-gh-pill
               variant="surface"
               className="justify-center border-2 border-black bg-[#ff9ac2] px-3 py-3 text-center text-sm font-black uppercase text-black"
             >
-              Forks {stats.totalForks ?? "N/D"}
-            </Badge>
-            <Badge
-              data-gh-pill
-              variant="surface"
-              className="justify-center border-2 border-black bg-[#c6a8ff] px-3 py-3 text-center text-sm font-black uppercase text-black"
-            >
-              Suivis {stats.totalWatchers ?? "N/D"}
+              Forks {stats.totalForks ?? (isFrench ? "N/D" : "N/A")}
             </Badge>
           </div>
         </BentoCard>
@@ -159,9 +163,13 @@ export function GithubOverviewBento({
           data-gh-card
           className="sm:col-span-2 lg:col-span-4 self-start"
         >
-          <p className="font-display text-2xl uppercase">Dépôts publics</p>
+          <p className="font-display text-2xl uppercase">
+            {isFrench ? "Projets mis en avant" : "Featured Projects"}
+          </p>
           <p className="mt-1 text-xs font-bold uppercase text-muted-foreground">
-            Sélection de projets open source et dépôts de recherche.
+            {isFrench
+              ? "Sélection de projets open source et dépôts de recherche."
+              : "Curated open source projects and research repositories."}
           </p>
           <div className="mt-4 grid min-h-44 grid-cols-1 gap-3 border-4 border-black bg-muted p-2 shadow-retro-sm sm:grid-cols-2 sm:p-3">
             {stats.projects.map((project) => (
@@ -174,7 +182,8 @@ export function GithubOverviewBento({
               >
                 <span className="break-all">{project.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  {project.language ?? "Mixte"} · Dépôt public
+                  {project.language ?? (isFrench ? "Mixte" : "Mixed")} ·{" "}
+                  {isFrench ? "Dépôt public" : "Public repo"}
                 </span>
               </Link>
             ))}
@@ -185,7 +194,9 @@ export function GithubOverviewBento({
             className="mt-4 w-full border-4 border-black uppercase sm:w-auto"
           >
             <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
-              Voir le profil GitHub complet
+              {isFrench
+                ? "Voir le profil GitHub complet"
+                : "View full GitHub profile"}
             </Link>
           </Button>
         </BentoCard>
@@ -195,7 +206,7 @@ export function GithubOverviewBento({
           className="sm:col-span-2 lg:col-span-2 self-start min-h-96 h-full"
         >
           <p className="font-display text-2xl uppercase">
-            Dépôts les plus étoilés
+            {isFrench ? "Dépôts les plus étoilés" : "Most Starred Repositories"}
           </p>
           <div className="mt-3 h-72 w-full">
             {stats.topRepositories.length > 0 ? (
@@ -211,7 +222,9 @@ export function GithubOverviewBento({
               />
             ) : (
               <p className="flex h-full items-center justify-center text-center font-bold uppercase">
-                Le décompte d&apos;étoiles est indisponible.
+                {isFrench
+                  ? "Le décompte d'étoiles est indisponible."
+                  : "Star count is unavailable."}
               </p>
             )}
           </div>
@@ -221,7 +234,9 @@ export function GithubOverviewBento({
           data-gh-card
           className="sm:col-span-2 lg:col-span-2 self-start min-h-96 h-full"
         >
-          <p className="font-display text-2xl uppercase">Langages utilisés</p>
+          <p className="font-display text-2xl uppercase">
+            {isFrench ? "Langages utilisés" : "Languages Used"}
+          </p>
           <div className="retro-scrollbar mt-3 max-h-96 overflow-y-auto overflow-x-hidden pr-2">
             <BarChart
               data={languageChartData}
@@ -246,7 +261,9 @@ export function GithubOverviewBento({
           className="sm:col-span-2 lg:col-span-2 self-start min-h-96 h-full"
         >
           <p className="font-display text-2xl uppercase">
-            Activité mensuelle des dépôts
+            {isFrench
+              ? "Activité mensuelle des dépôts"
+              : "Monthly Repository Activity"}
           </p>
           <div className="mt-3 h-72 w-full">
             {stats.monthlyActivity.length > 0 ? (
@@ -261,7 +278,9 @@ export function GithubOverviewBento({
               />
             ) : (
               <p className="flex h-full items-center justify-center text-center font-bold uppercase">
-                Historique d&apos;activité non configuré.
+                {isFrench
+                  ? "Historique d'activité non configuré."
+                  : "Activity history not configured."}
               </p>
             )}
           </div>
@@ -271,7 +290,9 @@ export function GithubOverviewBento({
           data-gh-card
           className="sm:col-span-2 lg:col-span-2 self-start min-h-96 h-full"
         >
-          <p className="font-display text-2xl uppercase">Indicateurs GitHub</p>
+          <p className="font-display text-2xl uppercase">
+            {isFrench ? "Indicateurs GitHub" : "GitHub Insights"}
+          </p>
           <div className="mt-4 h-72 w-full">
             {insightsData.length > 0 ? (
               <BarChart
@@ -287,13 +308,16 @@ export function GithubOverviewBento({
               />
             ) : (
               <p className="flex h-full items-center justify-center text-center font-bold uppercase">
-                Métriques GitHub indisponibles.
+                {isFrench
+                  ? "Métriques GitHub indisponibles."
+                  : "GitHub metrics unavailable."}
               </p>
             )}
           </div>
           <p className="mt-4 text-sm font-medium leading-relaxed">
-            Données calculées à partir des dépôts publics sélectionnés et du
-            profil public.
+            {isFrench
+              ? "Données calculées à partir de l'ensemble des dépôts publics et du profil GitHub."
+              : "Data calculated across all public repositories and GitHub profile."}
           </p>
         </BentoCard>
       </BentoGrid>

@@ -218,7 +218,70 @@ describe("public portfolio boundary", () => {
     ]);
     expect(result?.commitHistory).toEqual([]);
     expect(result?.monthlyActivity).toEqual([]);
-    expect(result?.totalStars).toBeNull(); // incomplete curated metric set
+    expect(result?.totalStars).toBe(3); // aggregated across public owned non-fork repos
+    expect(result?.totalForks).toBe(2);
+    expect(result?.totalWatchers).toBeNull(); // misleading watchers omitted
     expect(JSON.stringify(result)).not.toContain("99");
+  });
+
+  it("separates GitHub profile repo count from curated project count and aggregates public repo metrics", async () => {
+    globalThis.fetch = mock(async (input) => {
+      const url = String(input);
+      if (url.includes("/repos?")) {
+        return Response.json([
+          publicRepo, // spoor: stars 3, forks 2
+          {
+            ...publicRepo,
+            name: "diskboot",
+            stargazers_count: 5,
+            forks_count: 1,
+            language: "Rust",
+          },
+          {
+            ...publicRepo,
+            name: "forked-repo",
+            fork: true,
+            stargazers_count: 100,
+            forks_count: 50,
+          },
+          {
+            ...publicRepo,
+            name: "foreign-repo",
+            owner: { login: "someone-else" },
+            stargazers_count: 100,
+            forks_count: 50,
+          },
+          {
+            ...publicRepo,
+            name: "private-repo",
+            private: true,
+            stargazers_count: 100,
+            forks_count: 50,
+          },
+        ]);
+      }
+      return Response.json({
+        login: "Voldigoade",
+        followers: 10,
+        following: 2,
+        public_repos: 7, // Real public repo count from profile
+      });
+    }) as unknown as typeof fetch;
+
+    const overview = await getGithubOverview();
+    expect(overview).not.toBeNull();
+    // Profile counters: 7 public repos from profile, not curated manifest length (3)
+    expect(overview?.publicRepos).toBe(7);
+    expect(overview?.totalRepositories).toBe(7);
+    // Curated projects card: strictly the 3 featured projects
+    expect(overview?.projects.map((p) => p.name)).toEqual([
+      "spoor",
+      "crucksware",
+      "recherche-messageries",
+    ]);
+    // Aggregate metrics across public owned non-fork repos (spoor: 3 + diskboot: 5 = 8 stars; 2 + 1 = 3 forks)
+    expect(overview?.totalStars).toBe(8);
+    expect(overview?.totalForks).toBe(3);
+    expect(overview?.totalWatchers).toBeNull();
   });
 });

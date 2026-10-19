@@ -216,7 +216,7 @@ export const copyFr: SiteCopy = {
     blogAria: "Lire le blog",
     links: [
       { href: "/robots.txt", label: "Robots" },
-      { href: "/sitemap.xml", label: "Plan du site" },
+      { href: "/sitemap.xml", label: "Sitemap" },
       { href: "/rss.xml", label: "RSS" },
       { href: "/privacy-policy", label: "Confidentialité" },
     ],
@@ -328,11 +328,11 @@ export const copyFr: SiteCopy = {
     githubOverview: {
       title: "Activité GitHub",
       profileCta: "Profil GitHub",
-      subtitle: "Métadonnées publiques récupérées depuis l'API GitHub.",
-      activityTitle: "Activité GitHub publique",
+      subtitle: "Statistiques du profil et sélection de projets publics.",
+      activityTitle: "Statistiques du profil GitHub",
       activitySubtitle:
-        "Données publiques agrégées sur les dépôts sélectionnés.",
-      reposTitle: "Dépôts publics",
+        "Métadonnées publiques du compte et de l'ensemble des dépôts publics.",
+      reposTitle: "Projets mis en avant",
       reposSubtitle: "Sélection de projets open source et dépôts de recherche.",
       followers: "Abonnés",
       following: "Abonnements",
@@ -394,32 +394,32 @@ export const copyFr: SiteCopy = {
     },
     terminal: {
       title: "Spoor Demo",
-      cardTitle: "Exécution réelle de Spoor",
-      p1: "Spoor inspecte les métadonnées publiques d'un compte ou d'un repo GitHub (commits, clés, signatures).",
-      p2: "Le terminal ci-contre rejoue une capture déterministe réelle de la commande `spoor repo Voldigoade/spoor` exécutée avec le binaire Rust.",
-      p3: "Aucune simulation inventée ni fausse commande : les données correspondent aux identités réelles de commit et au scan public.",
+      cardTitle: "Capture réelle de Spoor",
+      p1: "Spoor inspecte les métadonnées publiques d'un compte ou d'un dépôt GitHub : commits, clés SSH, dépôts et signatures.",
+      p2: "Le terminal ci-contre est une restitution statique d'une exécution réelle de `spoor torvalds` capturée avec le binaire Rust (commit 7d49428, 19 oct. 2026). Le binaire n'est pas réexécuté à chaque visite.",
+      p3: "Aucune donnée inventée : les métadonnées, langages et volumes correspondent exactement à la sortie du scan public.",
       docLink: "Documentation Spoor sur GitHub",
       resultsTitle: "Comprendre les sorties",
       cards: [
         {
           title: "Données observées",
-          text: "Faits bruts extraits des commits publics (identités de commits, adresses noreply, signatures vérifiées).",
+          text: "Métadonnées extraites des endpoints publics : profil, dépôts publics, clés SSH et échantillon de commits récents.",
         },
         {
           title: "Valeurs dérivées",
-          text: "Métriques agrégées (nombre de commits, langages détectés, volumétrie) calculées directement sur le sample scanné.",
+          text: "Statistiques agrégées (étoiles, forks, répartition des langages) calculées directement sur les dépôts découverts.",
         },
         {
           title: "Limites & Quotas",
-          text: "Les résultats dépendent des quotas de l'API GitHub et de la profondeur de scan configurée.",
+          text: "En mode rapide (fast), Spoor respecte les quotas de l'API GitHub non authentifiée et borne le nombre de commits par dépôt.",
         },
       ],
       meta: {
         tool: "Spoor CLI",
-        command: "spoor repo Voldigoade/spoor",
-        target: "Voldigoade/spoor",
+        command: "spoor torvalds",
+        target: "torvalds",
         sha: "7d49428a88b86204b23ae509b0be954d9c41110b",
-        date: "2026-10-18 23:38:13 UTC",
+        date: "2026-10-19 10:57:48 UTC",
       },
     },
     faq: {
@@ -469,7 +469,7 @@ export const copyFr: SiteCopy = {
   about: {
     title: "À propos",
     intro: [
-      "Je travaille surtout sur des CLI et du tooling autour de Rust, OSINT, privacy et systèmes. J'aime comprendre comment un tool se comporte vraiment, où sont ses limites et ce qu'on peut vérifier. Le code est sur GitHub, les write-ups sont ici.",
+      "Je construis surtout des tools qui me donnent une bonne excuse pour comprendre ce qu'il se passe sous le capot : CLI en Rust, OSINT, firmware, privacy et systèmes. J'aime partir d'un comportement concret, remonter jusqu'à son fonctionnement réel, tester les limites et garder uniquement ce que je peux vérifier. Le code finit sur GitHub, les recherches et write-ups ici.",
     ],
     projectsCta: "Voir les projets",
     blogCta: "Lire le blog",
@@ -477,7 +477,7 @@ export const copyFr: SiteCopy = {
     focusItems: [
       {
         title: "Rust / CLI",
-        text: "Développement d'outils en ligne de commande : typage strict, gestion d'erreurs robuste et performance.",
+        text: "Outils en ligne de commande : typage strict, gestion propre des erreurs et binaires autonomes.",
       },
       {
         title: "OSINT / Privacy",
@@ -492,31 +492,27 @@ export const copyFr: SiteCopy = {
         text: "Outils autonomes s'exécutant en local, sans dépendance continue à des services cloud tiers.",
       },
     ],
-    stackTitle: "Stack & Environnement",
+    stackTitle: "Ce que j'utilise",
     stackItems: [
       {
         title: "Rust",
-        detail: "Langage principal pour les CLI et l'outillage système",
+        detail:
+          "Premier langage que j'ai choisi d'apprendre sérieusement. Je l'utilise surtout pour les CLI, le tooling système et les backends où je veux du contrôle, du typage et un binaire autonome.",
       },
       {
         title: "Linux",
-        detail: "Environnement de dev, scripts shell et conteneurs",
+        detail:
+          "Mon environnement quotidien pour développer, tester, automatiser et comprendre ce qui se passe réellement sur la machine.",
       },
       {
         title: "Python",
-        detail: "Scripts d'analyse, parsing de données et MkDocs",
+        detail:
+          "Le choix rapide pour les scripts, le parsing, l'analyse de données et les petits outils où sortir un résultat compte plus que produire un binaire.",
       },
       {
-        title: "TypeScript & Next.js",
-        detail: "Interfaces web légères et statiques",
-      },
-      {
-        title: "SQLite",
-        detail: "Stockage local structuré et cache hors-ligne",
-      },
-      {
-        title: "Git & GitHub",
-        detail: "Versioning public, CI GitHub Actions et releases",
+        title: "TypeScript / Next.js",
+        detail:
+          "Pour les interfaces et applications web : front-end, intégration des données et tout ce qui doit finir proprement dans un navigateur.",
       },
     ],
     currentWorkTitle: "Projets en cours",
@@ -563,7 +559,7 @@ export const copyFr: SiteCopy = {
   blog: {
     title: "Blog",
     description:
-      "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et l'outillage.",
+      "Notes techniques, write-ups et retours d'expérience sur les systèmes, la sécurité et les outils.",
     searchPlaceholder: "Rechercher un article...",
     allFilter: "Tous",
     emptyHeading: "Aucun article publié",
@@ -751,10 +747,11 @@ export const copyEn: SiteCopy = {
     githubOverview: {
       title: "GitHub Activity",
       profileCta: "GitHub Profile",
-      subtitle: "Public metadata fetched directly from the GitHub API.",
-      activityTitle: "Public GitHub Activity",
-      activitySubtitle: "Aggregated public data across curated repositories.",
-      reposTitle: "Public Repositories",
+      subtitle: "Profile statistics and curated public projects.",
+      activityTitle: "GitHub Profile Statistics",
+      activitySubtitle:
+        "Public metadata from profile and all public repositories.",
+      reposTitle: "Featured Projects",
       reposSubtitle: "Curated open source projects and research repositories.",
       followers: "Followers",
       following: "Following",
@@ -816,32 +813,32 @@ export const copyEn: SiteCopy = {
     },
     terminal: {
       title: "Spoor Demo",
-      cardTitle: "Real Spoor Execution",
-      p1: "Spoor inspects public metadata from a GitHub account or repository (commits, keys, signatures).",
-      p2: "The terminal below replays a real deterministic capture of `spoor repo Voldigoade/spoor` executed with the Rust binary.",
-      p3: "No fabricated output or fake commands: data matches real commit identities and the public scan.",
+      cardTitle: "Real Spoor Capture",
+      p1: "Spoor inspects public GitHub metadata for an account or repository: commits, SSH keys, repos, and signatures.",
+      p2: "The terminal below is a static replay of a real run of `spoor torvalds` captured with the Rust binary (commit 7d49428, Oct 19, 2026). It does not execute live on each page visit.",
+      p3: "No fabricated data: metadata, languages, and volume match the public scan output directly.",
       docLink: "Spoor documentation on GitHub",
       resultsTitle: "Understanding Results",
       cards: [
         {
           title: "Observed Data",
-          text: "Raw facts extracted from public commits (commit identities, noreply emails, verified signatures).",
+          text: "Metadata extracted from public endpoints: profile info, public repos, SSH keys, and sampled recent commits.",
         },
         {
           title: "Derived Values",
-          text: "Aggregated metrics (commit count, detected languages, volume) calculated directly from the scanned sample.",
+          text: "Aggregated metrics (stars, forks, language breakdown) computed across the discovered public repositories.",
         },
         {
           title: "Limits & Quotas",
-          text: "Results depend on GitHub API rate limits and the configured scan depth.",
+          text: "In fast mode, Spoor adheres to unauthenticated GitHub API rate limits and bounds commit depth per repository.",
         },
       ],
       meta: {
         tool: "Spoor CLI",
-        command: "spoor repo Voldigoade/spoor",
-        target: "Voldigoade/spoor",
+        command: "spoor torvalds",
+        target: "torvalds",
         sha: "7d49428a88b86204b23ae509b0be954d9c41110b",
-        date: "2026-10-18 23:38:13 UTC",
+        date: "2026-10-19 10:57:48 UTC",
       },
     },
     faq: {
@@ -891,7 +888,7 @@ export const copyEn: SiteCopy = {
   about: {
     title: "About",
     intro: [
-      "I mostly work on CLI tools around Rust, OSINT, privacy and systems. I like understanding how tools behave in practice, where their limits are, and what can actually be verified. Code is on GitHub; write-ups live here.",
+      "I mostly build tools that give me a good excuse to understand what actually happens under the hood: Rust CLIs, OSINT, firmware, privacy, and systems. I like starting from a concrete behavior, tracing it back to how it really works, testing edge cases, and keeping only what can be verified. The code ends up on GitHub, the research and write-ups live here.",
     ],
     projectsCta: "View projects",
     blogCta: "Read blog",
@@ -899,7 +896,7 @@ export const copyEn: SiteCopy = {
     focusItems: [
       {
         title: "Rust / CLI",
-        text: "Command-line tools: strict typing, robust error handling, and performance.",
+        text: "Command-line tools: strict typing, clean error handling, and standalone binaries.",
       },
       {
         title: "OSINT / Privacy",
@@ -914,25 +911,27 @@ export const copyEn: SiteCopy = {
         text: "Standalone tools running locally without constant dependencies on external cloud services.",
       },
     ],
-    stackTitle: "Stack & Environment",
+    stackTitle: "What I Use",
     stackItems: [
       {
         title: "Rust",
-        detail: "Primary language for CLI tools and systems development",
+        detail:
+          "The first language I chose to learn seriously. I use it mostly for CLI tools, systems utilities, and backends where I want control, strict typing, and a standalone binary.",
       },
       {
         title: "Linux",
-        detail: "Primary development environment, shell scripting, containers",
-      },
-      { title: "Python", detail: "Analysis scripts, data parsing, and MkDocs" },
-      { title: "TypeScript & Next.js", detail: "Fast, static web interfaces" },
-      {
-        title: "SQLite",
-        detail: "Structured local storage and offline caching",
+        detail:
+          "My daily environment to develop, test, automate, and understand what is actually happening on the machine.",
       },
       {
-        title: "Git & GitHub",
-        detail: "Public versioning, GitHub Actions CI, and releases",
+        title: "Python",
+        detail:
+          "The go-to choice for quick scripts, parsing, data analysis, and small tools where getting a fast result matters more than building a binary.",
+      },
+      {
+        title: "TypeScript / Next.js",
+        detail:
+          "For web apps and interfaces: front-end, data integration, and anything that needs to run cleanly in a browser.",
       },
     ],
     currentWorkTitle: "Current Work",

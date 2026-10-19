@@ -166,7 +166,7 @@ export function AboutPageClient({
         <h2 className="font-display text-3xl uppercase sm:text-4xl">
           {copy.stackTitle}
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {copy.stackItems.map((item) => (
             <Card
               key={item.title}

@@ -16,37 +16,57 @@ import { getCopy, type Locale } from "@/lib/site-copy";
 const spoorLines = [
   {
     kind: "type",
-    text: "$ spoor repo Voldigoade/spoor",
+    text: "$ spoor torvalds",
     className: "text-[#ff8d3b]",
   },
   {
     kind: "line",
-    text: "[init] Voldigoade/spoor in fast",
+    text: "[init] torvalds in fast mode",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "[resolve] target type: repository",
+    text: "[resolve] target type: user",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "[query] GitHub REST: Fetching repository 'Voldigoade/spoor'",
+    text: "[query] GitHub REST: Fetching user profile",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "[ok] GitHub REST: Repository metadata retrieved for 'Voldigoade/spoor'",
+    text: "[ok] Profile resolved for 'torvalds' (Linus Torvalds)",
     className: "text-[#64cbff]",
   },
   {
     kind: "line",
-    text: "[scan] [1/1] Inspecting recent commits in Voldigoade/spoor",
+    text: "[query] GitHub REST: Fetching public repositories",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "[done] completed in 1.05s",
+    text: "[ok] Retrieved 12 repositories (★ 265,996 · ⑂ 69,583)",
+    className: "text-[#64cbff]",
+  },
+  {
+    kind: "line",
+    text: "[query] GitHub Commit Search: Searching global commits",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "[scan] Inspecting repositories (torvalds/linux, subsurface...)",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "[query] GitHub Keys: Fetching public GPG and SSH keys",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "[done] completed in 13.11s",
     className: "text-[#84ff6f]",
   },
   {
@@ -56,37 +76,32 @@ const spoorLines = [
   },
   {
     kind: "line",
-    text: "Target: Voldigoade/spoor (Rust CLI / inspection)",
+    text: "TARGET: torvalds (Linus Torvalds)",
     className: "text-[#ffc96b]",
   },
   {
     kind: "line",
-    text: "Visibility: public | Default branch: main",
+    text: "Repositories: 12 · Stars: 265,996 · Forks: 69,583",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "Commit signers observed:",
+    text: "Top Languages: C (10), C++ (1), OpenSCAD (1)",
+    className: "text-[#84ff6f]",
+  },
+  {
+    kind: "line",
+    text: "Public Keys: 1 SSH key · 0 GPG keys",
     className: "text-[#64cbff]",
   },
   {
     kind: "line",
-    text: "  - 245930475+Voldigoade@users.noreply.github.com",
+    text: "Coverage: 412 commits analyzed across 8 repositories",
     className: "text-[#84ff6f]",
   },
   {
     kind: "line",
-    text: "  - noreply@github.com (GitHub Web Flow)",
-    className: "text-[#84ff6f]",
-  },
-  {
-    kind: "line",
-    text: "  - dependabot[bot]@users.noreply.github.com",
-    className: "text-[#84ff6f]",
-  },
-  {
-    kind: "line",
-    text: "Status: clean | Cache: SQLite local | 0 leaks detected",
+    text: "Status: clean | Mode: fast | 0 leaks detected",
     className: "text-[#64cbff]",
   },
 ];

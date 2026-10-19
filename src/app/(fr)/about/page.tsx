@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "à propos de voldigoade",
     "rust",
     "linux",
-    "outillage cli",
+    "outils cli",
     "osint",
     "sécurité",
     "projets open source",

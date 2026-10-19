@@ -367,7 +367,10 @@ export function HomePageClient({
         <p className="font-bold uppercase text-muted-foreground">
           {homeCopy.githubOverview.subtitle}
         </p>
-        <GithubOverviewBento stats={githubOverview ?? null} />
+        <GithubOverviewBento
+          stats={githubOverview ?? null}
+          locale={currentLocale}
+        />
       </section>
 
       <section className="space-y-4" data-home-reveal>

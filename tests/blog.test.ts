@@ -7,6 +7,7 @@ import {
   calculateReadingMinutes,
   calculateReadingTime,
   calculateReadingTimeText,
+  formatArticleDate,
   getAllArticles,
   getArticleBySlug,
   getBlogPostsForListing,
@@ -333,6 +334,31 @@ Content EN`,
         );
       },
     );
+  });
+
+  it("formats dates in a clean locale-aware style and avoids timezone shifts", () => {
+    // Exact format required: "12 déc. 2025" for FR and "Dec 12, 2025" for EN
+    expect(formatArticleDate("2025-12-12", "fr")).toBe("12 déc. 2025");
+    expect(formatArticleDate("2025-12-12", "en")).toBe("Dec 12, 2025");
+
+    // Must handle full ISO strings with T00:00:00.000Z identically without date shifts
+    expect(formatArticleDate("2025-12-12T00:00:00.000Z", "fr")).toBe(
+      "12 déc. 2025",
+    );
+    expect(formatArticleDate("2025-12-12T00:00:00.000Z", "en")).toBe(
+      "Dec 12, 2025",
+    );
+
+    // Human-visible output never contains raw ISO strings or timestamps
+    const formattedFr = formatArticleDate("2025-12-12T00:00:00.000Z", "fr");
+    const formattedEn = formatArticleDate("2025-12-12T00:00:00.000Z", "en");
+    expect(formattedFr).not.toContain("T00:00:00");
+    expect(formattedFr).not.toContain(".000Z");
+    expect(formattedEn).not.toContain("T00:00:00");
+    expect(formattedEn).not.toContain(".000Z");
+
+    // Gracefully returns original value if unparseable
+    expect(formatArticleDate("not-a-date", "fr")).toBe("not-a-date");
   });
 });
 
