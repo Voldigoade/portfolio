@@ -1,0 +1,141 @@
+media:
+  input: public/images/writing
+  output: /images/writing
+  rename: safe
+  categories:
+    - image
+  extensions:
+    - png
+    - jpg
+    - jpeg
+    - webp
+    - avif
+
+content:
+  - name: writing_fr
+    label: "ARTICLES FRANCAIS"
+    type: collection
+    path: content/writing/fr
+    format: yaml-frontmatter
+    subfolders: false
+    filename: "{primary}.md"
+    fields:
+      - name: title
+        label: Titre
+        type: string
+        required: true
+      - name: summary
+        label: Résumé
+        type: text
+        required: true
+      - name: category
+        label: Catégorie
+        type: string
+        default: "Systèmes"
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+      - name: series
+        label: Série
+        type: string
+      - name: publishedAt
+        label: Date de publication
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: updatedAt
+        label: Date de mise à jour
+        type: date
+        options:
+          format: yyyy-MM-dd
+      - name: eventDate
+        label: Date d'événement
+        type: date
+        options:
+          format: yyyy-MM-dd
+      - name: draft
+        label: Brouillon (Draft)
+        type: boolean
+        required: true
+        default: true
+      - name: cover
+        label: Image de couverture
+        type: image
+      - name: canonical
+        label: URL canonique
+        type: string
+      - name: body
+        label: Corps de l'article
+        type: rich-text
+        options:
+          format: markdown
+          rename: safe
+          extensions: [png, jpg, jpeg, webp, avif]
+
+  - name: writing_en
+    label: "ARTICLES ENGLISH"
+    type: collection
+    path: content/writing/en
+    format: yaml-frontmatter
+    subfolders: false
+    filename: "{primary}.md"
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: frenchVersion
+        label: Source French Article
+        type: reference
+        collection: writing_fr
+      - name: summary
+        label: Summary
+        type: text
+        required: true
+      - name: category
+        label: Category
+        type: string
+        default: "Systems"
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+      - name: series
+        label: Series
+        type: string
+      - name: publishedAt
+        label: Published Date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: updatedAt
+        label: Updated Date
+        type: date
+        options:
+          format: yyyy-MM-dd
+      - name: eventDate
+        label: Event Date
+        type: date
+        options:
+          format: yyyy-MM-dd
+      - name: draft
+        label: Draft
+        type: boolean
+        required: true
+        default: true
+      - name: cover
+        label: Cover Image
+        type: image
+      - name: canonical
+        label: Canonical URL
+        type: string
+      - name: body
+        label: Body
+        type: rich-text
+        options:
+          format: markdown
+          rename: safe
+          extensions: [png, jpg, jpeg, webp, avif]
