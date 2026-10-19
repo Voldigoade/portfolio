@@ -24,12 +24,10 @@ export const siteName = "Voldigoade";
 export const githubUser = "Voldigoade";
 export const githubUrl = "https://github.com/Voldigoade";
 
-// Technical project references
 export const spoorUrl = "https://github.com/Voldigoade/spoor";
 export const rechercheMessageriesUrl =
   "https://github.com/Voldigoade/recherche-messageries";
 export const cruckswareUrl = "https://github.com/Voldigoade/crucksware";
 
-// Public profile destination for the link hub
 export const linkHubUrl = githubUrl;
 export const ogImageUrl = `${siteUrl}/opengraph-image`;

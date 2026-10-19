@@ -20,7 +20,6 @@ function getAlternateUrl(currentPath: string, targetLocale: Locale): string {
     return `/en${currentPath}`;
   }
 
-  // target is French
   if (!isEn) return currentPath;
   if (currentPath === "/en") return "/";
   return currentPath.replace(/^\/en/, "") || "/";
@@ -31,7 +30,6 @@ export function Navbar({ locale }: { locale?: Locale }) {
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Determine current active locale from pathname or prop
   const currentLocale: Locale =
     pathname === "/en" || pathname.startsWith("/en/") ? "en" : locale || "fr";
 
@@ -39,7 +37,6 @@ export function Navbar({ locale }: { locale?: Locale }) {
   const [frHref, setFrHref] = useState(() => getAlternateUrl(pathname, "fr"));
   const [enHref, setEnHref] = useState(() => getAlternateUrl(pathname, "en"));
 
-  // Check if page specifies custom alternate link (e.g. translated blog article)
   useEffect(() => {
     const frAlternate = document
       .querySelector('link[rel="alternate"][hreflang="fr"]')

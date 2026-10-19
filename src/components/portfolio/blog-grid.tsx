@@ -89,7 +89,6 @@ export function BlogGrid({
     setSelectedTag("All");
   }, [compact, setSelectedCategory, setSelectedTag]);
 
-  // Dynamic category extraction
   const categories = useMemo(() => {
     const set = new Set<string>();
     for (const p of posts) {
@@ -98,7 +97,6 @@ export function BlogGrid({
     return ["All", ...Array.from(set)];
   }, [posts]);
 
-  // Distinct tags
   const distinctTags = useMemo(() => {
     const counts = new Map<string, number>();
 
