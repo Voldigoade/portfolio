@@ -18,6 +18,8 @@ content:
     path: content/writing/fr
     format: yaml-frontmatter
     subfolders: false
+    view:
+      primary: title
     filename: "{primary}.md"
     fields:
       - name: title
@@ -31,7 +33,7 @@ content:
       - name: category
         label: Catégorie
         type: string
-        default: "Systèmes"
+        required: true
       - name: tags
         label: Tags
         type: string
@@ -48,11 +50,13 @@ content:
       - name: updatedAt
         label: Date de mise à jour
         type: date
+        default: ""
         options:
           format: yyyy-MM-dd
       - name: eventDate
         label: Date d'événement
         type: date
+        default: ""
         options:
           format: yyyy-MM-dd
       - name: draft
@@ -80,6 +84,8 @@ content:
     path: content/writing/en
     format: yaml-frontmatter
     subfolders: false
+    view:
+      primary: title
     filename: "{primary}.md"
     fields:
       - name: title
@@ -89,7 +95,12 @@ content:
       - name: frenchVersion
         label: Source French Article
         type: reference
-        collection: writing_fr
+        required: true
+        options:
+          collection: writing_fr
+          search: "title"
+          value: "{path}"
+          label: "{primary}"
       - name: summary
         label: Summary
         type: text
@@ -97,7 +108,7 @@ content:
       - name: category
         label: Category
         type: string
-        default: "Systems"
+        required: true
       - name: tags
         label: Tags
         type: string
@@ -114,11 +125,13 @@ content:
       - name: updatedAt
         label: Updated Date
         type: date
+        default: ""
         options:
           format: yyyy-MM-dd
       - name: eventDate
         label: Event Date
         type: date
+        default: ""
         options:
           format: yyyy-MM-dd
       - name: draft

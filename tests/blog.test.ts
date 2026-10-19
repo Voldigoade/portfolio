@@ -11,9 +11,11 @@ import {
   getArticleBySlug,
   getBlogPostsForListing,
   getPublishedArticles,
+  normalizeTranslationRef,
   renderMarkdownToHtml,
   validateFrontmatter,
 } from "../src/lib/blog";
+import { withWritingFiles } from "./helpers/writing";
 
 const valid = {
   title: "Parser fixture",
@@ -239,6 +241,97 @@ describe("article parsing and publication boundary", () => {
     );
     expect(calculateReadingTimeText("Word ".repeat(50), "en")).toBe(
       "1 min read",
+    );
+  });
+
+  it("normalizes Pages CMS reference values to clean slugs", () => {
+    expect(
+      normalizeTranslationRef(
+        "content/writing/fr/root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal.md",
+      ),
+    ).toBe("root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal");
+    expect(
+      normalizeTranslationRef(
+        "content\\writing\\fr\\root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal.md",
+      ),
+    ).toBe("root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal");
+    expect(
+      normalizeTranslationRef(
+        "root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal.md",
+      ),
+    ).toBe("root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal");
+    expect(
+      normalizeTranslationRef(
+        "root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal",
+      ),
+    ).toBe("root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal");
+    expect(normalizeTranslationRef("")).toBeUndefined();
+    expect(normalizeTranslationRef(undefined)).toBeUndefined();
+    expect(normalizeTranslationRef("   ")).toBeUndefined();
+    expect(
+      normalizeTranslationRef("invalid/slug with spaces.md"),
+    ).toBeUndefined();
+  });
+
+  it("resolves bidirectional translations using Pages CMS reference path values and distinct slugs", async () => {
+    await withWritingFiles(
+      {
+        "fr/root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal.md": `---
+title: "Root-Me : exploiter une wildcard sudoers avec un path traversal"
+summary: "Write-up du challenge"
+category: "CTF"
+tags: ["root-me"]
+publishedAt: "2025-12-22"
+draft: false
+---
+Contenu FR`,
+        "en/root-me-exploiting-a-sudoers-wildcard-with-path-traversal.md": `---
+title: "Root-Me: Exploiting a sudoers wildcard with path traversal"
+summary: "Challenge write-up"
+category: "CTF"
+tags: ["root-me"]
+publishedAt: "2025-12-22"
+draft: false
+frenchVersion: "content/writing/fr/root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal.md"
+---
+Content EN`,
+      },
+      async () => {
+        const frArticles = await getAllArticles({ locale: "fr" });
+        const enArticles = await getAllArticles({ locale: "en" });
+
+        expect(frArticles).toHaveLength(1);
+        expect(enArticles).toHaveLength(1);
+
+        const fr = frArticles[0];
+        const en = enArticles[0];
+
+        expect(en?.frenchVersion).toBe(
+          "root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal",
+        );
+        expect(en?.translationSlug).toBe(
+          "root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal",
+        );
+        expect(fr?.translationSlug).toBe(
+          "root-me-exploiting-a-sudoers-wildcard-with-path-traversal",
+        );
+
+        const fetchedFr = await getArticleBySlug(
+          "root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal",
+          "fr",
+        );
+        expect(fetchedFr?.translationSlug).toBe(
+          "root-me-exploiting-a-sudoers-wildcard-with-path-traversal",
+        );
+
+        const fetchedEn = await getArticleBySlug(
+          "root-me-exploiting-a-sudoers-wildcard-with-path-traversal",
+          "en",
+        );
+        expect(fetchedEn?.translationSlug).toBe(
+          "root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal",
+        );
+      },
     );
   });
 });
