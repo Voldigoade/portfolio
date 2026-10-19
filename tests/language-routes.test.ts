@@ -1,16 +1,31 @@
-import { describe, expect, it } from "bun:test";
-import { metadata as frAboutMetadata } from "../src/app/(fr)/about/page";
-import { metadata as frBlogMetadata } from "../src/app/(fr)/blog/page";
-import { metadata as frHomeMetadata } from "../src/app/(fr)/page";
-import { metadata as frPrivacyMetadata } from "../src/app/(fr)/privacy-policy/page";
-import { metadata as frProjectMetadata } from "../src/app/(fr)/project/page";
-import { metadata as enAboutMetadata } from "../src/app/en/about/page";
-import { metadata as enBlogMetadata } from "../src/app/en/blog/page";
-import { metadata as enHomeMetadata } from "../src/app/en/page";
-import { metadata as enPrivacyMetadata } from "../src/app/en/privacy-policy/page";
-import { metadata as enProjectMetadata } from "../src/app/en/project/page";
-import sitemap from "../src/app/sitemap";
-import { getCopy } from "../src/lib/site-copy";
+import { describe, expect, it, mock } from "bun:test";
+
+mock.module("server-only", () => ({}));
+
+const { metadata: frHomeMetadata } = await import("../src/app/(fr)/page");
+const { metadata: frAboutMetadata } = await import(
+  "../src/app/(fr)/about/page"
+);
+const { metadata: frProjectMetadata } = await import(
+  "../src/app/(fr)/project/page"
+);
+const { metadata: frBlogMetadata } = await import("../src/app/(fr)/blog/page");
+const { metadata: frPrivacyMetadata } = await import(
+  "../src/app/(fr)/privacy-policy/page"
+);
+
+const { metadata: enHomeMetadata } = await import("../src/app/en/page");
+const { metadata: enAboutMetadata } = await import("../src/app/en/about/page");
+const { metadata: enProjectMetadata } = await import(
+  "../src/app/en/project/page"
+);
+const { metadata: enBlogMetadata } = await import("../src/app/en/blog/page");
+const { metadata: enPrivacyMetadata } = await import(
+  "../src/app/en/privacy-policy/page"
+);
+
+const { default: sitemap } = await import("../src/app/sitemap");
+const { getCopy } = await import("../src/lib/site-copy");
 
 describe("bilingual site structure & metadata", () => {
   it("provides valid canonical and hreflang alternates for French routes", () => {
@@ -25,8 +40,9 @@ describe("bilingual site structure & metadata", () => {
     for (const { meta, path } of frRoutes) {
       expect(meta.alternates?.canonical).toBe(path);
       const langs = meta.alternates?.languages as Record<string, string>;
-      expect(langs?.fr).toBeDefined();
+      expect(langs?.fr).toBe(path);
       expect(langs?.en).toBeDefined();
+      expect(langs?.["x-default"]).toBe(path);
     }
   });
 
@@ -43,7 +59,8 @@ describe("bilingual site structure & metadata", () => {
       expect(meta.alternates?.canonical).toBe(path);
       const langs = meta.alternates?.languages as Record<string, string>;
       expect(langs?.fr).toBeDefined();
-      expect(langs?.en).toBeDefined();
+      expect(langs?.en).toBe(path);
+      expect(langs?.["x-default"]).toBeDefined();
     }
   });
 
