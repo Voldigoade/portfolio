@@ -224,4 +224,7 @@ I do not know yet whether that is a normal phase of learning, a sensible way to 
 
 Anyway.
 
-`cargo run`.
+```
+cargo run
+```
+
