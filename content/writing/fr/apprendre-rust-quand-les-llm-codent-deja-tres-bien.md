@@ -226,5 +226,7 @@ Je ne sais pas encore si c’est une phase normale quand on apprend, une façon 
 
 Anyway.
 
-`cargo run`.
+```
+cargo run
+```
 
