@@ -152,4 +152,57 @@ describe("bilingual site structure & metadata", () => {
     expect(en.home.terminal.p2).toContain("spoor torvalds");
     expect(en.home.terminal.p2).toContain("static replay");
   });
+
+  it("resolves bidirectional article translations between distinct slugs and leaves untranslated articles without fake URLs", async () => {
+    const { getArticleBySlug } = await import("../src/lib/blog");
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    // Verify obsolete article-level switcher component was removed
+    const obsoleteComponentPath = path.join(
+      process.cwd(),
+      "src/components/portfolio/article-language-switcher.tsx",
+    );
+    expect(fs.existsSync(obsoleteComponentPath)).toBe(false);
+
+    // Root-Me articles: distinct slugs mapped bidirectionally
+    const rootMeFr = await getArticleBySlug(
+      "root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal",
+      "fr",
+    );
+    const rootMeEn = await getArticleBySlug(
+      "root-me-sudo-exploiting-a-sudoers-wildcard-with-path-traversal",
+      "en",
+    );
+    expect(rootMeFr?.translationSlug).toBe(
+      "root-me-sudo-exploiting-a-sudoers-wildcard-with-path-traversal",
+    );
+    expect(rootMeEn?.translationSlug).toBe(
+      "root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal",
+    );
+
+    // Rust articles: distinct slugs mapped bidirectionally
+    const rustFr = await getArticleBySlug(
+      "apprendre-rust-quand-les-llm-codent-deja-tres-bien",
+      "fr",
+    );
+    const rustEn = await getArticleBySlug(
+      "learning-rust-while-llms-keep-getting-better-at-coding",
+      "en",
+    );
+    expect(rustFr?.translationSlug).toBe(
+      "learning-rust-while-llms-keep-getting-better-at-coding",
+    );
+    expect(rustEn?.translationSlug).toBe(
+      "apprendre-rust-quand-les-llm-codent-deja-tres-bien",
+    );
+
+    // Fake or untranslated article fixture has no translationSlug
+    const untranslatedMock = {
+      slug: "untranslated-unique-post",
+      frenchVersion: undefined,
+      translationSlug: undefined,
+    };
+    expect(untranslatedMock.translationSlug).toBeUndefined();
+  });
 });

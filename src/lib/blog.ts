@@ -28,11 +28,25 @@ export interface ArticleFrontmatter {
   translationSlug?: string;
 }
 
+export interface TableOfContentsItem {
+  id: string;
+  text: string;
+  depth: number;
+}
+
+export interface SeriesNavigation {
+  seriesName: string;
+  previousArticle?: { title: string; slug: string; url: string };
+  nextArticle?: { title: string; slug: string; url: string };
+}
+
 export interface Article extends ArticleFrontmatter {
   id: string;
   locale: WritingLocale;
   body: string;
   html?: string;
+  toc?: TableOfContentsItem[];
+  seriesNav?: SeriesNavigation | null;
   readingMinutes: number;
   readingTimeText: string;
   url: string;
@@ -285,27 +299,143 @@ function isSafeLink(value: string): boolean {
   );
 }
 
-export async function renderMarkdownToHtml(markdown: string): Promise<string> {
+const LANGUAGE_ALIASES: Record<string, string> = {
+  rs: "rust",
+  py: "python",
+  ts: "typescript",
+  js: "javascript",
+  sh: "bash",
+  shell: "bash",
+  zsh: "bash",
+  yml: "yaml",
+  txt: "text",
+};
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  rust: "Rust",
+  rs: "Rust",
+  python: "Python",
+  py: "Python",
+  typescript: "TypeScript",
+  ts: "TypeScript",
+  javascript: "JavaScript",
+  js: "JavaScript",
+  bash: "Bash",
+  sh: "Shell",
+  shell: "Shell",
+  zsh: "Zsh",
+  json: "JSON",
+  yaml: "YAML",
+  yml: "YAML",
+  toml: "TOML",
+  html: "HTML",
+  css: "CSS",
+  sql: "SQL",
+  markdown: "Markdown",
+  md: "Markdown",
+  diff: "Diff",
+  c: "C",
+  cpp: "C++",
+  go: "Go",
+  text: "Text",
+  txt: "Text",
+};
+
+export function parseCodeFence(langString?: string): {
+  lang: string;
+  normalizedLang: string;
+  label: string;
+  title?: string;
+} {
+  if (!langString?.trim()) {
+    return {
+      lang: "text",
+      normalizedLang: "text",
+      label: "Text",
+      title: undefined,
+    };
+  }
+  const trimmed = langString.trim();
+  const titleMatch = trimmed.match(
+    /(?:^|\s+)title=(?:"([^"]*)"|'([^']*)'|(\S+))/i,
+  );
+  const title = titleMatch
+    ? (titleMatch[1] ?? titleMatch[2] ?? titleMatch[3])
+    : undefined;
+  const rawLang = (trimmed.split(/\s+/)[0] || "").toLowerCase();
+  const langKey = rawLang.startsWith("title=") ? "" : rawLang;
+
+  const normalizedLang = LANGUAGE_ALIASES[langKey] || langKey || "text";
+  const label =
+    LANGUAGE_LABELS[langKey] ||
+    (langKey ? langKey.charAt(0).toUpperCase() + langKey.slice(1) : "Text");
+
+  return {
+    lang: langKey || "text",
+    normalizedLang,
+    label,
+    title,
+  };
+}
+
+export function slugifyHeading(text: string): string {
+  const normalized = text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return normalized || "section";
+}
+
+export async function renderMarkdown(
+  markdown: string,
+  locale: WritingLocale = "fr",
+): Promise<{ html: string; toc: TableOfContentsItem[] }> {
   const highlighted = new Map<Tokens.Code, string>();
+  const toc: TableOfContentsItem[] = [];
+  const seenHeadings = new Map<string, number>();
+
   const marked = new Marked({
     async: true,
     async walkTokens(token) {
       if (token.type !== "code") return;
       const code = token as Tokens.Code;
+      const { normalizedLang, label, title } = parseCodeFence(code.lang);
+      const lineCount = code.text.trim().split("\n").length;
+      const isShellOrText = [
+        "bash",
+        "sh",
+        "shell",
+        "zsh",
+        "text",
+        "txt",
+        "console",
+      ].includes(normalizedLang.toLowerCase());
+      const showLineNumbers = lineCount > 2 && !isShellOrText;
+
+      let shikiHtml = "";
       try {
-        highlighted.set(
-          code,
-          await codeToHtml(code.text, {
-            lang: code.lang?.split(/\s+/)[0] || "text",
-            theme: "nord",
-          }),
-        );
+        shikiHtml = await codeToHtml(code.text, {
+          lang: normalizedLang,
+          themes: {
+            light: "github-light",
+            dark: "github-dark",
+          },
+        });
       } catch {
-        highlighted.set(
-          code,
-          `<pre class="border-2 border-black bg-muted p-4 overflow-x-auto"><code>${escapeHtml(code.text)}</code></pre>`,
-        );
+        shikiHtml = `<pre class="shiki border-0 bg-transparent p-4 overflow-x-auto m-0"><code>${escapeHtml(code.text)}</code></pre>`;
       }
+
+      const copyBtnText = locale === "en" ? "Copy" : "Copier";
+      const copyAria = locale === "en" ? "Copy code snippet" : "Copier le code";
+      const headerTitleHtml = title
+        ? `<span class="flex items-center gap-2 font-mono text-xs font-bold text-foreground overflow-hidden text-ellipsis whitespace-nowrap min-w-0"><span class="border-2 border-black bg-card px-1.5 py-0.5 text-[10px] font-black uppercase shadow-retro-2xs shrink-0">${escapeHtml(label)}</span><span class="truncate font-semibold">${escapeHtml(title)}</span></span>`
+        : `<span class="border-2 border-black bg-card px-2 py-0.5 font-mono text-xs font-black uppercase shadow-retro-2xs">${escapeHtml(label)}</span>`;
+
+      const codePanelHtml = `<div class="not-prose code-panel my-6 border-4 border-black bg-card shadow-retro-sm overflow-hidden${showLineNumbers ? " code-with-lines" : ""}"><div class="flex items-center justify-between border-b-4 border-black bg-muted px-4 py-2 font-mono text-xs font-bold text-foreground gap-3">${headerTitleHtml}<button type="button" class="copy-code-button border-2 border-black bg-card px-2.5 py-1 font-mono text-xs font-black uppercase text-card-foreground shadow-retro-2xs transition hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 focus-visible:outline-2 focus-visible:outline-primary cursor-pointer select-none shrink-0" data-code="${encodeURIComponent(code.text)}" aria-label="${copyAria}"><span class="copy-label">${copyBtnText}</span></button></div>${shikiHtml}</div>`;
+
+      highlighted.set(code, codePanelHtml);
     },
     renderer: {
       code(token) {
@@ -313,6 +443,28 @@ export async function renderMarkdownToHtml(markdown: string): Promise<string> {
           highlighted.get(token) ||
           `<pre><code>${escapeHtml(token.text)}</code></pre>`
         );
+      },
+      heading({ tokens, depth, text }) {
+        const renderedText = this.parser.parseInline(tokens);
+        const plainText = text.replace(/<[^>]+>/g, "").trim();
+        const baseSlug = slugifyHeading(plainText);
+        const count = seenHeadings.get(baseSlug) || 0;
+        seenHeadings.set(baseSlug, count + 1);
+        const id = count === 0 ? baseSlug : `${baseSlug}-${count + 1}`;
+
+        if (depth === 2) {
+          toc.push({ id, text: plainText, depth: 2 });
+        } else if (depth === 3) {
+          toc.push({ id, text: plainText, depth: 3 });
+        }
+
+        const anchorLabel =
+          locale === "en" ? "Link to this section" : "Lien vers cette section";
+        const tag = `h${depth}`;
+        if (depth === 2 || depth === 3) {
+          return `<${tag} id="${id}" class="group scroll-mt-24 flex items-center justify-between gap-2"><span>${renderedText}</span><a href="#${id}" class="anchor-link opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 text-muted-foreground hover:text-primary transition font-mono text-sm select-none no-underline ml-2" aria-label="${anchorLabel}">#</a></${tag}>`;
+        }
+        return `<${tag}>${renderedText}</${tag}>`;
       },
       html({ text }) {
         return escapeHtml(text);
@@ -323,11 +475,33 @@ export async function renderMarkdownToHtml(markdown: string): Promise<string> {
           : this.parser.parseInline(token.tokens);
       },
       image(token) {
-        return isWritingImage(token.href) ? false : escapeHtml(token.text);
+        if (!isWritingImage(token.href)) {
+          return escapeHtml(token.text || "");
+        }
+        const safeSrc = escapeHtml(token.href);
+        const safeAlt = escapeHtml(token.text || "");
+        const titleAttr = token.title
+          ? ` title="${escapeHtml(token.title)}"`
+          : "";
+        const captionHtml = token.title
+          ? `<figcaption class="mt-2 text-center font-mono text-xs text-muted-foreground">${escapeHtml(token.title)}</figcaption>`
+          : "";
+
+        return `<figure class="my-6 max-w-full"><div class="overflow-hidden border-4 border-black bg-card shadow-retro-sm"><img src="${safeSrc}" alt="${safeAlt}"${titleAttr} class="h-auto max-w-full w-full object-contain mx-auto" loading="lazy" /></div>${captionHtml}</figure>`;
       },
     },
   });
-  return marked.parse(markdown, { async: true });
+
+  const html = await marked.parse(markdown, { async: true });
+  return { html, toc };
+}
+
+export async function renderMarkdownToHtml(
+  markdown: string,
+  locale: WritingLocale = "fr",
+): Promise<string> {
+  const result = await renderMarkdown(markdown, locale);
+  return result.html;
 }
 
 export function parseYamlFrontmatter(source: string) {
@@ -467,6 +641,39 @@ export async function getPublishedArticles(
   return getAllArticles({ locale, includeDrafts: false });
 }
 
+export async function getSeriesNavigation(
+  article: ArticleFrontmatter & { locale: WritingLocale; slug: string },
+): Promise<SeriesNavigation | null> {
+  if (!article.series) return null;
+  const articles = await getPublishedArticles(article.locale);
+  const seriesArticles = articles
+    .filter((a) => a.series === article.series)
+    .sort((a, b) => Date.parse(a.publishedAt) - Date.parse(b.publishedAt));
+
+  if (seriesArticles.length <= 1) {
+    return null;
+  }
+
+  const currentIndex = seriesArticles.findIndex((a) => a.slug === article.slug);
+  if (currentIndex === -1) return null;
+
+  const prev = currentIndex > 0 ? seriesArticles[currentIndex - 1] : undefined;
+  const next =
+    currentIndex < seriesArticles.length - 1
+      ? seriesArticles[currentIndex + 1]
+      : undefined;
+
+  return {
+    seriesName: article.series,
+    previousArticle: prev
+      ? { title: prev.title, slug: prev.slug, url: prev.url }
+      : undefined,
+    nextArticle: next
+      ? { title: next.title, slug: next.slug, url: next.url }
+      : undefined,
+  };
+}
+
 export async function getArticleBySlug(
   slug: string,
   locale: WritingLocale = "fr",
@@ -483,9 +690,14 @@ export async function getArticleBySlug(
   const article = articles.find((a) => a.slug === slug);
   if (!article) return null;
 
+  const { html, toc } = await renderMarkdown(article.body, locale);
+  const seriesNav = await getSeriesNavigation(article);
+
   return {
     ...article,
-    html: await renderMarkdownToHtml(article.body),
+    html,
+    toc,
+    seriesNav,
   };
 }
 

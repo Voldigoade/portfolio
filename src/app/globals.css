@@ -361,6 +361,49 @@
       content: "...";
     }
   }
+
+  /* Shiki syntax highlighting dual-theme & code panels */
+  .code-panel pre.shiki {
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 1rem !important;
+    overflow-x: auto !important;
+    font-family:
+      var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      monospace !important;
+    font-size: 0.875rem !important;
+    line-height: 1.6 !important;
+    background-color: var(--card) !important;
+  }
+
+  html.dark .shiki,
+  html.dark .shiki span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg, transparent) !important;
+  }
+
+  html.dark .code-panel pre.shiki {
+    background-color: #161b22 !important;
+  }
+
+  /* Code line numbers */
+  .code-with-lines code {
+    counter-reset: step;
+    counter-increment: step 0;
+  }
+  .code-with-lines .line::before {
+    content: counter(step);
+    counter-increment: step;
+    width: 1.75rem;
+    margin-right: 1.25rem;
+    display: inline-block;
+    text-align: right;
+    color: var(--muted-foreground);
+    opacity: 0.45;
+    user-select: none;
+    pointer-events: none;
+  }
 }
 
 ::view-transition-old(root),

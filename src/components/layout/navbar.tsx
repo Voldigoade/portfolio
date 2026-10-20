@@ -34,37 +34,96 @@ export function Navbar({ locale }: { locale?: Locale }) {
     pathname === "/en" || pathname.startsWith("/en/") ? "en" : locale || "fr";
 
   const copy = getCopy(currentLocale);
-  const [frHref, setFrHref] = useState(() => getAlternateUrl(pathname, "fr"));
-  const [enHref, setEnHref] = useState(() => getAlternateUrl(pathname, "en"));
+  const isArticlePage = /^\/(?:en\/)?blog\/[^/]+$/.test(pathname);
+  const [frHref, setFrHref] = useState(() =>
+    isArticlePage && currentLocale === "en"
+      ? ""
+      : getAlternateUrl(pathname, "fr"),
+  );
+  const [enHref, setEnHref] = useState(() =>
+    isArticlePage && currentLocale === "fr"
+      ? ""
+      : getAlternateUrl(pathname, "en"),
+  );
+  const [frDisabled, setFrDisabled] = useState(false);
+  const [enDisabled, setEnDisabled] = useState(false);
 
   useEffect(() => {
-    const frAlternate = document
-      .querySelector('link[rel="alternate"][hreflang="fr"]')
-      ?.getAttribute("href");
-    const enAlternate = document
-      .querySelector('link[rel="alternate"][hreflang="en"]')
-      ?.getAttribute("href");
-
-    if (frAlternate) {
-      try {
-        setFrHref(new URL(frAlternate).pathname);
-      } catch {
+    function updateAlternates(overrideSlug?: string | null) {
+      const isArticle = /^\/(?:en\/)?blog\/[^/]+$/.test(pathname);
+      if (!isArticle) {
         setFrHref(getAlternateUrl(pathname, "fr"));
+        setEnHref(getAlternateUrl(pathname, "en"));
+        setFrDisabled(false);
+        setEnDisabled(false);
+        return;
       }
-    } else {
-      setFrHref(getAlternateUrl(pathname, "fr"));
+
+      if (currentLocale === "fr") {
+        setFrHref(pathname);
+        setFrDisabled(false);
+
+        const enAlternate = document
+          .querySelector('link[rel="alternate"][hreflang="en"]')
+          ?.getAttribute("href");
+
+        let targetEn = overrideSlug !== undefined ? overrideSlug : null;
+        if (!targetEn && enAlternate) {
+          try {
+            targetEn = new URL(enAlternate).pathname;
+          } catch {
+            targetEn = null;
+          }
+        }
+
+        if (targetEn) {
+          setEnHref(
+            targetEn.startsWith("/") ? targetEn : `/en/blog/${targetEn}`,
+          );
+          setEnDisabled(false);
+        } else {
+          setEnHref("");
+          setEnDisabled(true);
+        }
+      } else {
+        setEnHref(pathname);
+        setEnDisabled(false);
+
+        const frAlternate = document
+          .querySelector('link[rel="alternate"][hreflang="fr"]')
+          ?.getAttribute("href");
+
+        let targetFr = overrideSlug !== undefined ? overrideSlug : null;
+        if (!targetFr && frAlternate) {
+          try {
+            targetFr = new URL(frAlternate).pathname;
+          } catch {
+            targetFr = null;
+          }
+        }
+
+        if (targetFr) {
+          setFrHref(targetFr.startsWith("/") ? targetFr : `/blog/${targetFr}`);
+          setFrDisabled(false);
+        } else {
+          setFrHref("");
+          setFrDisabled(true);
+        }
+      }
     }
 
-    if (enAlternate) {
-      try {
-        setEnHref(new URL(enAlternate).pathname);
-      } catch {
-        setEnHref(getAlternateUrl(pathname, "en"));
-      }
-    } else {
-      setEnHref(getAlternateUrl(pathname, "en"));
-    }
-  }, [pathname]);
+    updateAlternates();
+
+    const handleSync = (e: Event) => {
+      const customEvent = e as CustomEvent<{ translationSlug?: string }>;
+      updateAlternates(customEvent.detail?.translationSlug || null);
+    };
+
+    window.addEventListener("article-translation-sync", handleSync);
+    return () => {
+      window.removeEventListener("article-translation-sync", handleSync);
+    };
+  }, [pathname, currentLocale]);
 
   const homeHref = currentLocale === "en" ? "/en" : "/";
 
@@ -84,38 +143,66 @@ export function Navbar({ locale }: { locale?: Locale }) {
         currentLocale === "fr" ? "Sélecteur de langue" : "Language selector"
       }
     >
-      <Link
-        href={frHref}
-        className={cn(
-          "px-2 py-1 transition text-center",
-          currentLocale === "fr"
-            ? "border-2 border-black bg-primary text-primary-foreground font-black shadow-retro-xs"
-            : "text-muted-foreground hover:text-foreground",
-        )}
-        aria-current={currentLocale === "fr" ? "true" : undefined}
-        aria-label="Version française"
-      >
-        FR
-      </Link>
+      {frDisabled ? (
+        <span
+          className="px-2 py-1 text-center text-muted-foreground/40 cursor-not-allowed select-none border-2 border-transparent"
+          aria-disabled="true"
+          title={
+            currentLocale === "en"
+              ? "French translation unavailable"
+              : "Traduction française non disponible"
+          }
+        >
+          FR
+        </span>
+      ) : (
+        <Link
+          href={frHref}
+          className={cn(
+            "px-2 py-1 transition text-center",
+            currentLocale === "fr"
+              ? "border-2 border-black bg-primary text-primary-foreground font-black shadow-retro-xs"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+          aria-current={currentLocale === "fr" ? "true" : undefined}
+          aria-label="Version française"
+        >
+          FR
+        </Link>
+      )}
       <span
         className="px-1 text-black/40 dark:text-white/40 font-bold select-none"
         aria-hidden="true"
       >
         |
       </span>
-      <Link
-        href={enHref}
-        className={cn(
-          "px-2 py-1 transition text-center",
-          currentLocale === "en"
-            ? "border-2 border-black bg-primary text-primary-foreground font-black shadow-retro-xs"
-            : "text-muted-foreground hover:text-foreground",
-        )}
-        aria-current={currentLocale === "en" ? "true" : undefined}
-        aria-label="English version"
-      >
-        EN
-      </Link>
+      {enDisabled ? (
+        <span
+          className="px-2 py-1 text-center text-muted-foreground/40 cursor-not-allowed select-none border-2 border-transparent"
+          aria-disabled="true"
+          title={
+            currentLocale === "fr"
+              ? "Traduction anglaise non disponible"
+              : "English translation unavailable"
+          }
+        >
+          EN
+        </span>
+      ) : (
+        <Link
+          href={enHref}
+          className={cn(
+            "px-2 py-1 transition text-center",
+            currentLocale === "en"
+              ? "border-2 border-black bg-primary text-primary-foreground font-black shadow-retro-xs"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+          aria-current={currentLocale === "en" ? "true" : undefined}
+          aria-label="English version"
+        >
+          EN
+        </Link>
+      )}
     </div>
   );
 

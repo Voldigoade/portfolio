@@ -12,8 +12,12 @@ import {
   getArticleBySlug,
   getBlogPostsForListing,
   getPublishedArticles,
+  getSeriesNavigation,
   normalizeTranslationRef,
+  parseCodeFence,
+  renderMarkdown,
   renderMarkdownToHtml,
+  slugifyHeading,
   validateFrontmatter,
 } from "../src/lib/blog";
 import { withWritingFiles } from "./helpers/writing";
@@ -410,5 +414,219 @@ describe("safe Markdown rendering", () => {
     expect(html).toContain("SHIKI_CODE_BLOCK_0");
     expect(html.indexOf("first")).toBeLessThan(html.indexOf("second"));
     expect(html.indexOf("second")).toBeLessThan(html.indexOf("third"));
+  });
+});
+
+describe("advanced markdown code blocks and developer UX", () => {
+  it("normalizes common language aliases and parses optional titles", () => {
+    expect(parseCodeFence("rs")).toEqual({
+      lang: "rs",
+      normalizedLang: "rust",
+      label: "Rust",
+      title: undefined,
+    });
+    expect(parseCodeFence("py")).toEqual({
+      lang: "py",
+      normalizedLang: "python",
+      label: "Python",
+      title: undefined,
+    });
+    expect(parseCodeFence("ts")).toEqual({
+      lang: "ts",
+      normalizedLang: "typescript",
+      label: "TypeScript",
+      title: undefined,
+    });
+    expect(parseCodeFence("sh")).toEqual({
+      lang: "sh",
+      normalizedLang: "bash",
+      label: "Shell",
+      title: undefined,
+    });
+    expect(parseCodeFence("bash")).toEqual({
+      lang: "bash",
+      normalizedLang: "bash",
+      label: "Bash",
+      title: undefined,
+    });
+    expect(parseCodeFence('rust title="src/main.rs"')).toEqual({
+      lang: "rust",
+      normalizedLang: "rust",
+      label: "Rust",
+      title: "src/main.rs",
+    });
+    expect(parseCodeFence("python title='scripts/test.py'")).toEqual({
+      lang: "python",
+      normalizedLang: "python",
+      label: "Python",
+      title: "scripts/test.py",
+    });
+    expect(parseCodeFence("")).toEqual({
+      lang: "text",
+      normalizedLang: "text",
+      label: "Text",
+      title: undefined,
+    });
+  });
+
+  it("renders code panels with copy button, data-code, and safe title escaping", async () => {
+    const markdown =
+      '```rust title="<unsafe>.rs"\nfn main() {\n    let x = 42;\n    let y = 100;\n}\n```';
+    const html = await renderMarkdownToHtml(markdown, "fr");
+
+    expect(html).toContain('class="not-prose code-panel');
+    expect(html).toContain('class="copy-code-button');
+    expect(html).toContain("Copier");
+    expect(html).toContain("&lt;unsafe&gt;.rs");
+    expect(html).not.toContain("<unsafe>.rs");
+
+    // data-code must contain the exact raw code encoded
+    const encoded = encodeURIComponent(
+      "fn main() {\n    let x = 42;\n    let y = 100;\n}",
+    );
+    expect(html).toContain(`data-code="${encoded}"`);
+
+    // Multiline rust code gets line numbers
+    expect(html).toContain("code-with-lines");
+  });
+
+  it("omits line numbers for one-line commands and shell snippets", async () => {
+    const singleLine = "```bash\nsudo -l\n```";
+    const htmlSingle = await renderMarkdownToHtml(singleLine);
+    expect(htmlSingle).not.toContain("code-with-lines");
+
+    const multiLineBash = "```bash\ncd /tmp\nls -la\nwhoami\n```";
+    const htmlBash = await renderMarkdownToHtml(multiLineBash);
+    expect(htmlBash).not.toContain("code-with-lines");
+  });
+
+  it("preserves technical text verbatim without transforming into links or entities inside code", async () => {
+    const technicalSnippet =
+      "```text\nssh user@example.org\nreadme.md\nCargo.toml\nsrc/main.rs\n../\n*\n@\n~\n=\n```";
+    const html = await renderMarkdownToHtml(technicalSnippet);
+
+    expect(html).not.toContain("mailto:user@example.org");
+    expect(html).not.toContain('href="http://readme.md"');
+    expect(html).toContain("ssh user@example.org");
+    expect(html).toContain("Cargo.toml");
+    expect(html).toContain("../");
+  });
+});
+
+describe("heading anchors and table of contents", () => {
+  it("generates deterministic kebab-case heading IDs and handles accents and duplicates", () => {
+    expect(slugifyHeading("Vérifier les droits sudo")).toBe(
+      "verifier-les-droits-sudo",
+    );
+    expect(slugifyHeading("Root-Me : exploiter une wildcard sudoers")).toBe(
+      "root-me-exploiter-une-wildcard-sudoers",
+    );
+    expect(slugifyHeading("Why sudoers is vulnerable")).toBe(
+      "why-sudoers-is-vulnerable",
+    );
+  });
+
+  it("injects heading anchors and extracts TOC items", async () => {
+    const md =
+      "## Section Première\nContent 1\n\n## Section Deuxième\nContent 2\n\n## Section Troisième\nContent 3\n\n### Sous-section\nSubcontent";
+    const { html, toc } = await renderMarkdown(md, "fr");
+
+    expect(html).toContain('id="section-premiere"');
+    expect(html).toContain('id="section-deuxieme"');
+    expect(html).toContain('id="section-troisieme"');
+    expect(html).toContain('id="sous-section"');
+    expect(html).toContain('class="anchor-link');
+
+    expect(toc).toHaveLength(4);
+    expect(toc[0]).toEqual({
+      id: "section-premiere",
+      text: "Section Première",
+      depth: 2,
+    });
+    expect(toc[1]).toEqual({
+      id: "section-deuxieme",
+      text: "Section Deuxième",
+      depth: 2,
+    });
+    expect(toc[2]).toEqual({
+      id: "section-troisieme",
+      text: "Section Troisième",
+      depth: 2,
+    });
+    expect(toc[3]).toEqual({
+      id: "sous-section",
+      text: "Sous-section",
+      depth: 3,
+    });
+  });
+
+  it("handles duplicate headings cleanly with suffix counters", async () => {
+    const md = "## Example\nFirst\n\n## Example\nSecond\n\n## Example\nThird";
+    const { html, toc } = await renderMarkdown(md);
+
+    expect(html).toContain('id="example"');
+    expect(html).toContain('id="example-2"');
+    expect(html).toContain('id="example-3"');
+    expect(toc.map((t) => t.id)).toEqual(["example", "example-2", "example-3"]);
+  });
+});
+
+describe("series navigation", () => {
+  it("returns null when article has no series or is the only article in the series", async () => {
+    const singleArticle = {
+      title: "Solo",
+      slug: "solo",
+      summary: "Solo article",
+      category: "Test",
+      tags: [],
+      publishedAt: "2026-01-01",
+      draft: false,
+      locale: "fr" as const,
+    };
+    const nav = await getSeriesNavigation(singleArticle);
+    expect(nav).toBeNull();
+  });
+});
+
+describe("real published articles validation", () => {
+  it("renders the Root-Me article with bash blocks, H2 anchors, and TOC", async () => {
+    const article = await getArticleBySlug(
+      "root-me-exploiter-une-wildcard-sudoers-avec-un-path-traversal",
+      "fr",
+    );
+    expect(article).not.toBeNull();
+    if (!article) throw new Error("Article not found");
+
+    expect(article.title).toContain("Root-Me");
+    expect(article.category).toBe("CTF");
+    expect(article.html).toContain("code-panel");
+    expect(decodeURIComponent(article.html || "")).toContain("sudo -l");
+    expect(article.toc?.length).toBeGreaterThanOrEqual(3);
+    expect(article.toc?.some((t) => t.id.includes("verifier"))).toBe(true);
+  });
+
+  it("renders the Rust/LLM article with rust code blocks, comparison, and TOC", async () => {
+    const article = await getArticleBySlug(
+      "apprendre-rust-quand-les-llm-codent-deja-tres-bien",
+      "fr",
+    );
+    expect(article).not.toBeNull();
+    if (!article) throw new Error("Article not found");
+
+    expect(article.title).toContain("Apprendre Rust");
+    expect(article.html).toContain("code-panel");
+
+    // Extract raw code from data-code attribute
+    const dataCodeMatches = Array.from(
+      (article.html || "").matchAll(/data-code="([^"]+)"/g),
+    );
+    const decodedSnippets = dataCodeMatches.map((m) =>
+      decodeURIComponent(m[1]),
+    );
+    expect(
+      decodedSnippets.some((snippet) => snippet.includes('path == "."')),
+    ).toBe(true);
+
+    expect(article.toc?.length).toBeGreaterThanOrEqual(3);
   });
 });

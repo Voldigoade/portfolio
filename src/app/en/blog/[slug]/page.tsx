@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArticleLanguageSwitcher } from "@/components/portfolio/article-language-switcher";
+import { ArticleEnhancements } from "@/components/portfolio/article-enhancements";
+import { ArticleNavbarSync } from "@/components/portfolio/article-navbar-sync";
+import { ArticleShare } from "@/components/portfolio/article-share";
+import { ArticleToc } from "@/components/portfolio/article-toc";
 import { Button } from "@/components/retroui/Button";
 import {
   formatArticleDate,
@@ -35,6 +38,9 @@ export async function generateMetadata({
 
   const canonicalUrl =
     article.canonical || `${siteUrl}/en/blog/${article.slug}`;
+  const ogImageUrl = article.cover
+    ? `${siteUrl}${article.cover}`
+    : `${siteUrl}/api/og/article?slug=${article.slug}&locale=en`;
 
   return {
     title: article.title,
@@ -59,11 +65,20 @@ export async function generateMetadata({
       modifiedTime: article.updatedAt || article.publishedAt,
       authors: [siteName],
       tags: article.tags,
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description: article.summary,
+      images: [ogImageUrl],
     },
   };
 }
@@ -77,6 +92,9 @@ export default async function EnglishArticlePage({
   if (!article) {
     notFound();
   }
+
+  const canonicalUrl =
+    article.canonical || `${siteUrl}/en/blog/${article.slug}`;
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -106,6 +124,9 @@ export default async function EnglishArticlePage({
 
   return (
     <article className="space-y-6 pb-20">
+      <ArticleNavbarSync translationSlug={article.translationSlug} />
+      <ArticleEnhancements locale="en" />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -122,15 +143,17 @@ export default async function EnglishArticlePage({
           <Link href="/en/blog">← All Writing</Link>
         </Button>
         <div className="flex items-center gap-3">
-          <ArticleLanguageSwitcher
-            currentLocale="en"
-            translationSlug={article.translationSlug}
-          />
           {article.category ? (
-            <span className="border-2 border-black bg-accent px-3 py-1 font-pixel text-xs uppercase text-accent-foreground">
+            <span className="border-2 border-black bg-accent px-3 py-1 font-pixel text-xs uppercase text-accent-foreground shadow-retro-xs">
               {article.category}
             </span>
           ) : null}
+          <ArticleShare
+            title={article.title}
+            summary={article.summary}
+            canonicalUrl={canonicalUrl}
+            locale="en"
+          />
         </div>
       </div>
 
@@ -163,6 +186,10 @@ export default async function EnglishArticlePage({
         </div>
       </header>
 
+      {article.toc && article.toc.length >= 3 ? (
+        <ArticleToc items={article.toc} locale="en" />
+      ) : null}
+
       <div className="border-4 border-black bg-card p-6 shadow-retro-lg sm:p-8 md:p-10">
         <div
           className="prose prose-neutral dark:prose-invert max-w-none font-medium leading-relaxed
@@ -176,22 +203,73 @@ export default async function EnglishArticlePage({
         />
       </div>
 
+      {article.seriesNav ? (
+        <nav
+          aria-label="Series navigation"
+          className="border-4 border-black bg-card p-5 sm:p-6 shadow-retro-sm space-y-3"
+        >
+          <div className="flex items-center justify-between border-b-2 border-black pb-2">
+            <span className="font-pixel text-xs uppercase font-bold text-muted-foreground">
+              Series: {article.seriesNav.seriesName}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            {article.seriesNav.previousArticle ? (
+              <Link
+                href={article.seriesNav.previousArticle.url}
+                className="group border-2 border-black bg-muted p-3 hover:bg-primary hover:text-primary-foreground transition shadow-retro-xs"
+              >
+                <span className="block text-xs uppercase font-black text-muted-foreground group-hover:text-primary-foreground">
+                  ← Previous article
+                </span>
+                <span className="mt-1 block font-bold text-sm line-clamp-2">
+                  {article.seriesNav.previousArticle.title}
+                </span>
+              </Link>
+            ) : (
+              <div className="hidden sm:block" />
+            )}
+            {article.seriesNav.nextArticle ? (
+              <Link
+                href={article.seriesNav.nextArticle.url}
+                className="group border-2 border-black bg-muted p-3 hover:bg-primary hover:text-primary-foreground transition shadow-retro-xs sm:text-right"
+              >
+                <span className="block text-xs uppercase font-black text-muted-foreground group-hover:text-primary-foreground">
+                  Next article →
+                </span>
+                <span className="mt-1 block font-bold text-sm line-clamp-2">
+                  {article.seriesNav.nextArticle.title}
+                </span>
+              </Link>
+            ) : null}
+          </div>
+        </nav>
+      ) : null}
+
       <footer className="flex flex-wrap items-center justify-between gap-4 border-4 border-black bg-card p-4 shadow-retro-sm">
         <Button
           asChild
           variant="secondary"
           className="border-2 border-black uppercase shadow-retro-xs"
         >
-          <Link href="/en/blog">Back to All Articles</Link>
+          <Link href="/en/blog">Back to all articles</Link>
         </Button>
-        <Button
-          asChild
-          className="border-2 border-black uppercase shadow-retro-xs"
-        >
-          <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
-            View on GitHub
-          </Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <ArticleShare
+            title={article.title}
+            summary={article.summary}
+            canonicalUrl={canonicalUrl}
+            locale="en"
+          />
+          <Button
+            asChild
+            className="border-2 border-black uppercase shadow-retro-xs"
+          >
+            <Link href={githubUrl} target="_blank" rel="noreferrer noopener">
+              View on GitHub
+            </Link>
+          </Button>
+        </div>
       </footer>
     </article>
   );
