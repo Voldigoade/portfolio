@@ -1,6 +1,6 @@
 ---
 title: "Custshell "
-summary: "Custshell Custshell Custshell Custshell Custshell Custshell Custshell "
+summary: Transcription du vocal
 category: custshell
 publishedAt: 2026-10-30
 draft: false
@@ -20,19 +20,12 @@ Créer une application web complète mais minimaliste, avec une interface beauco
 L’objectif serait notamment d’améliorer :
 
 - les cours et le système d’apprentissage ;  
-
 - la progression des utilisateurs ;  
-
 - le leaderboard ;  
-
 - les profils ;  
-
 - l’administration ;  
-
 - la persistance des données ;  
-
-- l’expérience générale sur PC et mobile.  
-
+- l’expérience générale sur PC et mobile.
 
 Discord resterait connecté au projet, mais ne serait plus forcément l’endroit où tout se passe.
 
@@ -61,17 +54,11 @@ Cela permettrait de construire quelque chose de beaucoup plus propre visuellemen
 Le système pourrait gérer notamment :
 
 - plusieurs cours/modules ;  
-
 - plusieurs leçons par cours ;  
-
 - la progression au sein de chaque cours ;  
-
 - la reprise automatique ;  
-
 - le suivi des leçons terminées ;  
-
-- éventuellement les points/récompenses liés à l’apprentissage.  
-
+- éventuellement les points/récompenses liés à l’apprentissage.
 
 L’objectif est de rendre toute la partie apprentissage nettement plus propre que ce qui est actuellement possible avec l’UX de Discord.
 
@@ -86,15 +73,10 @@ Une intégration avec Discord pourrait ensuite synchroniser cette progression.
 Par exemple :
 
 - utilisateur atteignant un certain niveau → rôle Discord automatiquement attribué ;  
-
 - niveau 1 → rôle Discord niveau 1 ;  
-
 - niveau 2 → rôle Discord niveau 2 ;  
-
 - progression importante dans les cours → rôle/récompense spécifique ;  
-
-- position élevée dans le leaderboard → possibilité d’attribuer automatiquement un rôle.  
-
+- position élevée dans le leaderboard → possibilité d’attribuer automatiquement un rôle.
 
 Les seuils et les récompenses restent à définir.
 
@@ -123,15 +105,10 @@ Chaque utilisateur disposerait d’un profil.
 L’idée serait de permettre plusieurs possibilités autour de ce profil :
 
 - modifier/personnaliser son profil ;  
-
 - avoir une page publique ;  
-
 - partager son profil avec d’autres personnes ;  
-
 - afficher certaines informations sur sa progression ;  
-
-- éventuellement transformer le profil en petit portfolio.  
-
+- éventuellement transformer le profil en petit portfolio.
 
 Le contenu exact et le degré de personnalisation restent à définir.
 
@@ -152,19 +129,12 @@ Au contraire, le site et Discord pourraient communiquer.
 Discord pourrait rester utile pour la communauté et les discussions, tandis que le site gérerait mieux les parties structurées comme :
 
 - apprentissage ;  
-
 - progression ;  
-
 - leaderboard ;  
-
 - comptes ;  
-
 - profils ;  
-
 - administration ;  
-
-- contenu.  
-
+- contenu.
 
 Le bot Discord pourrait ensuite servir principalement de passerelle entre les deux systèmes, par exemple pour synchroniser automatiquement les rôles avec le niveau obtenu sur le site.
 
@@ -177,11 +147,8 @@ Pour commencer, je pense héberger la partie nécessitant un serveur sur mon VPS
 Pour le frontend, plusieurs solutions sont envisagées, par exemple :
 
 - Vercel ;  
-
 - Cloudflare Pages ;  
-
-- ou une autre solution similaire.  
-
+- ou une autre solution similaire.
 
 L’architecture exacte reste donc encore à décider.
 
