@@ -3,7 +3,7 @@ title: "Custshell "
 summary: Transcription du vocal
 category: custshell
 publishedAt: 2026-10-30
-draft: false
+draft: true
 ---
 # Contexte
 
